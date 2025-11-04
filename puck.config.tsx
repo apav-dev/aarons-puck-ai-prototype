@@ -1,11 +1,14 @@
 import type { Config } from "@measured/puck";
+import { Hero, HeroProps } from "./blocks/example/Hero";
 
 type Props = {
   HeadingBlock: { title: string };
+  Hero: HeroProps;
 };
 
 export const config: Config<Props> = {
   components: {
+    Hero: Hero,
     HeadingBlock: {
       fields: {
         title: { type: "text" },
