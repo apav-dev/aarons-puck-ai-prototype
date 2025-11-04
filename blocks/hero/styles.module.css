@@ -1,0 +1,167 @@
+.HeroSection {
+  background-color: white;
+}
+
+.HeroSection-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+@media (min-width: 1024px) {
+  .HeroSection-inner {
+    flex-direction: row;
+    align-items: center;
+    gap: 48px;
+  }
+}
+
+.HeroSection-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .HeroSection-content {
+    flex: 1;
+    max-width: 50%;
+  }
+}
+
+.HeroSection-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: #000;
+  margin: 0;
+}
+
+.HeroSection-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .HeroSection-title {
+    font-size: 48px;
+  }
+}
+
+.HeroSection-status {
+  font-size: 14px;
+  font-weight: 400;
+  color: #000;
+  margin: 0;
+}
+
+.HeroSection-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.HeroSection-ratingValue {
+  font-size: 14px;
+  font-weight: 400;
+  color: #000;
+}
+
+.HeroSection-stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.HeroSection-star {
+  width: 16px;
+  height: 16px;
+  color: #dc2626;
+  flex-shrink: 0;
+}
+
+.HeroSection-star.empty {
+  color: #e5e7eb;
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.HeroSection-reviewCount {
+  font-size: 14px;
+  font-weight: 400;
+  color: #000;
+}
+
+.HeroSection-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.HeroSection-primaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.HeroSection-primaryButton:hover {
+  background-color: #b91c1c;
+}
+
+.HeroSection-secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background-color: white;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.HeroSection-secondaryButton:hover {
+  background-color: #fef2f2;
+}
+
+.HeroSection-imageWrapper {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+}
+
+@media (min-width: 1024px) {
+  .HeroSection-imageWrapper {
+    flex: 1;
+    max-width: 50%;
+    aspect-ratio: 4 / 3;
+  }
+}
+
+.HeroSection-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+

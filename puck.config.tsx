@@ -1,5 +1,5 @@
 import type { Config } from "@measured/puck";
-import { Hero, HeroProps } from "./blocks/example/Hero";
+import { Hero, HeroProps } from "./blocks/hero";
 
 type Props = {
   HeadingBlock: { title: string };
