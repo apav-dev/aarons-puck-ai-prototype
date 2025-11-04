@@ -9,7 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@measured/puck": "^0.20.2",
+    "@measured/puck": "^0.21.0-canary.e9d5c0ea",
+    "@puckeditor/cloud-client": "^0.1.0",
+    "@puckeditor/plugin-ai": "^0.1.0",
     "classnames": "^2.3.2",
     "next": "^15.2.4",
     "react": "^19.0.0",
