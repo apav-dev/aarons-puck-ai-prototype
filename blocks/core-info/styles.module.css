@@ -1,0 +1,122 @@
+.CoreInfoSection {
+  background-color: white;
+}
+
+.CoreInfoSection-inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+}
+
+@media (min-width: 768px) {
+  .CoreInfoSection-inner {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 64px;
+  }
+}
+
+.CoreInfoSection-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.CoreInfoSection-heading {
+  font-size: 24px;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.CoreInfoSection-address {
+  font-size: 16px;
+  font-weight: 400;
+  color: #000;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.CoreInfoSection-link {
+  font-size: 16px;
+  font-weight: 400;
+  color: #dc2626;
+  text-decoration: underline;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.CoreInfoSection-link:hover {
+  color: #b91c1c;
+}
+
+.CoreInfoSection-contactItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 400;
+  color: #000;
+}
+
+.CoreInfoSection-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: #000;
+}
+
+.CoreInfoSection-hoursList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.CoreInfoSection-hoursItem {
+  display: flex;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 400;
+  color: #000;
+}
+
+.CoreInfoSection-day {
+  font-weight: 500;
+  min-width: 90px;
+}
+
+.CoreInfoSection-specialNote {
+  font-size: 16px;
+  font-weight: 400;
+  color: #000;
+  margin-top: 8px;
+}
+
+.CoreInfoSection-servicesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.CoreInfoSection-serviceItem {
+  font-size: 16px;
+  font-weight: 400;
+  color: #000;
+  padding-left: 20px;
+  position: relative;
+}
+
+.CoreInfoSection-serviceItem::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #000;
+  font-weight: 700;
+}
+

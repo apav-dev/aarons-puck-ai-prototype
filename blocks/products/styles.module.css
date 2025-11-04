@@ -1,0 +1,117 @@
+.ProductsSection {
+  background-color: #fce7f3;
+}
+
+.ProductsSection-heading {
+  font-size: 28px;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 32px 0;
+  text-align: center;
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .ProductsSection-heading {
+    font-size: 36px;
+  }
+}
+
+.ProductsSection-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .ProductsSection-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .ProductsSection-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.ProductsSection-card {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ProductsSection-imageWrapper {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.ProductsSection-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ProductsSection-cardContent {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.ProductsSection-productTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.ProductsSection-categoryTag {
+  display: inline-block;
+  padding: 4px 12px;
+  background-color: #f3f4f6;
+  color: #666;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 400;
+  align-self: flex-start;
+}
+
+.ProductsSection-description {
+  font-size: 16px;
+  font-weight: 400;
+  color: #000;
+  margin: 0;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.ProductsSection-learnMoreButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background-color: white;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+.ProductsSection-learnMoreButton:hover {
+  background-color: #fef2f2;
+}
+
