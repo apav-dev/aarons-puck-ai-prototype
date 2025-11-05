@@ -11,6 +11,117 @@ const tavilyClient = tavily({
 const PLACEHOLDER_IMAGE_URL =
   "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop";
 
+// Common image file extensions
+const IMAGE_EXTENSIONS = [
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".gif",
+  ".webp",
+  ".svg",
+  ".bmp",
+  ".ico",
+];
+
+// Domains known to host direct image URLs
+const TRUSTED_IMAGE_DOMAINS = [
+  "unsplash.com",
+  "images.unsplash.com",
+  "pexels.com",
+  "images.pexels.com",
+  "pixabay.com",
+  "cdn.",
+  "imgur.com",
+  "i.imgur.com",
+  "cloudinary.com",
+  "res.cloudinary.com",
+];
+
+// Domains that are known to NOT provide direct image URLs
+const BLOCKED_DOMAINS = [
+  "instagram.com",
+  "lookaside.instagram.com",
+  "facebook.com",
+  "fbcdn.net",
+  "twitter.com",
+  "x.com",
+  "t.co",
+  "pinterest.com",
+  "linkedin.com",
+];
+
+/**
+ * Validates if a URL is a direct image URL that can be used in an <img> tag
+ */
+function isValidImageUrl(url: string): boolean {
+  if (!url || typeof url !== "string") {
+    return false;
+  }
+
+  try {
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname.toLowerCase();
+    const pathname = urlObj.pathname.toLowerCase();
+
+    // Block known non-image domains
+    for (const blockedDomain of BLOCKED_DOMAINS) {
+      if (hostname.includes(blockedDomain)) {
+        return false;
+      }
+    }
+
+    // Check if URL ends with image extension
+    const hasImageExtension = IMAGE_EXTENSIONS.some((ext) =>
+      pathname.endsWith(ext)
+    );
+
+    if (hasImageExtension) {
+      return true;
+    }
+
+    // Check for trusted image hosting domains
+    const isTrustedDomain = TRUSTED_IMAGE_DOMAINS.some((domain) =>
+      hostname.includes(domain)
+    );
+
+    if (isTrustedDomain) {
+      return true;
+    }
+
+    // Check for common image path patterns
+    const imagePathPatterns = [
+      "/image/",
+      "/images/",
+      "/img/",
+      "/photo/",
+      "/photos/",
+      "/media/",
+      "/picture/",
+      "/pictures/",
+    ];
+
+    const hasImagePath = imagePathPatterns.some((pattern) =>
+      pathname.includes(pattern)
+    );
+
+    // Check for image-related query parameters
+    const imageQueryParams = ["image", "img", "photo", "media", "picture"];
+    const hasImageQueryParam = imageQueryParams.some((param) =>
+      urlObj.searchParams.has(param)
+    );
+
+    // Accept if it has image path or query param, but also check it's not a social media crawler URL
+    if ((hasImagePath || hasImageQueryParam) && !hostname.includes("crawler")) {
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    // Invalid URL format
+    return false;
+  }
+}
+
 // Define the input schema for getImage tool
 const getImageInputSchema = z.object({
   brand: z.string().describe("The brand or business name"),
@@ -54,11 +165,11 @@ export const getImage = tool({
       const images = response.images || [];
 
       if (images.length > 0) {
-        // Tavily returns images sorted by relevance, so take the first one
-        const bestImage = images[0];
-
-        if (bestImage?.url) {
-          return bestImage.url;
+        // Iterate through images to find the first valid direct image URL
+        for (const image of images) {
+          if (image?.url && isValidImageUrl(image.url)) {
+            return image.url;
+          }
         }
       }
 
