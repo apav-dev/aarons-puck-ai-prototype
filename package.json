@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:colors": "npx tsx test-brand-colors.ts"
+    "test:colors": "npx tsx test-brand-colors.ts",
+    "test:fonts": "npx tsx test-font-family.ts",
+    "test:fonts:tool": "npx tsx test-font-family-tool.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.28",
