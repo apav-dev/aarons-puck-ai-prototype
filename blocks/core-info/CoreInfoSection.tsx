@@ -318,6 +318,7 @@ export const CoreInfoSectionConfig: ComponentConfig<CoreInfoSectionProps> = {
       ai: {
         instructions:
           "Always use the getFontFamily tool. Use the business name as the brand, 'heading' as the fontType, and any available entity type context.",
+        stream: false,
       },
     },
     bodyFont: {
@@ -326,6 +327,7 @@ export const CoreInfoSectionConfig: ComponentConfig<CoreInfoSectionProps> = {
       ai: {
         instructions:
           "Always use the getFontFamily tool. Use the business name as the brand, 'body' as the fontType, and any available entity type context.",
+        stream: false,
       },
     },
     colors: {
@@ -340,6 +342,7 @@ export const CoreInfoSectionConfig: ComponentConfig<CoreInfoSectionProps> = {
       ai: {
         instructions:
           "Always use the getBrandColors tool. Use the business name as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
+        stream: false,
       },
     },
   },

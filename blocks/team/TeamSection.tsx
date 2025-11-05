@@ -226,6 +226,7 @@ export const TeamSectionConfig: ComponentConfig<TeamSectionProps> = {
           ai: {
             instructions:
               "Always use an image URL provided by the getImage tool. Use the business name as the brand, 'TeamSection' as the component, and the team member's name and role as additional context. Use professional headshot images. If not provided, a placeholder icon will be displayed.",
+            stream: false,
           },
         },
         name: {
@@ -296,6 +297,7 @@ export const TeamSectionConfig: ComponentConfig<TeamSectionProps> = {
       ai: {
         instructions:
           "Always use the getFontFamily tool. Use the business name as the brand, 'heading' as the fontType, and any available entity type context.",
+        stream: false,
       },
     },
     bodyFont: {
@@ -304,6 +306,7 @@ export const TeamSectionConfig: ComponentConfig<TeamSectionProps> = {
       ai: {
         instructions:
           "Always use the getFontFamily tool. Use the business name as the brand, 'body' as the fontType, and any available entity type context.",
+        stream: false,
       },
     },
     colors: {
@@ -318,6 +321,7 @@ export const TeamSectionConfig: ComponentConfig<TeamSectionProps> = {
       ai: {
         instructions:
           "Always use the getBrandColors tool. Use the business name as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios. Default to white background (#ffffff) and black text (#000000) if not specified.",
+        stream: false,
       },
     },
   },

@@ -293,6 +293,7 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
       ai: {
         instructions:
           "Always use an image URL provided by the getImage tool. Use the business name from the businessName field as the brand, 'Hero' as the component, and the entity type if available.",
+        stream: false,
       },
     },
     padding: {
@@ -305,6 +306,7 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
       ai: {
         instructions:
           "Always use the getFontFamily tool. Use the business name from the businessName field as the brand, 'heading' as the fontType, and any available entity type context.",
+        stream: false,
       },
     },
     bodyFont: {
@@ -313,6 +315,7 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
       ai: {
         instructions:
           "Always use the getFontFamily tool. Use the business name from the businessName field as the brand, 'body' as the fontType, and any available entity type context.",
+        stream: false,
       },
     },
     colors: {
@@ -327,6 +330,7 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
       ai: {
         instructions:
           "Always use the getBrandColors tool. Use the business name from the businessName field as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
+        stream: false,
       },
     },
   },

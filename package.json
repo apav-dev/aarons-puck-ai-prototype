@@ -9,10 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ai-sdk/google": "^2.0.28",
+    "@ai-sdk/openai": "^2.0.62",
+    "@ai-sdk/react": "^2.0.87",
     "@measured/puck": "^0.21.0-canary.e9d5c0ea",
     "@puckeditor/cloud-client": "^0.1.0",
     "@puckeditor/plugin-ai": "^0.1.0",
     "@tavily/core": "^0.5.12",
+    "ai": "^5.0.87",
     "classnames": "^2.3.2",
     "lucide-react": "^0.552.0",
     "next": "^15.2.4",

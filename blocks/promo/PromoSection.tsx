@@ -238,6 +238,7 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
       ai: {
         instructions:
           "Always use an image URL provided by the getImage tool. Use the business name as the brand, 'PromoSection' as the component, and any relevant context from the title or description.",
+        stream: false,
       },
     },
     padding: {
@@ -250,6 +251,7 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
       ai: {
         instructions:
           "Always use the getFontFamily tool. Use the business name as the brand, 'heading' as the fontType, and any available entity type context.",
+        stream: false,
       },
     },
     bodyFont: {
@@ -258,6 +260,7 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
       ai: {
         instructions:
           "Always use the getFontFamily tool. Use the business name as the brand, 'body' as the fontType, and any available entity type context.",
+        stream: false,
       },
     },
     colors: {
@@ -272,6 +275,7 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
       ai: {
         instructions:
           "Always use the getBrandColors tool. Use the business name as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
+        stream: false,
       },
     },
   },

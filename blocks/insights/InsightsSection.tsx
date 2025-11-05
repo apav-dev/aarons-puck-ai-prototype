@@ -232,6 +232,7 @@ export const InsightsSectionConfig: ComponentConfig<InsightsSectionProps> = {
           ai: {
             instructions:
               "Always use an image URL provided by the getImage tool. Use the business name as the brand, 'InsightsSection' as the component, and the article title or category as additional context. Images should be relevant to the article topic and location.",
+            stream: false,
           },
         },
         link: {
@@ -272,6 +273,7 @@ export const InsightsSectionConfig: ComponentConfig<InsightsSectionProps> = {
       ai: {
         instructions:
           "Always use the getFontFamily tool. Use the business name as the brand, 'heading' as the fontType, and any available entity type context.",
+        stream: false,
       },
     },
     bodyFont: {
@@ -280,6 +282,7 @@ export const InsightsSectionConfig: ComponentConfig<InsightsSectionProps> = {
       ai: {
         instructions:
           "Always use the getFontFamily tool. Use the business name as the brand, 'body' as the fontType, and any available entity type context.",
+        stream: false,
       },
     },
     colors: {
@@ -294,6 +297,7 @@ export const InsightsSectionConfig: ComponentConfig<InsightsSectionProps> = {
       ai: {
         instructions:
           "Always use the getBrandColors tool. Use the business name as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
+        stream: false,
       },
     },
   },

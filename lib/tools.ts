@@ -1,6 +1,8 @@
 import { tool } from "@puckeditor/cloud-client";
 import { tavily } from "@tavily/core";
 import z from "zod";
+import { generateText } from "ai";
+import { google } from "@ai-sdk/google";
 import { getGoogleFonts } from "./google-fonts";
 
 // Initialize Tavily client
@@ -251,48 +253,27 @@ Consider:
 
 Respond with ONLY the font name, nothing else.`;
 
-      // Make LLM call using OpenAI API
-      const openaiApiKey = process.env.OPENAI_API_KEY;
-      if (!openaiApiKey) {
-        console.warn("OPENAI_API_KEY not set, using default font");
+      // Make LLM call using AI SDK with Gemini
+      const googleApiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+      if (!googleApiKey) {
+        console.warn(
+          "GOOGLE_GENERATIVE_AI_API_KEY not set, using default font"
+        );
         const defaultFont = fontType === "heading" ? "Montserrat" : "Open Sans";
         fontFamilyCache.set(cacheKey, defaultFont);
         return defaultFont;
       }
 
-      const response = await fetch(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${openaiApiKey}`,
-          },
-          body: JSON.stringify({
-            model: "gpt-3.5-turbo",
-            messages: [
-              {
-                role: "system",
-                content:
-                  "You are a typography expert. Respond with only the font name from the provided list, nothing else.",
-              },
-              {
-                role: "user",
-                content: prompt,
-              },
-            ],
-            max_tokens: 50,
-            temperature: 0.7,
-          }),
-        }
-      );
+      const { text } = await generateText({
+        model: google("gemini-2.5-flash"),
+        system:
+          "You are a typography expert. Respond with only the font name from the provided list, nothing else.",
+        prompt: prompt,
+        maxOutputTokens: 50,
+        temperature: 0.7,
+      });
 
-      if (!response.ok) {
-        throw new Error(`OpenAI API returned ${response.status}`);
-      }
-
-      const data = await response.json();
-      const selectedFont = data.choices?.[0]?.message?.content?.trim();
+      const selectedFont = text.trim();
 
       if (!selectedFont) {
         throw new Error("No font returned from LLM");
@@ -378,10 +359,12 @@ Requirements:
 Respond with ONLY valid JSON in this exact format:
 {"primary": "#hexcolor", "secondary": "#hexcolor", "background": "#hexcolor", "text": "#hexcolor"}`;
 
-      // Make LLM call using OpenAI API
-      const openaiApiKey = process.env.OPENAI_API_KEY;
-      if (!openaiApiKey) {
-        console.warn("OPENAI_API_KEY not set, using default colors");
+      // Make LLM call using AI SDK with Gemini
+      const googleApiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+      if (!googleApiKey) {
+        console.warn(
+          "GOOGLE_GENERATIVE_AI_API_KEY not set, using default colors"
+        );
         const defaultColors = {
           primary: "#dc2626",
           secondary: "#7c3aed",
@@ -392,39 +375,16 @@ Respond with ONLY valid JSON in this exact format:
         return defaultColors;
       }
 
-      const response = await fetch(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${openaiApiKey}`,
-          },
-          body: JSON.stringify({
-            model: "gpt-3.5-turbo",
-            messages: [
-              {
-                role: "system",
-                content:
-                  "You are a color expert. Respond with ONLY valid JSON containing the 4 color fields: primary, secondary, background, text. All values must be valid hex colors starting with #.",
-              },
-              {
-                role: "user",
-                content: prompt,
-              },
-            ],
-            max_tokens: 200,
-            temperature: 0.7,
-          }),
-        }
-      );
+      const { text } = await generateText({
+        model: google("gemini-2.5-flash"),
+        system:
+          "You are a color expert. Respond with ONLY valid JSON containing the 4 color fields: primary, secondary, background, text. All values must be valid hex colors starting with #.",
+        prompt: prompt,
+        maxOutputTokens: 200,
+        temperature: 0.7,
+      });
 
-      if (!response.ok) {
-        throw new Error(`OpenAI API returned ${response.status}`);
-      }
-
-      const data = await response.json();
-      const colorJson = data.choices?.[0]?.message?.content?.trim();
+      const colorJson = text.trim();
 
       if (!colorJson) {
         throw new Error("No colors returned from LLM");

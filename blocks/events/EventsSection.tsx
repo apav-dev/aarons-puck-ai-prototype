@@ -187,6 +187,7 @@ export const EventsSectionConfig: ComponentConfig<EventsSectionProps> = {
           ai: {
             instructions:
               "Always use an image URL provided by the getImage tool. Use the business name as the brand, 'EventsSection' as the component, and the event title as additional context. Images should be relevant to the event type and location.",
+            stream: false,
           },
         },
         eventTitle: {
@@ -256,6 +257,7 @@ export const EventsSectionConfig: ComponentConfig<EventsSectionProps> = {
       ai: {
         instructions:
           "Always use the getFontFamily tool. Use the business name as the brand, 'heading' as the fontType, and any available entity type context.",
+        stream: false,
       },
     },
     bodyFont: {
@@ -264,6 +266,7 @@ export const EventsSectionConfig: ComponentConfig<EventsSectionProps> = {
       ai: {
         instructions:
           "Always use the getFontFamily tool. Use the business name as the brand, 'body' as the fontType, and any available entity type context.",
+        stream: false,
       },
     },
     colors: {
@@ -278,6 +281,7 @@ export const EventsSectionConfig: ComponentConfig<EventsSectionProps> = {
       ai: {
         instructions:
           "Always use the getBrandColors tool. Use the business name as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
+        stream: false,
       },
     },
   },
@@ -328,4 +332,3 @@ export const EventsSectionConfig: ComponentConfig<EventsSectionProps> = {
 };
 
 export default EventsSection;
-
