@@ -5,7 +5,6 @@ import { PromoSection, PromoSectionProps } from "./blocks/promo";
 import { ProductsSection, ProductsSectionProps } from "./blocks/products";
 
 type Props = {
-  HeadingBlock: { title: string };
   Hero: HeroProps;
   CoreInfoSection: CoreInfoSectionProps;
   PromoSection: PromoSectionProps;
@@ -18,19 +17,6 @@ export const config: Config<Props> = {
     CoreInfoSection: CoreInfoSection,
     PromoSection: PromoSection,
     ProductsSection: ProductsSection,
-    HeadingBlock: {
-      fields: {
-        title: { type: "text" },
-      },
-      defaultProps: {
-        title: "Heading",
-      },
-      render: ({ title }) => (
-        <div style={{ padding: 64 }}>
-          <h1>{title}</h1>
-        </div>
-      ),
-    },
   },
 };
 

@@ -53,7 +53,7 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
           <div className={getClassName("label")}>{businessNameLabel}</div>
           <h1 className={getClassName("title")}>{businessName}</h1>
           <div className={getClassName("status")}>{statusText}</div>
-          
+
           <div className={getClassName("rating")}>
             <span className={getClassName("ratingValue")}>{rating}</span>
             <div className={getClassName("stars")}>
@@ -74,9 +74,19 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
                   fill="currentColor"
                 >
                   <defs>
-                    <linearGradient id={`half-${rating}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                    <linearGradient
+                      id={`half-${rating}`}
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="0%"
+                    >
                       <stop offset="50%" stopColor="currentColor" />
-                      <stop offset="50%" stopColor="transparent" stopOpacity="0" />
+                      <stop
+                        offset="50%"
+                        stopColor="transparent"
+                        stopOpacity="0"
+                      />
                     </linearGradient>
                   </defs>
                   <path
@@ -141,6 +151,10 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
     businessName: {
       type: "text",
       label: "Business Name",
+      ai: {
+        instructions:
+          "The name of the business. This is typically the name of the business.",
+      },
     },
     statusText: {
       type: "text",
@@ -183,6 +197,10 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
       label: "Padding",
     },
   },
+  ai: {
+    instructions:
+      "Create a hero section for a brick-and-mortar store landing page. Always place this section at the top of the page. The image should be a stock image of a storefront.",
+  },
   defaultProps: {
     businessNameLabel: "Business Name",
     businessName: "Geomodifier",
@@ -197,11 +215,11 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
       label: "Call to Action",
       href: "#",
     },
-    imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop",
+    imageUrl:
+      "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop",
     padding: "64px",
   },
   render: HeroSection,
 };
 
 export default HeroSection;
-
