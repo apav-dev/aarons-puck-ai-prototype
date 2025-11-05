@@ -13,7 +13,7 @@ type Props = {
   CoreInfoSection: CoreInfoSectionProps;
   PromoSection: PromoSectionProps;
   ProductsSection: ProductsSectionProps;
-  FAQsSection: FAQsSectionProps;
+  // FAQsSection: FAQsSectionProps;
   InsightsSection: InsightsSectionProps;
   EventsSection: EventsSectionProps;
   TeamSection: TeamSectionProps;
@@ -25,7 +25,7 @@ export const config: Config<Props> = {
     CoreInfoSection: CoreInfoSection,
     PromoSection: PromoSection,
     ProductsSection: ProductsSection,
-    FAQsSection: FAQsSection,
+    // FAQsSection: FAQsSection,
     InsightsSection: InsightsSection,
     EventsSection: EventsSection,
     TeamSection: TeamSection,

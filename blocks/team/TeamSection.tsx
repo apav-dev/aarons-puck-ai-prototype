@@ -225,7 +225,7 @@ export const TeamSectionConfig: ComponentConfig<TeamSectionProps> = {
           label: "Profile Image URL",
           ai: {
             instructions:
-              "Optional profile photo URL for the team member. Use professional headshot images. If not provided, a placeholder icon will be displayed.",
+              "Always use an image URL provided by the getImage tool. Use the business name as the brand, 'TeamSection' as the component, and the team member's name and role as additional context. Use professional headshot images. If not provided, a placeholder icon will be displayed.",
           },
         },
         name: {
@@ -383,4 +383,3 @@ export const TeamSectionConfig: ComponentConfig<TeamSectionProps> = {
 };
 
 export default TeamSection;
-
