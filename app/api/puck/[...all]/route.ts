@@ -1,7 +1,7 @@
 // app/api/puck/[...all]/route.ts
 
 import { puckHandler } from "@puckeditor/cloud-client";
-import { getImage } from "../../../../lib/tools";
+import { getImage, getFontFamily } from "../../../../lib/tools";
 
 export async function POST(request: Request) {
   return puckHandler(request, {
@@ -28,6 +28,7 @@ export async function POST(request: Request) {
 </thinking-instructions>`,
       tools: {
         getImage,
+        getFontFamily,
       },
     },
   });

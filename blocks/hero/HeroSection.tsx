@@ -1,10 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
-import React from "react";
+import React, { useEffect } from "react";
 import { ComponentConfig } from "@measured/puck";
 import { Section } from "../../components/Section/index";
 import { PuckComponent } from "@measured/puck";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
+import { getGoogleFontsUrl } from "../../lib/google-fonts";
+import classnames from "classnames";
 
 const getClassName = getClassNameFactory("HeroSection", styles);
 
@@ -24,6 +26,8 @@ export type HeroSectionProps = {
   };
   imageUrl: string;
   padding: string;
+  headingFont?: string;
+  bodyFont?: string;
 };
 
 export const HeroSection: PuckComponent<HeroSectionProps> = ({
@@ -36,12 +40,46 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
   secondaryButton,
   imageUrl,
   padding,
+  headingFont,
+  bodyFont,
   puck,
 }) => {
   // Generate star rating display
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 >= 0.5;
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+  // Prepare font styles
+  const headingStyle = headingFont
+    ? { fontFamily: `"${headingFont}", sans-serif` }
+    : undefined;
+  const bodyStyle = bodyFont
+    ? { fontFamily: `"${bodyFont}", sans-serif` }
+    : undefined;
+
+  // Load Google Fonts into document head
+  useEffect(() => {
+    if (headingFont) {
+      const linkId = `font-heading-${headingFont}`;
+      if (!document.getElementById(linkId)) {
+        const link = document.createElement("link");
+        link.id = linkId;
+        link.rel = "stylesheet";
+        link.href = getGoogleFontsUrl(headingFont);
+        document.head.appendChild(link);
+      }
+    }
+    if (bodyFont && bodyFont !== headingFont) {
+      const linkId = `font-body-${bodyFont}`;
+      if (!document.getElementById(linkId)) {
+        const link = document.createElement("link");
+        link.id = linkId;
+        link.rel = "stylesheet";
+        link.href = getGoogleFontsUrl(bodyFont);
+        document.head.appendChild(link);
+      }
+    }
+  }, [headingFont, bodyFont]);
 
   return (
     <Section
@@ -50,9 +88,15 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
     >
       <div className={getClassName("inner")}>
         <div className={getClassName("content")}>
-          <div className={getClassName("label")}>{businessNameLabel}</div>
-          <h1 className={getClassName("title")}>{businessName}</h1>
-          <div className={getClassName("status")}>{statusText}</div>
+          <div className={getClassName("label")} style={bodyStyle}>
+            {businessNameLabel}
+          </div>
+          <h1 className={getClassName("title")} style={headingStyle}>
+            {businessName}
+          </h1>
+          <div className={getClassName("status")} style={bodyStyle}>
+            {statusText}
+          </div>
 
           <div className={getClassName("rating")}>
             <span className={getClassName("ratingValue")}>{rating}</span>
@@ -98,7 +142,7 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
               {Array.from({ length: emptyStars }).map((_, i) => (
                 <svg
                   key={`empty-${i}`}
-                  className={getClassName("star", "empty")}
+                  className={classnames(getClassName("star"), "empty")}
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -107,7 +151,7 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
                 </svg>
               ))}
             </div>
-            <span className={getClassName("reviewCount")}>
+            <span className={getClassName("reviewCount")} style={bodyStyle}>
               ({reviewCount} reviews)
             </span>
           </div>
@@ -116,6 +160,7 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
             <a
               href={primaryButton.href}
               className={getClassName("primaryButton")}
+              style={bodyStyle}
               tabIndex={puck.isEditing ? -1 : undefined}
             >
               {primaryButton.label}
@@ -123,6 +168,7 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
             <a
               href={secondaryButton.href}
               className={getClassName("secondaryButton")}
+              style={bodyStyle}
               tabIndex={puck.isEditing ? -1 : undefined}
             >
               {secondaryButton.label}
@@ -199,6 +245,22 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
     padding: {
       type: "text",
       label: "Padding",
+    },
+    headingFont: {
+      type: "text",
+      label: "Heading Font",
+      ai: {
+        instructions:
+          "Always use the getFontFamily tool. Use the business name from the businessName field as the brand, 'heading' as the fontType, and any available entity type context.",
+      },
+    },
+    bodyFont: {
+      type: "text",
+      label: "Body Font",
+      ai: {
+        instructions:
+          "Always use the getFontFamily tool. Use the business name from the businessName field as the brand, 'body' as the fontType, and any available entity type context.",
+      },
     },
   },
   ai: {

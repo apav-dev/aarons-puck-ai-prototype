@@ -1,10 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
-import React from "react";
+import React, { useEffect } from "react";
 import { ComponentConfig } from "@measured/puck";
 import { Section } from "../../components/Section/index";
 import { PuckComponent } from "@measured/puck";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
+import { getGoogleFontsUrl } from "../../lib/google-fonts";
 
 const getClassName = getClassNameFactory("CoreInfoSection", styles);
 
@@ -28,6 +29,8 @@ export type CoreInfoSectionProps = {
   };
   services: Array<string | { value: string }>;
   padding: string;
+  headingFont?: string;
+  bodyFont?: string;
 };
 
 export const CoreInfoSection: PuckComponent<CoreInfoSectionProps> = ({
@@ -35,8 +38,42 @@ export const CoreInfoSection: PuckComponent<CoreInfoSectionProps> = ({
   hours,
   services,
   padding,
+  headingFont,
+  bodyFont,
   puck,
 }) => {
+  // Prepare font styles
+  const headingStyle = headingFont
+    ? { fontFamily: `"${headingFont}", sans-serif` }
+    : undefined;
+  const bodyStyle = bodyFont
+    ? { fontFamily: `"${bodyFont}", sans-serif` }
+    : undefined;
+
+  // Load Google Fonts into document head
+  useEffect(() => {
+    if (headingFont) {
+      const linkId = `font-heading-${headingFont}`;
+      if (!document.getElementById(linkId)) {
+        const link = document.createElement("link");
+        link.id = linkId;
+        link.rel = "stylesheet";
+        link.href = getGoogleFontsUrl(headingFont);
+        document.head.appendChild(link);
+      }
+    }
+    if (bodyFont && bodyFont !== headingFont) {
+      const linkId = `font-body-${bodyFont}`;
+      if (!document.getElementById(linkId)) {
+        const link = document.createElement("link");
+        link.id = linkId;
+        link.rel = "stylesheet";
+        link.href = getGoogleFontsUrl(bodyFont);
+        document.head.appendChild(link);
+      }
+    }
+  }, [headingFont, bodyFont]);
+
   return (
     <Section
       className={getClassName()}
@@ -44,16 +81,21 @@ export const CoreInfoSection: PuckComponent<CoreInfoSectionProps> = ({
     >
       <div className={getClassName("inner")}>
         <div className={getClassName("column")}>
-          <h2 className={getClassName("heading")}>Information</h2>
-          <div className={getClassName("address")}>{information.address}</div>
+          <h2 className={getClassName("heading")} style={headingStyle}>
+            Information
+          </h2>
+          <div className={getClassName("address")} style={bodyStyle}>
+            {information.address}
+          </div>
           <a
             href={information.directionsLink}
             className={getClassName("link")}
+            style={bodyStyle}
             tabIndex={puck.isEditing ? -1 : undefined}
           >
             Get Directions &gt;
           </a>
-          <div className={getClassName("contactItem")}>
+          <div className={getClassName("contactItem")} style={bodyStyle}>
             <svg
               className={getClassName("icon")}
               viewBox="0 0 24 24"
@@ -66,7 +108,7 @@ export const CoreInfoSection: PuckComponent<CoreInfoSectionProps> = ({
             <span>Phone {information.phone}</span>
           </div>
           {information.tollFree && (
-            <div className={getClassName("contactItem")}>
+            <div className={getClassName("contactItem")} style={bodyStyle}>
               <svg
                 className={getClassName("icon")}
                 viewBox="0 0 24 24"
@@ -79,7 +121,7 @@ export const CoreInfoSection: PuckComponent<CoreInfoSectionProps> = ({
               <span>Toll-free {information.tollFree}</span>
             </div>
           )}
-          <div className={getClassName("contactItem")}>
+          <div className={getClassName("contactItem")} style={bodyStyle}>
             <svg
               className={getClassName("icon")}
               viewBox="0 0 24 24"
@@ -93,6 +135,7 @@ export const CoreInfoSection: PuckComponent<CoreInfoSectionProps> = ({
             <a
               href={`mailto:${information.email}`}
               className={getClassName("link")}
+              style={bodyStyle}
               tabIndex={puck.isEditing ? -1 : undefined}
             >
               {information.email}
@@ -101,47 +144,53 @@ export const CoreInfoSection: PuckComponent<CoreInfoSectionProps> = ({
         </div>
 
         <div className={getClassName("column")}>
-          <h2 className={getClassName("heading")}>Hours</h2>
+          <h2 className={getClassName("heading")} style={headingStyle}>
+            Hours
+          </h2>
           <div className={getClassName("hoursList")}>
-            <div className={getClassName("hoursItem")}>
+            <div className={getClassName("hoursItem")} style={bodyStyle}>
               <span className={getClassName("day")}>Monday:</span>
               <span>{hours.monday}</span>
             </div>
-            <div className={getClassName("hoursItem")}>
+            <div className={getClassName("hoursItem")} style={bodyStyle}>
               <span className={getClassName("day")}>Tuesday:</span>
               <span>{hours.tuesday}</span>
             </div>
-            <div className={getClassName("hoursItem")}>
+            <div className={getClassName("hoursItem")} style={bodyStyle}>
               <span className={getClassName("day")}>Wednesday:</span>
               <span>{hours.wednesday}</span>
             </div>
-            <div className={getClassName("hoursItem")}>
+            <div className={getClassName("hoursItem")} style={bodyStyle}>
               <span className={getClassName("day")}>Thursday:</span>
               <span>{hours.thursday}</span>
             </div>
-            <div className={getClassName("hoursItem")}>
+            <div className={getClassName("hoursItem")} style={bodyStyle}>
               <span className={getClassName("day")}>Friday:</span>
               <span>{hours.friday}</span>
             </div>
-            <div className={getClassName("hoursItem")}>
+            <div className={getClassName("hoursItem")} style={bodyStyle}>
               <span className={getClassName("day")}>Saturday:</span>
               <span>{hours.saturday}</span>
             </div>
-            <div className={getClassName("hoursItem")}>
+            <div className={getClassName("hoursItem")} style={bodyStyle}>
               <span className={getClassName("day")}>Sunday:</span>
               <span>{hours.sunday}</span>
             </div>
           </div>
           {hours.specialNote && (
-            <div className={getClassName("specialNote")}>{hours.specialNote}</div>
+            <div className={getClassName("specialNote")} style={bodyStyle}>
+              {hours.specialNote}
+            </div>
           )}
         </div>
 
         <div className={getClassName("column")}>
-          <h2 className={getClassName("heading")}>Services</h2>
+          <h2 className={getClassName("heading")} style={headingStyle}>
+            Services
+          </h2>
           <ul className={getClassName("servicesList")}>
             {services.map((service, index) => (
-              <li key={index} className={getClassName("serviceItem")}>
+              <li key={index} className={getClassName("serviceItem")} style={bodyStyle}>
                 {typeof service === "string" ? service : service.value || ""}
               </li>
             ))}
@@ -193,6 +242,22 @@ export const CoreInfoSectionConfig: ComponentConfig<CoreInfoSectionProps> = {
     padding: {
       type: "text",
       label: "Padding",
+    },
+    headingFont: {
+      type: "text",
+      label: "Heading Font",
+      ai: {
+        instructions:
+          "Always use the getFontFamily tool. Use the business name as the brand, 'heading' as the fontType, and any available entity type context.",
+      },
+    },
+    bodyFont: {
+      type: "text",
+      label: "Body Font",
+      ai: {
+        instructions:
+          "Always use the getFontFamily tool. Use the business name as the brand, 'body' as the fontType, and any available entity type context.",
+      },
     },
   },
   defaultProps: {
