@@ -6,6 +6,7 @@ import { PuckComponent } from "@measured/puck";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
 import { getGoogleFontsUrl } from "../../lib/google-fonts";
+import { isLightColor } from "../../lib/color-utils";
 
 const getClassName = getClassNameFactory("PromoSection", styles);
 
@@ -22,6 +23,12 @@ export type PromoSectionProps = {
   padding: string;
   headingFont?: string;
   bodyFont?: string;
+  colors?: {
+    primary: string;
+    secondary: string;
+    background: string;
+    text: string;
+  };
 };
 
 export const PromoSection: PuckComponent<PromoSectionProps> = ({
@@ -34,6 +41,7 @@ export const PromoSection: PuckComponent<PromoSectionProps> = ({
   padding,
   headingFont,
   bodyFont,
+  colors,
   puck,
 }) => {
   // Prepare font styles
@@ -42,6 +50,23 @@ export const PromoSection: PuckComponent<PromoSectionProps> = ({
     : undefined;
   const bodyStyle = bodyFont
     ? { fontFamily: `"${bodyFont}", sans-serif` }
+    : undefined;
+
+  // Prepare color styles
+  const primaryTextColor = colors?.primary
+    ? isLightColor(colors.primary)
+      ? colors.text
+      : "#ffffff"
+    : undefined;
+  const sectionStyle = colors
+    ? { backgroundColor: colors.background }
+    : undefined;
+  const textColorStyle = colors ? { color: colors.text } : undefined;
+  const primaryButtonStyle = colors
+    ? {
+        backgroundColor: colors.primary,
+        color: primaryTextColor,
+      }
     : undefined;
 
   // Load Google Fonts into document head
@@ -71,7 +96,11 @@ export const PromoSection: PuckComponent<PromoSectionProps> = ({
   return (
     <Section
       className={getClassName()}
-      style={{ paddingTop: padding, paddingBottom: padding }}
+      style={{
+        paddingTop: padding,
+        paddingBottom: padding,
+        ...sectionStyle,
+      }}
     >
       <div className={getClassName("inner")}>
         <div className={getClassName("imageWrapper")}>
@@ -79,17 +108,23 @@ export const PromoSection: PuckComponent<PromoSectionProps> = ({
         </div>
 
         <div className={getClassName("content")}>
-          <h2 className={getClassName("title")} style={headingStyle}>
+          <h2
+            className={getClassName("title")}
+            style={{ ...headingStyle, ...textColorStyle }}
+          >
             {title}
           </h2>
-          <p className={getClassName("description")} style={bodyStyle}>
+          <p
+            className={getClassName("description")}
+            style={{ ...bodyStyle, ...textColorStyle }}
+          >
             {description}
           </p>
 
           <a
             href={ctaButton.href}
             className={getClassName("ctaButton")}
-            style={bodyStyle}
+            style={primaryButtonStyle}
             tabIndex={puck.isEditing ? -1 : undefined}
           >
             {ctaButton.label}
@@ -223,6 +258,20 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
       ai: {
         instructions:
           "Always use the getFontFamily tool. Use the business name as the brand, 'body' as the fontType, and any available entity type context.",
+      },
+    },
+    colors: {
+      type: "object",
+      label: "Brand Colors",
+      objectFields: {
+        primary: { type: "text", label: "Primary Color" },
+        secondary: { type: "text", label: "Secondary Color" },
+        background: { type: "text", label: "Background Color" },
+        text: { type: "text", label: "Text Color" },
+      },
+      ai: {
+        instructions:
+          "Always use the getBrandColors tool. Use the business name as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
       },
     },
   },

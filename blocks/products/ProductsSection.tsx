@@ -6,6 +6,7 @@ import { PuckComponent } from "@measured/puck";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
 import { getGoogleFontsUrl } from "../../lib/google-fonts";
+import { isLightColor } from "../../lib/color-utils";
 
 const getClassName = getClassNameFactory("ProductsSection", styles);
 
@@ -23,6 +24,12 @@ export type ProductsSectionProps = {
   padding: string;
   headingFont?: string;
   bodyFont?: string;
+  colors?: {
+    primary: string;
+    secondary: string;
+    background: string;
+    text: string;
+  };
 };
 
 export const ProductsSection: PuckComponent<ProductsSectionProps> = ({
@@ -31,6 +38,7 @@ export const ProductsSection: PuckComponent<ProductsSectionProps> = ({
   padding,
   headingFont,
   bodyFont,
+  colors,
   puck,
 }) => {
   // Prepare font styles
@@ -39,6 +47,21 @@ export const ProductsSection: PuckComponent<ProductsSectionProps> = ({
     : undefined;
   const bodyStyle = bodyFont
     ? { fontFamily: `"${bodyFont}", sans-serif` }
+    : undefined;
+
+  // Prepare color styles
+  const sectionStyle = colors
+    ? { backgroundColor: colors.background }
+    : undefined;
+  const textColorStyle = colors ? { color: colors.text } : undefined;
+  const cardBackgroundStyle = colors
+    ? { backgroundColor: colors.background }
+    : undefined;
+  const linkButtonStyle = colors
+    ? {
+        color: colors.secondary,
+        borderColor: colors.secondary,
+      }
     : undefined;
 
   // Load Google Fonts into document head
@@ -68,14 +91,25 @@ export const ProductsSection: PuckComponent<ProductsSectionProps> = ({
   return (
     <Section
       className={getClassName()}
-      style={{ paddingTop: padding, paddingBottom: padding }}
+      style={{
+        paddingTop: padding,
+        paddingBottom: padding,
+        ...sectionStyle,
+      }}
     >
-      <h2 className={getClassName("heading")} style={headingStyle}>
+      <h2
+        className={getClassName("heading")}
+        style={{ ...headingStyle, ...textColorStyle }}
+      >
         {heading}
       </h2>
       <div className={getClassName("grid")}>
         {products.map((product, index) => (
-          <div key={index} className={getClassName("card")}>
+          <div
+            key={index}
+            className={getClassName("card")}
+            style={cardBackgroundStyle}
+          >
             <div className={getClassName("imageWrapper")}>
               <img
                 src={product.imageUrl}
@@ -84,19 +118,28 @@ export const ProductsSection: PuckComponent<ProductsSectionProps> = ({
               />
             </div>
             <div className={getClassName("cardContent")}>
-              <h3 className={getClassName("productTitle")} style={headingStyle}>
+              <h3
+                className={getClassName("productTitle")}
+                style={{ ...headingStyle, ...textColorStyle }}
+              >
                 {product.title}
               </h3>
-              <div className={getClassName("categoryTag")} style={bodyStyle}>
+              <div
+                className={getClassName("categoryTag")}
+                style={{ ...bodyStyle, ...textColorStyle }}
+              >
                 {product.category}
               </div>
-              <p className={getClassName("description")} style={bodyStyle}>
+              <p
+                className={getClassName("description")}
+                style={{ ...bodyStyle, ...textColorStyle }}
+              >
                 {product.description}
               </p>
               <a
                 href={product.link}
                 className={getClassName("learnMoreButton")}
-                style={bodyStyle}
+                style={linkButtonStyle}
                 tabIndex={puck.isEditing ? -1 : undefined}
               >
                 Learn More
@@ -163,6 +206,20 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
       ai: {
         instructions:
           "Always use the getFontFamily tool. Use the business name as the brand, 'body' as the fontType, and any available entity type context.",
+      },
+    },
+    colors: {
+      type: "object",
+      label: "Brand Colors",
+      objectFields: {
+        primary: { type: "text", label: "Primary Color" },
+        secondary: { type: "text", label: "Secondary Color" },
+        background: { type: "text", label: "Background Color" },
+        text: { type: "text", label: "Text Color" },
+      },
+      ai: {
+        instructions:
+          "Always use the getBrandColors tool. Use the business name as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
       },
     },
   },

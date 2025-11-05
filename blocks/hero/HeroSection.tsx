@@ -6,6 +6,7 @@ import { PuckComponent } from "@measured/puck";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
 import { getGoogleFontsUrl } from "../../lib/google-fonts";
+import { isLightColor } from "../../lib/color-utils";
 import classnames from "classnames";
 
 const getClassName = getClassNameFactory("HeroSection", styles);
@@ -28,6 +29,12 @@ export type HeroSectionProps = {
   padding: string;
   headingFont?: string;
   bodyFont?: string;
+  colors?: {
+    primary: string;
+    secondary: string;
+    background: string;
+    text: string;
+  };
 };
 
 export const HeroSection: PuckComponent<HeroSectionProps> = ({
@@ -42,6 +49,7 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
   padding,
   headingFont,
   bodyFont,
+  colors,
   puck,
 }) => {
   // Generate star rating display
@@ -55,6 +63,30 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
     : undefined;
   const bodyStyle = bodyFont
     ? { fontFamily: `"${bodyFont}", sans-serif` }
+    : undefined;
+
+  // Prepare color styles
+  const primaryTextColor = colors?.primary
+    ? isLightColor(colors.primary)
+      ? colors.text
+      : "#ffffff"
+    : undefined;
+  const sectionStyle = colors
+    ? { backgroundColor: colors.background }
+    : undefined;
+  const textColorStyle = colors ? { color: colors.text } : undefined;
+  const primaryButtonStyle = colors
+    ? {
+        backgroundColor: colors.primary,
+        color: primaryTextColor,
+      }
+    : undefined;
+  const secondaryButtonStyle = colors
+    ? {
+        backgroundColor: "transparent",
+        color: colors.secondary,
+        borderColor: colors.secondary,
+      }
     : undefined;
 
   // Load Google Fonts into document head
@@ -84,22 +116,40 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
   return (
     <Section
       className={getClassName()}
-      style={{ paddingTop: padding, paddingBottom: padding }}
+      style={{
+        paddingTop: padding,
+        paddingBottom: padding,
+        ...sectionStyle,
+      }}
     >
       <div className={getClassName("inner")}>
         <div className={getClassName("content")}>
-          <div className={getClassName("label")} style={bodyStyle}>
+          <div
+            className={getClassName("label")}
+            style={{ ...bodyStyle, ...textColorStyle }}
+          >
             {businessNameLabel}
           </div>
-          <h1 className={getClassName("title")} style={headingStyle}>
+          <h1
+            className={getClassName("title")}
+            style={{ ...headingStyle, ...textColorStyle }}
+          >
             {businessName}
           </h1>
-          <div className={getClassName("status")} style={bodyStyle}>
+          <div
+            className={getClassName("status")}
+            style={{ ...bodyStyle, ...textColorStyle }}
+          >
             {statusText}
           </div>
 
           <div className={getClassName("rating")}>
-            <span className={getClassName("ratingValue")}>{rating}</span>
+            <span
+              className={getClassName("ratingValue")}
+              style={textColorStyle}
+            >
+              {rating}
+            </span>
             <div className={getClassName("stars")}>
               {Array.from({ length: fullStars }).map((_, i) => (
                 <svg
@@ -151,7 +201,10 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
                 </svg>
               ))}
             </div>
-            <span className={getClassName("reviewCount")} style={bodyStyle}>
+            <span
+              className={getClassName("reviewCount")}
+              style={{ ...bodyStyle, ...textColorStyle }}
+            >
               ({reviewCount} reviews)
             </span>
           </div>
@@ -160,7 +213,7 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
             <a
               href={primaryButton.href}
               className={getClassName("primaryButton")}
-              style={bodyStyle}
+              style={primaryButtonStyle}
               tabIndex={puck.isEditing ? -1 : undefined}
             >
               {primaryButton.label}
@@ -168,7 +221,7 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
             <a
               href={secondaryButton.href}
               className={getClassName("secondaryButton")}
-              style={bodyStyle}
+              style={secondaryButtonStyle}
               tabIndex={puck.isEditing ? -1 : undefined}
             >
               {secondaryButton.label}
@@ -260,6 +313,20 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
       ai: {
         instructions:
           "Always use the getFontFamily tool. Use the business name from the businessName field as the brand, 'body' as the fontType, and any available entity type context.",
+      },
+    },
+    colors: {
+      type: "object",
+      label: "Brand Colors",
+      objectFields: {
+        primary: { type: "text", label: "Primary Color" },
+        secondary: { type: "text", label: "Secondary Color" },
+        background: { type: "text", label: "Background Color" },
+        text: { type: "text", label: "Text Color" },
+      },
+      ai: {
+        instructions:
+          "Always use the getBrandColors tool. Use the business name from the businessName field as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
       },
     },
   },

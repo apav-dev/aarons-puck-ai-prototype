@@ -319,3 +319,169 @@ Respond with ONLY the font name, nothing else.`;
     }
   },
 });
+
+// Cache for getBrandColors tool responses
+const brandColorsCache = new Map<
+  string,
+  { primary: string; secondary: string; background: string; text: string }
+>();
+
+// Helper function to validate hex color
+function isValidHexColor(color: string): boolean {
+  return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
+}
+
+// Define the input schema for getBrandColors tool
+const getBrandColorsInputSchema = z.object({
+  brand: z.string().describe("The brand or business name"),
+  entityType: z
+    .string()
+    .optional()
+    .describe("The entity type (e.g., restaurant, hotel, location)"),
+});
+
+// Export the getBrandColors tool
+export const getBrandColors = tool({
+  description:
+    "Get a 4-color brand palette for a business. Returns an object with primary, secondary, background, and text colors in hex format. Colors are chosen to match the brand's identity and ensure accessibility with proper contrast ratios.",
+  inputSchema: getBrandColorsInputSchema,
+  execute: async ({ brand, entityType }) => {
+    try {
+      // Normalize cache key
+      const cacheKey = `${brand.toLowerCase().trim()}-${
+        entityType?.toLowerCase().trim() || ""
+      }`;
+
+      // Check cache first
+      if (brandColorsCache.has(cacheKey)) {
+        return brandColorsCache.get(cacheKey)!;
+      }
+
+      const prompt = `You are a color expert specializing in brand identity and accessibility. Given a brand name and context, recommend a 4-color palette in JSON format.
+
+Brand: ${brand}${entityType ? `\nEntity Type: ${entityType}` : ""}
+
+Return a JSON object with exactly these 4 hex color fields:
+- primary: Main brand color (hex format like "#dc2626") - used for primary buttons and accents
+- secondary: Complementary/accent color (hex format) - used for secondary buttons and accents
+- background: Light background color (hex format like "#ffffff" or "#f9fafb") - used for section/card backgrounds
+- text: Dark text color (hex format like "#000000" or "#1f2937") - used for all text on light backgrounds
+
+Requirements:
+- Colors should reflect the brand's industry and personality
+- Ensure WCAG AA contrast ratios: minimum 4.5:1 for normal text, 3:1 for large text
+- Primary and secondary colors should work well together
+- Background should be light (white or very light gray)
+- Text should be dark (black or dark gray) for readability on light backgrounds
+- Primary color should be distinct and brand-appropriate
+
+Respond with ONLY valid JSON in this exact format:
+{"primary": "#hexcolor", "secondary": "#hexcolor", "background": "#hexcolor", "text": "#hexcolor"}`;
+
+      // Make LLM call using OpenAI API
+      const openaiApiKey = process.env.OPENAI_API_KEY;
+      if (!openaiApiKey) {
+        console.warn("OPENAI_API_KEY not set, using default colors");
+        const defaultColors = {
+          primary: "#dc2626",
+          secondary: "#7c3aed",
+          background: "#ffffff",
+          text: "#000000",
+        };
+        brandColorsCache.set(cacheKey, defaultColors);
+        return defaultColors;
+      }
+
+      const response = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${openaiApiKey}`,
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You are a color expert. Respond with ONLY valid JSON containing the 4 color fields: primary, secondary, background, text. All values must be valid hex colors starting with #.",
+              },
+              {
+                role: "user",
+                content: prompt,
+              },
+            ],
+            max_tokens: 200,
+            temperature: 0.7,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`OpenAI API returned ${response.status}`);
+      }
+
+      const data = await response.json();
+      const colorJson = data.choices?.[0]?.message?.content?.trim();
+
+      if (!colorJson) {
+        throw new Error("No colors returned from LLM");
+      }
+
+      // Parse JSON response
+      let colors;
+      try {
+        // Remove markdown code blocks if present
+        const cleanedJson = colorJson
+          .replace(/```json\n?/g, "")
+          .replace(/```\n?/g, "")
+          .trim();
+        colors = JSON.parse(cleanedJson);
+      } catch (parseError) {
+        throw new Error("Invalid JSON returned from LLM");
+      }
+
+      // Validate color structure and format
+      if (
+        !colors.primary ||
+        !colors.secondary ||
+        !colors.background ||
+        !colors.text
+      ) {
+        throw new Error("Missing required color fields");
+      }
+
+      // Validate all colors are valid hex format
+      const colorFields = ["primary", "secondary", "background", "text"];
+      for (const field of colorFields) {
+        if (!isValidHexColor(colors[field])) {
+          throw new Error(`Invalid hex color format for ${field}`);
+        }
+      }
+
+      const finalColors = {
+        primary: colors.primary,
+        secondary: colors.secondary,
+        background: colors.background,
+        text: colors.text,
+      };
+
+      // Cache the result
+      brandColorsCache.set(cacheKey, finalColors);
+
+      return finalColors;
+    } catch (error) {
+      console.error("Error in getBrandColors:", error);
+      // Return sensible defaults
+      const defaultColors = {
+        primary: "#dc2626",
+        secondary: "#7c3aed",
+        background: "#ffffff",
+        text: "#000000",
+      };
+      return defaultColors;
+    }
+  },
+});
