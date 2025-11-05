@@ -1,6 +1,7 @@
 // app/api/puck/[...all]/route.ts
 
 import { puckHandler } from "@puckeditor/cloud-client";
+import { getImage } from "../../../../lib/tools";
 
 export async function POST(request: Request) {
   return puckHandler(request, {
@@ -25,6 +26,9 @@ export async function POST(request: Request) {
   2. How should these components be configured or arranged?
   3. Are there any SEO or accessibility considerations?
 </thinking-instructions>`,
+      tools: {
+        getImage,
+      },
     },
   });
 }

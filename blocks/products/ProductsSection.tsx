@@ -46,8 +46,12 @@ export const ProductsSection: PuckComponent<ProductsSectionProps> = ({
             </div>
             <div className={getClassName("cardContent")}>
               <h3 className={getClassName("productTitle")}>{product.title}</h3>
-              <div className={getClassName("categoryTag")}>{product.category}</div>
-              <p className={getClassName("description")}>{product.description}</p>
+              <div className={getClassName("categoryTag")}>
+                {product.category}
+              </div>
+              <p className={getClassName("description")}>
+                {product.description}
+              </p>
               <a
                 href={product.link}
                 className={getClassName("learnMoreButton")}
@@ -79,14 +83,23 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
         title: { type: "text", label: "Title" },
         category: { type: "text", label: "Category" },
         description: { type: "textarea", label: "Description" },
-        imageUrl: { type: "text", label: "Image URL" },
+        imageUrl: {
+          type: "text",
+          label: "Image URL",
+          ai: {
+            instructions:
+              "Always use an image URL provided by the getImage tool. Use the business name as the brand, 'ProductsSection' as the component, and the product title or category as additional context.",
+          },
+        },
         link: { type: "text", label: "Link" },
       },
       defaultItemProps: {
         title: "Product Title",
         category: "Category, Pricing, etc",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
-        imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop",
+        description:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
+        imageUrl:
+          "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop",
         link: "#",
       },
     },
@@ -101,22 +114,28 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
       {
         title: "Product Title",
         category: "Category, Pricing, etc",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
-        imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop",
+        description:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
+        imageUrl:
+          "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop",
         link: "#",
       },
       {
         title: "Product Title",
         category: "Category, Pricing, etc",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
-        imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop",
+        description:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
+        imageUrl:
+          "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop",
         link: "#",
       },
       {
         title: "Product Title",
         category: "Category, Pricing, etc",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
-        imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop",
+        description:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
+        imageUrl:
+          "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop",
         link: "#",
       },
     ],
@@ -126,4 +145,3 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
 };
 
 export default ProductsSection;
-

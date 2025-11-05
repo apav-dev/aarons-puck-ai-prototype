@@ -191,6 +191,10 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
     imageUrl: {
       type: "text",
       label: "Image URL",
+      ai: {
+        instructions:
+          "Always use an image URL provided by the getImage tool. Use the business name from the businessName field as the brand, 'Hero' as the component, and the entity type if available.",
+      },
     },
     padding: {
       type: "text",

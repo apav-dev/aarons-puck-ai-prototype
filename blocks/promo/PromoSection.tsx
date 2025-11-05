@@ -124,6 +124,10 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
     imageUrl: {
       type: "text",
       label: "Image URL",
+      ai: {
+        instructions:
+          "Always use an image URL provided by the getImage tool. Use the business name as the brand, 'PromoSection' as the component, and any relevant context from the title or description.",
+      },
     },
     padding: {
       type: "text",
