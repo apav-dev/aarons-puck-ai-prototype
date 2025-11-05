@@ -8,6 +8,16 @@ export async function middleware(req: NextRequest) {
   if (req.method === "GET") {
     // Rewrite routes that match "/[...puckPath]/edit" to "/puck/[...puckPath]"
     if (req.nextUrl.pathname.endsWith("/edit")) {
+      // Check for authentication cookie
+      const editAccess = req.cookies.get("edit-access");
+
+      if (!editAccess || editAccess.value !== "authenticated") {
+        // Redirect to login page with redirect parameter
+        const loginUrl = new URL("/login", req.url);
+        loginUrl.searchParams.set("redirect", req.nextUrl.pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+
       const pathWithoutEdit = req.nextUrl.pathname.slice(
         0,
         req.nextUrl.pathname.length - 5

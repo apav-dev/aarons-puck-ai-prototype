@@ -28,7 +28,7 @@ export type CoreInfoSectionProps = {
     sunday: string;
     specialNote?: string;
   };
-  services: Array<string | { value: string }>;
+  services: Array<{ value: string }>;
   padding: string;
   headingFont?: string;
   bodyFont?: string;
@@ -259,7 +259,7 @@ export const CoreInfoSection: PuckComponent<CoreInfoSectionProps> = ({
                 className={getClassName("serviceItem")}
                 style={{ ...bodyStyle, ...textColorStyle }}
               >
-                {typeof service === "string" ? service : service.value || ""}
+                {service.value || ""}
               </li>
             ))}
           </ul>
@@ -299,8 +299,7 @@ export const CoreInfoSectionConfig: ComponentConfig<CoreInfoSectionProps> = {
     services: {
       type: "array",
       label: "Services",
-      getItemSummary: (item) =>
-        (typeof item === "string" ? item : item?.value) || "Service",
+      getItemSummary: (item) => item.value || "Service",
       arrayFields: {
         value: { type: "text", label: "Service" },
       },

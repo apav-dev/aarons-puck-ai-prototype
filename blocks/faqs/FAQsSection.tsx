@@ -5,6 +5,7 @@ import { PuckComponent } from "@measured/puck";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
 import { getGoogleFontsUrl } from "../../lib/google-fonts";
+import classnames from "classnames";
 
 const getClassName = getClassNameFactory("FAQsSection", styles);
 
@@ -155,7 +156,10 @@ export const FAQsSection: PuckComponent<FAQsSectionProps> = ({
                     {faq.question}
                   </span>
                   <svg
-                    className={getClassName("chevron", { expanded: isExpanded })}
+                    className={classnames(
+                      getClassName("chevron"),
+                      isExpanded && styles["FAQsSection-chevron--expanded"]
+                    )}
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
