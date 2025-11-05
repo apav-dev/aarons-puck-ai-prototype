@@ -1,7 +1,7 @@
 import { tool } from "@puckeditor/cloud-client";
 import { tavily } from "@tavily/core";
 import z from "zod";
-import { generateText } from "ai";
+import { generateObject } from "ai";
 import { google } from "@ai-sdk/google";
 import { getGoogleFonts } from "./google-fonts";
 
@@ -186,120 +186,120 @@ export const getImage = tool({
   },
 });
 
+// COMMENTED OUT: getFontFamily tool - temporarily disabled
 // Cache for getFontFamily tool responses
-const fontFamilyCache = new Map<string, string>();
+// const fontFamilyCache = new Map<string, string>();
 
 // Define the input schema for getFontFamily tool
-const getFontFamilyInputSchema = z.object({
-  brand: z.string().describe("The brand or business name"),
-  fontType: z
-    .enum(["heading", "body"])
-    .describe(
-      "The type of font needed: 'heading' for headings or 'body' for body text"
-    ),
-  entityType: z
-    .string()
-    .optional()
-    .describe("The entity type (e.g., restaurant, hotel, location)"),
-});
+// const getFontFamilyInputSchema = z.object({
+//   brand: z.string().describe("The brand or business name"),
+//   fontType: z
+//     .enum(["heading", "body"])
+//     .describe(
+//       "The type of font needed: 'heading' for headings or 'body' for body text"
+//     ),
+//   entityType: z
+//     .string()
+//     .optional()
+//     .describe("The entity type (e.g., restaurant, hotel, location)"),
+// });
 
 // Export the getFontFamily tool
-export const getFontFamily = tool({
-  description:
-    "Get the closest matching Google Font for a brand. Returns a single font name from available Google Fonts that best matches the brand's style and identity. Use this for selecting fonts that align with brand aesthetics.",
-  inputSchema: getFontFamilyInputSchema,
-  execute: async ({ brand, fontType, entityType }) => {
-    try {
-      // Normalize cache key
-      const cacheKey = `${brand.toLowerCase().trim()}-${fontType}-${
-        entityType?.toLowerCase().trim() || ""
-      }`;
+// export const getFontFamily = tool({
+//   description:
+//     "Get the closest matching Google Font for a brand. Returns a single font name from available Google Fonts that best matches the brand's style and identity. Use this for selecting fonts that align with brand aesthetics.",
+//   inputSchema: getFontFamilyInputSchema,
+//   execute: async ({ brand, fontType, entityType }) => {
+//     try {
+//       // Normalize cache key
+//       const cacheKey = `${brand.toLowerCase().trim()}-${fontType}-${
+//         entityType?.toLowerCase().trim() || ""
+//       }`;
 
-      // Check cache first
-      if (fontFamilyCache.has(cacheKey)) {
-        return fontFamilyCache.get(cacheKey)!;
-      }
+//       // Check cache first
+//       if (fontFamilyCache.has(cacheKey)) {
+//         return fontFamilyCache.get(cacheKey)!;
+//       }
 
-      // Get available Google Fonts
-      const availableFonts = await getGoogleFonts();
-      const fontNames = availableFonts.map((f) => f.name);
+//       // Get available Google Fonts
+//       const availableFonts = await getGoogleFonts();
+//       const fontNames = availableFonts.map((f) => f.name);
 
-      // If no fonts available, return a default
-      if (fontNames.length === 0) {
-        const defaultFont = "Roboto";
-        fontFamilyCache.set(cacheKey, defaultFont);
-        return defaultFont;
-      }
+//       // If no fonts available, return a default
+//       if (fontNames.length === 0) {
+//         const defaultFont = "Roboto";
+//         fontFamilyCache.set(cacheKey, defaultFont);
+//         return defaultFont;
+//       }
 
-      // Prepare prompt for LLM
-      const fontList = fontNames.join(", ");
-      const fontTypeDescription =
-        fontType === "heading"
-          ? "Display font suitable for headings - can be bold, decorative, or distinctive"
-          : "Body font suitable for readable text - should be clean, legible, and professional";
+//       // Prepare prompt for LLM
+//       const fontList = fontNames.join(", ");
+//       const fontTypeDescription =
+//         fontType === "heading"
+//           ? "Display font suitable for headings - can be bold, decorative, or distinctive"
+//           : "Body font suitable for readable text - should be clean, legible, and professional";
 
-      const prompt = `You are a typography expert. Given a brand name and context, recommend the best Google Font from this list: ${fontList}
+//       const prompt = `You are a typography expert. Given a brand name and context, recommend the best Google Font from this list: ${fontList}
 
-Brand: ${brand}
-Font Type: ${fontTypeDescription}${
-        entityType ? `\nEntity Type: ${entityType}` : ""
-      }
+// Brand: ${brand}
+// Font Type: ${fontTypeDescription}${
+//         entityType ? `\nEntity Type: ${entityType}` : ""
+//       }
 
-Consider:
-- For headings: Choose fonts that are distinctive, bold, or match the brand's personality (e.g., modern tech brands might use sans-serif, traditional brands might use serif)
-- For body: Choose fonts that are highly readable and professional
-- Match the font style to the brand's industry and personality
-- Ensure the font name exactly matches one from the list above
+// Consider:
+// - For headings: Choose fonts that are distinctive, bold, or match the brand's personality (e.g., modern tech brands might use sans-serif, traditional brands might use serif)
+// - For body: Choose fonts that are highly readable and professional
+// - Match the font style to the brand's industry and personality
+// - Ensure the font name exactly matches one from the list above
 
-Respond with ONLY the font name, nothing else.`;
+// Respond with ONLY the font name, nothing else.`;
 
-      // Make LLM call using AI SDK with Gemini
-      const googleApiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-      if (!googleApiKey) {
-        console.warn(
-          "GOOGLE_GENERATIVE_AI_API_KEY not set, using default font"
-        );
-        const defaultFont = fontType === "heading" ? "Montserrat" : "Open Sans";
-        fontFamilyCache.set(cacheKey, defaultFont);
-        return defaultFont;
-      }
+//       // Make LLM call using AI SDK with Gemini
+//       const googleApiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+//       if (!googleApiKey) {
+//         console.warn(
+//           "GOOGLE_GENERATIVE_AI_API_KEY not set, using default font"
+//         );
+//         const defaultFont = fontType === "heading" ? "Montserrat" : "Open Sans";
+//         fontFamilyCache.set(cacheKey, defaultFont);
+//         return defaultFont;
+//       }
 
-      const { text } = await generateText({
-        model: google("gemini-2.5-flash"),
-        system:
-          "You are a typography expert. Respond with only the font name from the provided list, nothing else.",
-        prompt: prompt,
-        maxOutputTokens: 50,
-        temperature: 0.7,
-      });
+//       const { text } = await generateText({
+//         model: google("gemini-2.5-flash"),
+//         system:
+//           "You are a typography expert. Respond with only the font name from the provided list, nothing else.",
+//         prompt: prompt,
+//         temperature: 0.7,
+//       });
 
-      const selectedFont = text.trim();
+//       const selectedFont = text.trim();
 
-      if (!selectedFont) {
-        throw new Error("No font returned from LLM");
-      }
+//       if (!selectedFont) {
+//         throw new Error("No font returned from LLM");
+//       }
 
-      // Validate that the selected font is in our list (case-insensitive)
-      const normalizedSelected = selectedFont.replace(/^["']|["']$/g, ""); // Remove quotes if present
-      const matchedFont = fontNames.find(
-        (f) => f.toLowerCase() === normalizedSelected.toLowerCase()
-      );
+//       // Validate that the selected font is in our list (case-insensitive)
+//       const normalizedSelected = selectedFont.replace(/^["']|["']$/g, ""); // Remove quotes if present
+//       const matchedFont = fontNames.find(
+//         (f) => f.toLowerCase() === normalizedSelected.toLowerCase()
+//       );
 
-      const finalFont =
-        matchedFont || (fontType === "heading" ? "Montserrat" : "Open Sans");
+//       const finalFont =
+//         matchedFont || (fontType === "heading" ? "Montserrat" : "Open Sans");
 
-      // Cache the result
-      fontFamilyCache.set(cacheKey, finalFont);
+//       // Cache the result
+//       fontFamilyCache.set(cacheKey, finalFont);
 
-      return finalFont;
-    } catch (error) {
-      console.error("Error in getFontFamily:", error);
-      // Return a sensible default based on font type
-      const defaultFont = fontType === "heading" ? "Montserrat" : "Open Sans";
-      return defaultFont;
-    }
-  },
-});
+//       return finalFont;
+//     } catch (error) {
+//       console.error("Error in getFontFamily:", error);
+//       // Return a sensible default based on font type
+//       const defaultFont = fontType === "heading" ? "Montserrat" : "Open Sans";
+//       return defaultFont;
+//     }
+//   },
+// });
 
 // Cache for getBrandColors tool responses
 const brandColorsCache = new Map<
@@ -311,6 +311,34 @@ const brandColorsCache = new Map<
 function isValidHexColor(color: string): boolean {
   return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
 }
+
+// Define the output schema for getBrandColors tool (for structured output)
+const brandColorsOutputSchema = z.object({
+  primary: z
+    .string()
+    .regex(/^#[A-Fa-f0-9]{6}$/, "Must be a valid hex color (e.g., #dc2626)")
+    .describe(
+      "Main brand color in hex format - used for primary buttons and accents"
+    ),
+  secondary: z
+    .string()
+    .regex(/^#[A-Fa-f0-9]{6}$/, "Must be a valid hex color (e.g., #7c3aed)")
+    .describe(
+      "Complementary/accent color in hex format - used for secondary buttons and accents"
+    ),
+  background: z
+    .string()
+    .regex(/^#[A-Fa-f0-9]{6}$/, "Must be a valid hex color (e.g., #ffffff)")
+    .describe(
+      "Light background color in hex format - used for section/card backgrounds"
+    ),
+  text: z
+    .string()
+    .regex(/^#[A-Fa-f0-9]{6}$/, "Must be a valid hex color (e.g., #000000)")
+    .describe(
+      "Dark text color in hex format - used for all text on light backgrounds"
+    ),
+});
 
 // Define the input schema for getBrandColors tool
 const getBrandColorsInputSchema = z.object({
@@ -338,26 +366,17 @@ export const getBrandColors = tool({
         return brandColorsCache.get(cacheKey)!;
       }
 
-      const prompt = `You are a color expert specializing in brand identity and accessibility. Given a brand name and context, recommend a 4-color palette in JSON format.
-
-Brand: ${brand}${entityType ? `\nEntity Type: ${entityType}` : ""}
-
-Return a JSON object with exactly these 4 hex color fields:
-- primary: Main brand color (hex format like "#dc2626") - used for primary buttons and accents
-- secondary: Complementary/accent color (hex format) - used for secondary buttons and accents
-- background: Light background color (hex format like "#ffffff" or "#f9fafb") - used for section/card backgrounds
-- text: Dark text color (hex format like "#000000" or "#1f2937") - used for all text on light backgrounds
+      const prompt = `Generate a brand color palette for: ${brand}${
+        entityType ? ` (${entityType})` : ""
+      }
 
 Requirements:
-- Colors should reflect the brand's industry and personality
-- Ensure WCAG AA contrast ratios: minimum 4.5:1 for normal text, 3:1 for large text
-- Primary and secondary colors should work well together
-- Background should be light (white or very light gray)
-- Text should be dark (black or dark gray) for readability on light backgrounds
-- Primary color should be distinct and brand-appropriate
-
-Respond with ONLY valid JSON in this exact format:
-{"primary": "#hexcolor", "secondary": "#hexcolor", "background": "#hexcolor", "text": "#hexcolor"}`;
+- Primary: distinct brand color (hex format like #dc2626)
+- Secondary: complementary accent color (hex format)
+- Background: light color like #ffffff or #f9fafb
+- Text: dark color like #000000 or #1f2937
+- Colors should match the brand's industry and personality
+- Ensure good contrast for accessibility`;
 
       // Make LLM call using AI SDK with Gemini
       const googleApiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
@@ -375,57 +394,27 @@ Respond with ONLY valid JSON in this exact format:
         return defaultColors;
       }
 
-      const { text } = await generateText({
-        model: google("gemini-2.5-flash"),
+      // Use structured output with zod schema for reliable parsing
+      const { object } = await generateObject({
+        model: google("gemini-2.5-flash-lite"),
         system:
-          "You are a color expert. Respond with ONLY valid JSON containing the 4 color fields: primary, secondary, background, text. All values must be valid hex colors starting with #.",
+          "You are a color expert. Generate brand color palettes with 4 hex colors: primary, secondary, background, and text.",
         prompt: prompt,
-        maxOutputTokens: 200,
+        schema: brandColorsOutputSchema,
+        schemaName: "BrandColors",
+        schemaDescription:
+          "A 4-color brand palette with primary, secondary, background, and text colors in hex format",
         temperature: 0.7,
+        mode: "json",
+        maxOutputTokens: 1000,
       });
 
-      const colorJson = text.trim();
-
-      if (!colorJson) {
-        throw new Error("No colors returned from LLM");
-      }
-
-      // Parse JSON response
-      let colors;
-      try {
-        // Remove markdown code blocks if present
-        const cleanedJson = colorJson
-          .replace(/```json\n?/g, "")
-          .replace(/```\n?/g, "")
-          .trim();
-        colors = JSON.parse(cleanedJson);
-      } catch (parseError) {
-        throw new Error("Invalid JSON returned from LLM");
-      }
-
-      // Validate color structure and format
-      if (
-        !colors.primary ||
-        !colors.secondary ||
-        !colors.background ||
-        !colors.text
-      ) {
-        throw new Error("Missing required color fields");
-      }
-
-      // Validate all colors are valid hex format
-      const colorFields = ["primary", "secondary", "background", "text"];
-      for (const field of colorFields) {
-        if (!isValidHexColor(colors[field])) {
-          throw new Error(`Invalid hex color format for ${field}`);
-        }
-      }
-
+      // The structured output ensures we get valid colors
       const finalColors = {
-        primary: colors.primary,
-        secondary: colors.secondary,
-        background: colors.background,
-        text: colors.text,
+        primary: object.primary,
+        secondary: object.secondary,
+        background: object.background,
+        text: object.text,
       };
 
       // Cache the result

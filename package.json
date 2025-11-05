@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:colors": "npx tsx test-brand-colors.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.28",
@@ -28,6 +29,7 @@
     "@types/node": "^17.0.12",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
+    "dotenv": "^17.2.3",
     "eslint-config-custom": "*",
     "typescript": "^5.5.4"
   }
