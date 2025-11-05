@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function LoginPage() {
+function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -123,3 +123,36 @@ export default function LoginPage() {
   );
 }
 
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "100vh",
+            backgroundColor: "#f5f5f5",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "2rem",
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              width: "100%",
+              maxWidth: "400px",
+              textAlign: "center",
+            }}
+          >
+            Loading...
+          </div>
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
+  );
+}
