@@ -12,6 +12,7 @@ import classnames from "classnames";
 const getClassName = getClassNameFactory("HeroSection", styles);
 
 export type HeroSectionProps = {
+  variant?: "Classic" | "Spotlight";
   businessNameLabel: string;
   businessName: string;
   statusText: string;
@@ -26,7 +27,6 @@ export type HeroSectionProps = {
     href: string;
   };
   imageUrl: string;
-  padding: string;
   headingFont?: string;
   bodyFont?: string;
   colors?: {
@@ -38,6 +38,7 @@ export type HeroSectionProps = {
 };
 
 export const HeroSection: PuckComponent<HeroSectionProps> = ({
+  variant = "Classic",
   businessNameLabel,
   businessName,
   statusText,
@@ -46,7 +47,6 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
   primaryButton,
   secondaryButton,
   imageUrl,
-  padding,
   headingFont,
   bodyFont,
   colors,
@@ -113,122 +113,141 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
     }
   }, [headingFont, bodyFont]);
 
-  return (
-    <Section
-      className={getClassName()}
-      style={{
-        paddingTop: padding,
-        paddingBottom: padding,
-        ...sectionStyle,
-      }}
-    >
-      <div className={getClassName("inner")}>
-        <div className={getClassName("content")}>
-          <div
-            className={getClassName("label")}
-            style={{ ...bodyStyle, ...textColorStyle }}
-          >
-            {businessNameLabel}
-          </div>
-          <h1
-            className={getClassName("title")}
-            style={{ ...headingStyle, ...textColorStyle }}
-          >
-            {businessName}
-          </h1>
-          <div
-            className={getClassName("status")}
-            style={{ ...bodyStyle, ...textColorStyle }}
-          >
-            {statusText}
-          </div>
+  const isSpotlight = variant === "Spotlight";
 
-          <div className={getClassName("rating")}>
-            <span
-              className={getClassName("ratingValue")}
-              style={textColorStyle}
-            >
-              {rating}
-            </span>
-            <div className={getClassName("stars")}>
-              {Array.from({ length: fullStars }).map((_, i) => (
-                <svg
-                  key={`full-${i}`}
-                  className={getClassName("star")}
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
-              ))}
-              {hasHalfStar && (
-                <svg
-                  className={getClassName("star")}
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <defs>
-                    <linearGradient
-                      id={`half-${rating}`}
-                      x1="0%"
-                      y1="0%"
-                      x2="100%"
-                      y2="0%"
-                    >
-                      <stop offset="50%" stopColor="currentColor" />
-                      <stop
-                        offset="50%"
-                        stopColor="transparent"
-                        stopOpacity="0"
-                      />
-                    </linearGradient>
-                  </defs>
-                  <path
-                    fill={`url(#half-${rating})`}
-                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                  />
-                </svg>
-              )}
-              {Array.from({ length: emptyStars }).map((_, i) => (
-                <svg
-                  key={`empty-${i}`}
-                  className={classnames(getClassName("star"), "empty")}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
-              ))}
-            </div>
-            <span
-              className={getClassName("reviewCount")}
-              style={{ ...bodyStyle, ...textColorStyle }}
-            >
-              ({reviewCount} reviews)
-            </span>
-          </div>
+  const contentElement = (
+    <div className={getClassName("content")}>
+      <div
+        className={getClassName("label")}
+        style={{ ...bodyStyle, ...textColorStyle }}
+      >
+        {businessNameLabel}
+      </div>
+      <h1
+        className={getClassName("title")}
+        style={{ ...headingStyle, ...textColorStyle }}
+      >
+        {businessName}
+      </h1>
+      <div
+        className={getClassName("status")}
+        style={{ ...bodyStyle, ...textColorStyle }}
+      >
+        {statusText}
+      </div>
 
-          <div className={getClassName("actions")}>
-            <a
-              href={primaryButton.href}
-              className={getClassName("primaryButton")}
-              style={primaryButtonStyle}
-              tabIndex={puck.isEditing ? -1 : undefined}
+      <div className={getClassName("rating")}>
+        <span className={getClassName("ratingValue")} style={textColorStyle}>
+          {rating}
+        </span>
+        <div className={getClassName("stars")}>
+          {Array.from({ length: fullStars }).map((_, i) => (
+            <svg
+              key={`full-${i}`}
+              className={getClassName("star")}
+              viewBox="0 0 24 24"
+              fill="currentColor"
             >
-              {primaryButton.label}
-            </a>
-            <a
-              href={secondaryButton.href}
-              className={getClassName("secondaryButton")}
-              style={secondaryButtonStyle}
-              tabIndex={puck.isEditing ? -1 : undefined}
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+          ))}
+          {hasHalfStar && (
+            <svg
+              className={getClassName("star")}
+              viewBox="0 0 24 24"
+              fill="currentColor"
             >
-              {secondaryButton.label}
-            </a>
-          </div>
+              <defs>
+                <linearGradient
+                  id={`half-${rating}`}
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="0%"
+                >
+                  <stop offset="50%" stopColor="currentColor" />
+                  <stop offset="50%" stopColor="transparent" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <path
+                fill={`url(#half-${rating})`}
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+              />
+            </svg>
+          )}
+          {Array.from({ length: emptyStars }).map((_, i) => (
+            <svg
+              key={`empty-${i}`}
+              className={classnames(getClassName("star"), "empty")}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+          ))}
         </div>
+        <span
+          className={getClassName("reviewCount")}
+          style={{ ...bodyStyle, ...textColorStyle }}
+        >
+          ({reviewCount} reviews)
+        </span>
+      </div>
 
+      <div className={getClassName("actions")}>
+        <a
+          href={primaryButton.href}
+          className={getClassName("primaryButton")}
+          style={primaryButtonStyle}
+          tabIndex={puck.isEditing ? -1 : undefined}
+        >
+          {primaryButton.label}
+        </a>
+        <a
+          href={secondaryButton.href}
+          className={getClassName("secondaryButton")}
+          style={secondaryButtonStyle}
+          tabIndex={puck.isEditing ? -1 : undefined}
+        >
+          {secondaryButton.label}
+        </a>
+      </div>
+    </div>
+  );
+
+  if (isSpotlight) {
+    return (
+      <Section
+        className={classnames(getClassName(), getClassName("spotlight"))}
+        style={{
+          ...sectionStyle,
+          paddingTop: 0,
+          paddingBottom: 0,
+          paddingLeft: 0,
+          paddingRight: 0,
+          paddingInlineStart: 0,
+          paddingInlineEnd: 0,
+        }}
+      >
+        <div className={getClassName("spotlightInner")}>
+          <div className={getClassName("spotlightImageWrapper")}>
+            <img
+              src={imageUrl}
+              alt={businessName}
+              className={getClassName("spotlightImage")}
+            />
+          </div>
+          <div className={getClassName("spotlightCard")}>{contentElement}</div>
+        </div>
+      </Section>
+    );
+  }
+
+  return (
+    <Section className={getClassName()} style={sectionStyle}>
+      <div className={getClassName("inner")}>
+        {contentElement}
         <div className={getClassName("imageWrapper")}>
           <img
             src={imageUrl}
@@ -243,6 +262,14 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
 
 export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
   fields: {
+    variant: {
+      type: "select",
+      label: "Variant",
+      options: [
+        { label: "Classic", value: "Classic" },
+        { label: "Spotlight", value: "Spotlight" },
+      ],
+    },
     businessNameLabel: {
       type: "text",
       label: "Business Name Label",
@@ -296,10 +323,6 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
         stream: false,
       },
     },
-    padding: {
-      type: "text",
-      label: "Padding",
-    },
     headingFont: {
       type: "text",
       label: "Heading Font",
@@ -339,6 +362,7 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
       "Create a hero section for a brick-and-mortar store landing page. Always place this section at the top of the page. The image should be a stock image of a storefront.",
   },
   defaultProps: {
+    variant: "Classic",
     businessNameLabel: "Business Name",
     businessName: "Geomodifier",
     statusText: "Open Now • Closes at 5:00 PM",
@@ -354,7 +378,6 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
     },
     imageUrl:
       "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop",
-    padding: "64px",
   },
   render: HeroSection,
 };

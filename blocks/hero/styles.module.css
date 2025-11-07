@@ -1,5 +1,7 @@
 .HeroSection {
   background-color: white;
+  padding-top: 64px;
+  padding-bottom: 64px;
 }
 
 .HeroSection-inner {
@@ -163,5 +165,114 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+/* Spotlight Variant Styles */
+:global(.Section).HeroSection.spotlight {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-inline-start: 0 !important;
+  padding-inline-end: 0 !important;
+  background-color: transparent;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  :global(.Section).HeroSection.spotlight {
+    padding-inline-start: 0 !important;
+    padding-inline-end: 0 !important;
+  }
+}
+
+.HeroSection.spotlight .Section-inner {
+  max-width: none;
+  padding: 0;
+}
+
+.HeroSection-spotlightInner {
+  position: relative;
+  width: 100%;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+@media (min-width: 1024px) {
+  .HeroSection-spotlightInner {
+    min-height: 600px;
+  }
+}
+
+.HeroSection-spotlightImageWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.HeroSection-spotlightImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.HeroSection-spotlightCard {
+  position: relative;
+  z-index: 1;
+  background-color: white;
+  border-radius: 12px;
+  padding: 32px;
+  margin: 32px;
+  width: calc(100% - 64px);
+  max-width: 500px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+@media (min-width: 768px) {
+  .HeroSection-spotlightCard {
+    padding: 40px;
+    margin: 48px;
+    max-width: 550px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .HeroSection-spotlightCard {
+    padding: 48px;
+    margin: 64px;
+    max-width: 600px;
+  }
+}
+
+/* Spotlight variant: buttons stacked on mobile, side-by-side on desktop */
+.HeroSection.spotlight .HeroSection-actions {
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .HeroSection.spotlight .HeroSection-actions {
+    flex-direction: row;
+    gap: 16px;
+  }
+}
+
+/* Spotlight variant: ensure text colors work on white card */
+.HeroSection.spotlight .HeroSection-label,
+.HeroSection.spotlight .HeroSection-title,
+.HeroSection.spotlight .HeroSection-status,
+.HeroSection.spotlight .HeroSection-ratingValue,
+.HeroSection.spotlight .HeroSection-reviewCount {
+  color: #000;
+}
+
+/* Spotlight variant: star color */
+.HeroSection.spotlight .HeroSection-star:not(.empty) {
+  color: #dc2626;
 }
 
