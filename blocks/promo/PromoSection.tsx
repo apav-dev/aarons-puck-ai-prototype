@@ -17,8 +17,6 @@ export type PromoSectionProps = {
     label: string;
     href: string;
   };
-  appStoreLink?: string;
-  googlePlayLink?: string;
   imageUrl: string;
   padding: string;
   headingFont?: string;
@@ -35,8 +33,6 @@ export const PromoSection: PuckComponent<PromoSectionProps> = ({
   title,
   description,
   ctaButton,
-  appStoreLink,
-  googlePlayLink,
   imageUrl,
   padding,
   headingFont,
@@ -129,77 +125,6 @@ export const PromoSection: PuckComponent<PromoSectionProps> = ({
           >
             {ctaButton.label}
           </a>
-
-          {(appStoreLink || googlePlayLink) && (
-            <div className={getClassName("appBadges")}>
-              {appStoreLink && (
-                <a
-                  href={appStoreLink}
-                  className={getClassName("appBadge")}
-                  tabIndex={puck.isEditing ? -1 : undefined}
-                >
-                  <svg width="120" height="40" viewBox="0 0 120 40" fill="none">
-                    <rect width="120" height="40" rx="6" fill="#000" />
-                    <path
-                      d="M16 12h8v16h-8V12zm8.5 0c2.5 0 4.5 2 4.5 4.5s-2 4.5-4.5 4.5-4.5-2-4.5-4.5 2-4.5 4.5-4.5zm-9 8c0-2.5 2-4.5 4.5-4.5s4.5 2 4.5 4.5-2 4.5-4.5 4.5-4.5-2-4.5-4.5z"
-                      fill="#fff"
-                    />
-                    <text
-                      x="30"
-                      y="25"
-                      fill="#fff"
-                      fontSize="10"
-                      fontWeight="600"
-                    >
-                      Download on the
-                    </text>
-                    <text
-                      x="30"
-                      y="32"
-                      fill="#fff"
-                      fontSize="12"
-                      fontWeight="700"
-                    >
-                      App Store
-                    </text>
-                  </svg>
-                </a>
-              )}
-              {googlePlayLink && (
-                <a
-                  href={googlePlayLink}
-                  className={getClassName("appBadge")}
-                  tabIndex={puck.isEditing ? -1 : undefined}
-                >
-                  <svg width="135" height="40" viewBox="0 0 135 40" fill="none">
-                    <rect width="135" height="40" rx="6" fill="#000" />
-                    <path
-                      d="M8 12l12 7-12 7V12zm14 0v14l10-7-10-7zm-7 7l7 4 7-4-7-4-7 4z"
-                      fill="#fff"
-                    />
-                    <text
-                      x="30"
-                      y="22"
-                      fill="#fff"
-                      fontSize="8"
-                      fontWeight="600"
-                    >
-                      GET IT ON
-                    </text>
-                    <text
-                      x="30"
-                      y="32"
-                      fill="#fff"
-                      fontSize="11"
-                      fontWeight="700"
-                    >
-                      Google Play
-                    </text>
-                  </svg>
-                </a>
-              )}
-            </div>
-          )}
         </div>
       </div>
     </Section>
@@ -223,14 +148,6 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
         label: { type: "text" },
         href: { type: "text" },
       },
-    },
-    appStoreLink: {
-      type: "text",
-      label: "App Store Link (optional)",
-    },
-    googlePlayLink: {
-      type: "text",
-      label: "Google Play Link (optional)",
     },
     imageUrl: {
       type: "text",
@@ -287,8 +204,6 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
       label: "Learn More",
       href: "#",
     },
-    appStoreLink: "#",
-    googlePlayLink: "#",
     imageUrl:
       "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop",
     padding: "64px",
