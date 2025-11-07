@@ -328,6 +328,35 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
         { label: "Spotlight", value: "Spotlight" },
         { label: "Immersive", value: "Immersive" },
       ],
+      ai: {
+        instructions: `Choose the hero section variant that best matches the business type and desired visual impact:
+
+**Classic**: Traditional side-by-side layout with content on one side and image on the other. Best for:
+- Professional services (law firms, accounting, consulting)
+- Retail stores with clear product displays
+- Businesses prioritizing clarity and readability
+- When you want balanced visual weight between text and image
+- Standard, professional presentations
+
+**Spotlight**: Full-width background image with a white information card overlaid on the left. Best for:
+- Restaurants and cafes (showcases food/atmosphere)
+- Hotels and hospitality (highlights location/amenities)
+- Retail stores with impressive storefronts or products
+- Businesses wanting to showcase a specific location or product visually
+- When the background image is a key selling point
+- More modern, visually striking presentation
+
+**Immersive**: Full-width background image with dark overlay, text directly on the image (no white card). Best for:
+- Adventure/outdoor businesses (tours, activities, experiences)
+- Luxury brands and high-end services
+- Creative agencies and design studios
+- Businesses with dramatic, atmospheric imagery
+- When you want maximum visual impact and emotional connection
+- Most dramatic and immersive presentation
+
+Consider the business type, available imagery quality, and desired emotional tone when selecting the variant.`,
+        stream: false,
+      },
     },
     businessNameLabel: {
       type: "text",
@@ -385,20 +414,20 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
     headingFont: {
       type: "text",
       label: "Heading Font",
-      ai: {
-        instructions:
-          "Always use the getFontFamily tool. Use the business name from the businessName field as the brand, 'heading' as the fontType, and any available entity type context.",
-        stream: false,
-      },
+      // ai: {
+      //   instructions:
+      //     "Always use the getFontFamily tool. Use the business name from the businessName field as the brand, 'heading' as the fontType, and any available entity type context.",
+      //   stream: false,
+      // },
     },
     bodyFont: {
       type: "text",
       label: "Body Font",
-      ai: {
-        instructions:
-          "Always use the getFontFamily tool. Use the business name from the businessName field as the brand, 'body' as the fontType, and any available entity type context.",
-        stream: false,
-      },
+      // ai: {
+      //   instructions:
+      //     "Always use the getFontFamily tool. Use the business name from the businessName field as the brand, 'body' as the fontType, and any available entity type context.",
+      //   stream: false,
+      // },
     },
     colors: {
       type: "object",
@@ -409,11 +438,11 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
         background: { type: "text", label: "Background Color" },
         text: { type: "text", label: "Text Color" },
       },
-      ai: {
-        instructions:
-          "Always use the getBrandColors tool. Use the business name from the businessName field as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
-        stream: false,
-      },
+      // ai: {
+      //   instructions:
+      //     "Always use the getBrandColors tool. Use the business name from the businessName field as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
+      //   stream: false,
+      // },
     },
   },
   ai: {

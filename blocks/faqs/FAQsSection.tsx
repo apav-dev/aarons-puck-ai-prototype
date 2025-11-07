@@ -221,6 +221,11 @@ export const FAQsSectionConfig: ComponentConfig<FAQsSectionProps> = {
       label: "FAQs",
       min: 1,
       getItemSummary: (item) => item.question || "FAQ",
+      ai: {
+        instructions:
+          "Always use the getFAQs tool to populate the FAQs array. Use the business name as the brand, provide the locationUrl if available, include the entityType (e.g., restaurant, hotel, financial services), and location details (e.g., city, address) when available. The tool will return an array of FAQs with question and answer fields. Use the returned FAQs directly without modification.",
+        stream: false,
+      },
       arrayFields: {
         question: {
           type: "text",
@@ -313,7 +318,7 @@ export const FAQsSectionConfig: ComponentConfig<FAQsSectionProps> = {
   },
   ai: {
     instructions:
-      "Create a comprehensive FAQs section for a brick-and-mortar location landing page. The FAQs should address common customer questions about the location, services, hours, policies, and other relevant information. Questions and answers should be optimized for local SEO and include location-specific details when available.",
+      "Create a comprehensive FAQs section for a brick-and-mortar location landing page. Always use the getFAQs tool to retrieve FAQs for the business. The tool will attempt to extract FAQs from the brand's location landing page if a locationUrl is provided, or generate appropriate FAQs using AI based on the brand, entity type, and location. The FAQs should address common customer questions about the location, services, hours, policies, and other relevant information. Questions and answers should be optimized for local SEO and include location-specific details when available.",
   },
   render: FAQsSection,
 };

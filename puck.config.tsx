@@ -10,25 +10,25 @@ import { TeamSection, TeamSectionProps } from "./blocks/team";
 
 type Props = {
   Hero: HeroProps;
-  CoreInfoSection: CoreInfoSectionProps;
-  PromoSection: PromoSectionProps;
-  ProductsSection: ProductsSectionProps;
-  // FAQsSection: FAQsSectionProps;
-  InsightsSection: InsightsSectionProps;
-  EventsSection: EventsSectionProps;
-  TeamSection: TeamSectionProps;
+  // CoreInfoSection: CoreInfoSectionProps;
+  // PromoSection: PromoSectionProps;
+  // ProductsSection: ProductsSectionProps;
+  FAQsSection: FAQsSectionProps;
+  // InsightsSection: InsightsSectionProps;
+  // EventsSection: EventsSectionProps;
+  // TeamSection: TeamSectionProps;
 };
 
 export const config: Config<Props> = {
   components: {
     Hero: Hero,
-    CoreInfoSection: CoreInfoSection,
-    PromoSection: PromoSection,
-    ProductsSection: ProductsSection,
-    // FAQsSection: FAQsSection,
-    InsightsSection: InsightsSection,
-    EventsSection: EventsSection,
-    TeamSection: TeamSection,
+    // CoreInfoSection: CoreInfoSection,
+    // PromoSection: PromoSection,
+    // ProductsSection: ProductsSection,
+    FAQsSection: FAQsSection,
+    // InsightsSection: InsightsSection,
+    // EventsSection: EventsSection,
+    // TeamSection: TeamSection,
   },
 };
 
