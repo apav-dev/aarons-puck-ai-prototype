@@ -37,8 +37,8 @@ export async function POST(request: Request) {
       tools: {
         getImage,
         getFAQs,
-        // getFontFamily,
-        // getBrandColors,
+        getFontFamily,
+        getBrandColors,
       },
     },
   });

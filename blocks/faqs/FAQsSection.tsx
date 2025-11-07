@@ -97,7 +97,10 @@ export const FAQsSection: PuckComponent<FAQsSectionProps> = ({
     while ((match = linkRegex.exec(answer)) !== null) {
       // Add text before the link
       if (match.index > lastIndex) {
-        parts.push({ type: "text", content: answer.slice(lastIndex, match.index) });
+        parts.push({
+          type: "text",
+          content: answer.slice(lastIndex, match.index),
+        });
       }
       // Add the link
       parts.push({
@@ -223,25 +226,25 @@ export const FAQsSectionConfig: ComponentConfig<FAQsSectionProps> = {
       getItemSummary: (item) => item.question || "FAQ",
       ai: {
         instructions:
-          "Always use the getFAQs tool to populate the FAQs array. Use the business name as the brand, provide the locationUrl if available, include the entityType (e.g., restaurant, hotel, financial services), and location details (e.g., city, address) when available. The tool will return an array of FAQs with question and answer fields. Use the returned FAQs directly without modification.",
+          "Always use the getFAQs tool to populate the FAQs array. Use the returned FAQs directly without modification.",
         stream: false,
       },
       arrayFields: {
         question: {
           type: "text",
           label: "Question",
-          ai: {
-            instructions:
-              "Create SEO-optimized questions that potential customers would search for about this brick-and-mortar location. Include location-specific questions (e.g., 'Where is [Business Name] located?', 'What are your hours?', 'Do you offer [service] at your [location] location?'). Questions should be natural and match common search queries.",
-          },
+          // ai: {
+          //   instructions:
+          //     "Create SEO-optimized questions that potential customers would search for about this brick-and-mortar location. Include location-specific questions (e.g., 'Where is [Business Name] located?', 'What are your hours?', 'Do you offer [service] at your [location] location?'). Questions should be natural and match common search queries.",
+          // },
         },
         answer: {
           type: "textarea",
           label: "Answer",
-          ai: {
-            instructions:
-              "Provide comprehensive, SEO-optimized answers that include location-specific details, business name, services offered, and relevant information. Include internal links to other pages using markdown format: [link text](url). Answers should be detailed enough to satisfy search intent while maintaining readability. Include local keywords naturally.",
-          },
+          // ai: {
+          //   instructions:
+          //     "Provide comprehensive, SEO-optimized answers that include location-specific details, business name, services offered, and relevant information. Include internal links to other pages using markdown format: [link text](url). Answers should be detailed enough to satisfy search intent while maintaining readability. Include local keywords naturally.",
+          // },
         },
       },
       defaultItemProps: {
@@ -316,12 +319,11 @@ export const FAQsSectionConfig: ComponentConfig<FAQsSectionProps> = {
     ],
     padding: "64px",
   },
-  ai: {
-    instructions:
-      "Create a comprehensive FAQs section for a brick-and-mortar location landing page. Always use the getFAQs tool to retrieve FAQs for the business. The tool will attempt to extract FAQs from the brand's location landing page if a locationUrl is provided, or generate appropriate FAQs using AI based on the brand, entity type, and location. The FAQs should address common customer questions about the location, services, hours, policies, and other relevant information. Questions and answers should be optimized for local SEO and include location-specific details when available.",
-  },
+  // ai: {
+  //   instructions:
+  //     "Aa comprehensive FAQs section for a brick-and-mortar location landing page. Always use the getFAQs tool to retrieve FAQs for the business. The tool will attempt to extract FAQs from the brand's location landing page if a locationUrl is provided, or generate appropriate FAQs using AI based on the brand, entity type, and location. The FAQs should address common customer questions about the location, services, hours, policies, and other relevant information. Questions and answers should be optimized for local SEO and include location-specific details when available.",
+  // },
   render: FAQsSection,
 };
 
 export default FAQsSection;
-

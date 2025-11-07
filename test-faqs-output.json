@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-11-07T17:56:47.538Z",
+  "timestamp": "2025-11-07T18:06:21.753Z",
   "summary": {
     "passed": 3,
     "failed": 0,
@@ -14,12 +14,8 @@
       "success": true,
       "faqs": [
         {
-          "question": "How do I know which restaurants are participating in Mobile Order & Pay?",
-          "answer": "Make sure you turn on location services so that we can include all of the available features in the McDonald's app. Mobile Order & Pay will be available in the McDonald's app as a feature when you're within 5 miles of a McDonald's restaurant that offers Mobile Order & Pay. Within the location map, after selecting a restaurant icon, selecting the detail box will also indicate if Mobile Order & Pay is available at a particular location. If the restaurant is participating, \"Order Here\" will be available at the bottom of the detail page, allowing you to select it and begin the order. If not, \"Order Here\" will be muted, indicating that Mobile Order & Pay is not enabled at that location."
-        },
-        {
           "question": "What forms of payment are accepted?",
-          "answer": "You can register Visa, MasterCard, American Express and Discover cards in the app. Payment cards registered must be issued by a U.S. bank. If you have an iOS device, and your card is registered to your Apple Wallet, Apple Pay will automatically function as a payment option within the McDonald’s app. If you have registered a card to the Google Pay™ app on your Android, you can select Google Pay™ as a payment method in the McDonald's app. Payments with PayPal and Venmo are now also available with Mobile Order & Pay."
+          "answer": "You can register Visa, MasterCard, American Express and Discover cards in the app. Payment cards registered must be issued by a U.S. bank. If you have an iOS device, and your card is registered to your Apple Wallet, Apple Pay will automatically function as a payment option within the McDonald’s app. If you have registered a card to the Google Pay™ app on your Android, you can select Google Pay™ as a payment method in the [McDonald's app](https://www.mcdonalds.com/us/en-us/download-app.html). Payments with PayPal and Venmo are now also available with Mobile Order & Pay."
         },
         {
           "question": "Does McDonald’s have Contactless Delivery?",
@@ -27,22 +23,18 @@
         },
         {
           "question": "How Does McDonald’s Curbside Pickup Work?",
-          "answer": "By using the McDonald’s app you can get your food via curbside without leaving your vehicle."
+          "answer": "By using the [McDonald’s app](https://www.mcdonalds.com/us/en-us/download-app.html) you can get your food via curbside without leaving your vehicle."
         },
         {
           "question": "How Do I Order McDonald’s Contactless Delivery?",
           "answer": "To order McDonald’s contactless delivery, select your favorites in DoorDash, Uber Eats, Grubhub, or Postmates as you usually would. When you are checking out, choose the “Leave at Door” option in the Uber Eats app, “Leave at my door” option in the DoorDash app, or \"contact-free delivery\" in the Grubhub app, or choose the dropoff option \"Leave order at my door\" on Postmates."
         },
         {
-          "question": "How do I find McDonald’s contactless delivery near me?",
-          "answer": "To find McDonald’s contactless delivery near you, simply download the DoorDash, Uber Eats, Grubhub, or Postmates app. You can allow access to your location or input the address where you want to order your food for delivery. The apps will automatically find a McDonald’s nearest you! Simply select McDonald’s and add your favorites – then choose “Leave at Door” while checking out on Uber Eats, “Leave at my Door” during checkout on DoorDash, \"Contact-free delivery\" when checking out on Grubhub, or choose the dropoff option \"Leave order at my door\" on Postmates!"
-        },
-        {
           "question": "Is There Recording Happening at McDonald’s Restaurants?",
-          "answer": "Yes, we record video for service improvement, technology development and security purposes. Find more information in the recording notice FAQ."
+          "answer": "Yes, we record video for service improvement, technology development and security purposes. Find more information in the[recording notice FAQ](https://www.mcdonalds.com/us/en-us/faq/mcdonalds-app.html#recording-notice)."
         }
       ],
-      "duration": 12954
+      "duration": 18100
     },
     {
       "brand": "TIAA",
@@ -52,15 +44,23 @@
       "success": true,
       "faqs": [
         {
-          "question": "What are the operating hours and contact details for the TIAA Financial Services office at 730 Third Avenue in New York?",
-          "answer": "The TIAA Financial Services office at 730 Third Avenue, 6th Floor, New York, NY 10017 is currently open and closes at 5:00 PM on Friday. Visits are by appointment only. You can contact them directly at (212) 916-5800 or via the Toll-Free Number: (800) 842-2733."
+          "question": "What are the contact details and operating hours for TIAA Financial Services at 730 Third Avenue in New York?",
+          "answer": "The TIAA Financial Services office at 730 Third Avenue, 6th Floor, New York, NY 10017 is currently open and closes at 5:00 PM on Friday. Visits are by appointment only. You can get directions here: https://maps.google.com/maps/search/?api=1&query=730%20Third%20Avenue,%206th%20Floor,%20New%20York,%20NY,%2010017,%20US. The direct line is (212) 916-5800 and the toll-free number is (800) 842-2733."
         },
         {
-          "question": "Is the TIAA Financial Services location at 2815 Broadway in New York currently open?",
-          "answer": "The TIAA Financial Services location at 2815 Broadway, New York, NY 10025 is temporarily closed. You can call (800) 842-2733 for more information."
+          "question": "How can I connect with a Wealth Management Advisor?",
+          "answer": "You can connect with Wealth Management Advisor Alexander Newman. Visit his profile here: https://locations.tiaa.org/advisors/alexander-newman for more information."
+        },
+        {
+          "question": "What is the status of the TIAA Financial Services location at 2815 Broadway in New York?",
+          "answer": "The TIAA Financial Services location at 2815 Broadway, New York, NY 10025 is temporarily closed. You can call (800) 842-2733 for assistance. More details can be found here: https://locations.tiaa.org/ny/new-york/2815-broadway."
+        },
+        {
+          "question": "What are the contact details and operating hours for TIAA Financial Services in Roseland, NJ?",
+          "answer": "The TIAA Financial Services office at 5 Becker Farm Rd. Suite 140, Roseland, NJ 07068 is currently open and closes at 5:00 PM on Friday. You can reach them at (866) 271-0951. More details can be found here: https://locations.tiaa.org/nj/roseland/5-becker-farm-rd."
         }
       ],
-      "duration": 20311
+      "duration": 28170
     },
     {
       "brand": "Starbucks",
@@ -70,42 +70,26 @@
       "faqs": [
         {
           "question": "How do I search and apply for a position?",
-          "answer": "To search and apply for a position at Starbucks, please click on the tab labelled ‘search jobs’ at the top of the home page. This will lead you to a list of positions which we are currently recruiting for.\n\n\n\nCan I apply for more than one position within Starbucks at any one time"
+          "answer": "To search and apply for a position at Starbucks, please click on the tab labelled ‘search jobs’ at the top of the home page. This will lead you to a list of positions which we are currently recruiting for."
         },
         {
           "question": "How will I know if my application has been received?",
-          "answer": "Once you have submitted your application you will receive an email to say that we have received it.\n\n\n\nHow long will it take after I submit my application to receive a response"
+          "answer": "Once you have submitted your application you will receive an email to say that we have received it."
         },
         {
           "question": "What is the best way to stay updated on career opportunities at Starbucks?",
-          "answer": "To keep up to date on the latest career opportunities the search button is the best place to look. For retail stores we operate in licensed partnership with fantastic local and international operators across the UK and the Netherlands. Job vacancies for licensed partner operators are not listed on this website, if you cannot see opportunities for your area please visit your local store to find out how to apply\n\n\n\nWill I receive feedback on my application even if I am unsuccessful"
+          "answer": "To keep up to date on the latest career opportunities the search button is the best place to look. For retail stores we operate in licensed partnership with fantastic local and international operators across the UK and the Netherlands. Job vacancies for licensed partner operators are not listed on this website, if you cannot see opportunities for your area please visit your local store to find out how to apply."
         },
         {
           "question": "If I am unsuccessful, can I reapply for another position within Starbucks?",
-          "answer": "If you are unsuccessful for a position here at Starbucks you are more than welcome to reapply for another role. We recommend that you keep an eye on all the latest vacancies on the careers page.\n\n\n\nHow often is the careers page updated"
-        },
-        {
-          "question": "If I have worked for Starbucks before how should I apply to re-join?",
-          "answer": "It’s exciting to learn that you are interested in joining Starbucks again"
+          "answer": "If you are unsuccessful for a position here at Starbucks you are more than welcome to reapply for another role. We recommend that you keep an eye on all the latest vacancies on the careers page."
         },
         {
           "question": "Are there any tips on how I might better my Starbucks application?",
-          "answer": "Ensure your CV is up to date and provide as much relavant information within your application. Making sure you give us your correct contact details is a must, so double check before you click apply\n\n\n\nI’m having trouble submitting my application, what should I do"
-        },
-        {
-          "question": "I have a disability, are you able to cater to my requirements if I am invited in for an interview?",
-          "answer": "Yes, please let us know in advance of your interview and we will do everything we can to cater to your requirements.\n\n\n\nI require sponsorship to work in the EU, are Starbucks able to help sponsor me"
-        },
-        {
-          "question": "Are all Starbucks vacancies posted on the careers page?",
-          "answer": "Starbucks operate in licensed partnership with fantastic local and international operators across the UK and the Netherlands. Job vacancies for licensed partner operators are not listed on this website, if you cannot see opportunities for your area please visit your local store to find out how to apply.\n\n\n\nWhat do I do if I encounter a technical issue (i.e. map not displaying)"
-        },
-        {
-          "question": "Still experiencing problems?",
-          "answer": "Please get in touch by emailing [emeacareers@starbucks.com](mailto:emeacareers@starbucks.com).\n\n\n\nHow do I view the website in another language (i.e. Dutch)"
+          "answer": "Ensure your CV is up to date and provide as much relevant information within your application. Making sure you give us your correct contact details is a must, so double check before you click apply."
         }
       ],
-      "duration": 19597
+      "duration": 18702
     }
   ]
 }

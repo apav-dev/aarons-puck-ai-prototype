@@ -414,20 +414,20 @@ Consider the business type, available imagery quality, and desired emotional ton
     headingFont: {
       type: "text",
       label: "Heading Font",
-      // ai: {
-      //   instructions:
-      //     "Always use the getFontFamily tool. Use the business name from the businessName field as the brand, 'heading' as the fontType, and any available entity type context.",
-      //   stream: false,
-      // },
+      ai: {
+        instructions:
+          "Always use the getFontFamily tool. Use the business name from the businessName field as the brand, 'heading' as the fontType, and any available entity type context.",
+        stream: false,
+      },
     },
     bodyFont: {
       type: "text",
       label: "Body Font",
-      // ai: {
-      //   instructions:
-      //     "Always use the getFontFamily tool. Use the business name from the businessName field as the brand, 'body' as the fontType, and any available entity type context.",
-      //   stream: false,
-      // },
+      ai: {
+        instructions:
+          "Always use the getFontFamily tool. Use the business name from the businessName field as the brand, 'body' as the fontType, and any available entity type context.",
+        stream: false,
+      },
     },
     colors: {
       type: "object",
@@ -438,11 +438,11 @@ Consider the business type, available imagery quality, and desired emotional ton
         background: { type: "text", label: "Background Color" },
         text: { type: "text", label: "Text Color" },
       },
-      // ai: {
-      //   instructions:
-      //     "Always use the getBrandColors tool. Use the business name from the businessName field as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
-      //   stream: false,
-      // },
+      ai: {
+        instructions:
+          "Always use the getBrandColors tool. Use the business name from the businessName field as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
+        stream: false,
+      },
     },
   },
   ai: {

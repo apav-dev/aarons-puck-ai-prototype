@@ -32,7 +32,7 @@ export const faqsOutputSchema = z.object({
   faqs: z
     .array(faqItemSchema)
     .min(1)
-    .max(10)
+    .max(5)
     .describe("Array of FAQ items with question and answer"),
 });
 
@@ -418,61 +418,146 @@ export async function refineFAQsWithAI(
     }
   }
 
-  const prompt = `You are cleaning up and refining FAQs extracted from a website for ${brand}${
+  // Truncate very long answers in input to reduce token usage
+  // We'll preserve up to 800 chars per answer, which should be enough for context
+  const truncatedFAQs = rawFAQs.slice(0, 12).map((faq) => ({
+    question: faq.question.substring(0, 300), // Limit question length
+    answer: faq.answer.substring(0, 800), // Limit answer length for input
+  }));
+
+  const prompt = `Clean and refine FAQs for ${brand}${
     entityType ? ` (${entityType})` : ""
   }${location ? ` in ${location}` : ""}.
 
-Below are raw FAQs that were extracted from a web page. Some may be incorrectly formatted, contain non-FAQ content (like lists, hours, contact info, footers), or have questions and answers mixed together.
+CRITICAL: PRESERVE original content. Only fix formatting. Do NOT invent information.
+Keep answers concise but complete (aim for 100-300 words max per answer).
 
-CRITICAL INSTRUCTIONS:
-- PRESERVE the original content from the scraped FAQs. Do NOT invent new information or answers.
-- Only clean up formatting, remove markdown artifacts, and fix minor issues.
-- Keep the original meaning and details from the scraped content.
-- If a FAQ is valid but poorly formatted, fix the formatting while keeping the original content.
-- Do NOT rewrite answers with information you think might be correct - only use what was actually scraped.
+Tasks:
+1. Filter non-FAQs (blogs, lists, footers, etc.)
+2. Fix formatting (add "?" to questions, clean markdown)
+3. Keep original meaning and details
+4. Select best 3-5 FAQs (MAX 5)
+5. Keep answers concise - if an answer is very long, preserve the key information but trim unnecessary details
 
-Your task:
-1. Filter out any items that are NOT actual FAQs, including:
-   - Blog posts, Reddit comments, forum discussions
-   - Lists of advisors, team members, or staff
-   - Hours listings (unless part of a question)
-   - Contact info, navigation links, footers
-   - Social media sharing buttons or "buy me a coffee" links
-   - Review site content or user-generated content
-   - Any content that looks like it's from a blog, forum, or social media
-2. Ensure each question ends with a "?" and is a proper question (fix formatting only, don't change meaning)
-3. Clean up answers to remove markdown artifacts, extra formatting, URLs, and ensure they're readable - but PRESERVE the original content and meaning
-4. Separate questions from answers if they're mixed together
-5. Keep only the most relevant FAQs that are official business information
-6. Ensure questions are customer-focused and location-specific where possible
-7. If the content appears to be from blogs, Reddit, forums, or review sites, return an empty array
+Raw FAQs:
+${JSON.stringify(truncatedFAQs, null, 2)}
 
-CRITICAL: You MUST return AT MOST 10 FAQs. The response schema enforces a maximum of 10 items. If you return more than 10 FAQs, the validation will fail. Select only the best, most relevant FAQs (aim for 5-10 items).
-
-Raw FAQs to refine (showing up to 15):
-${JSON.stringify(rawFAQs.slice(0, 15), null, 2)}
-
-Return only properly formatted FAQs that preserve the original scraped content. Remember: MAXIMUM 10 FAQs, and PRESERVE the original information - do not invent or hallucinate content.`;
+Return formatted FAQs preserving original content. MAX 5 items. Keep answers concise.`;
 
   try {
     const { object } = await generateObject({
       model: google("gemini-2.5-flash"),
       system:
-        "You are an expert at cleaning and formatting FAQs. Your job is to PRESERVE the original scraped content while cleaning up formatting. Do NOT invent or hallucinate information - only use what was actually scraped. Filter out non-FAQ content and ensure proper question/answer formatting. CRITICAL: You must return at most 10 FAQs. The schema validation will fail if you return more than 10 items.",
+        "Clean and format FAQs. PRESERVE original content. Only fix formatting. Return max 5 FAQs.",
       prompt: prompt,
       schema: faqsOutputSchema,
       schemaName: "FAQs",
       schemaDescription:
-        "An array of cleaned FAQ items, each with a properly formatted question and answer. Maximum 10 items allowed.",
+        "An array of cleaned FAQ items, each with a properly formatted question and answer. Maximum 5 items allowed.",
       temperature: 0.1, // Very low temperature to preserve original content and minimize hallucination
       mode: "json",
-      maxOutputTokens: 4000, // Increased to handle up to 10 FAQs with detailed answers
+      maxOutputTokens: 8000, // Sufficient for up to 5 FAQs with detailed answers
     });
 
-    // Ensure we never return more than 10 FAQs (schema limit)
-    return object.faqs.slice(0, 10);
-  } catch (error) {
+    // Ensure we never return more than 5 FAQs (schema limit)
+    return object.faqs.slice(0, 5);
+  } catch (error: any) {
     console.error("Error refining FAQs with AI:", error);
+
+    // Try to extract partial results if JSON was truncated
+    if (
+      error.text &&
+      (error.finishReason === "length" ||
+        error.message?.includes("parse") ||
+        error.message?.includes("Unterminated"))
+    ) {
+      try {
+        let jsonText = error.text;
+
+        // Strategy: Find the last complete FAQ item by looking for complete question/answer pairs
+        // Look for patterns like: "question": "...",\n      "answer": "..."
+        // Then find the closing brace after a complete answer
+
+        // Find all complete FAQ items by looking for the pattern: }, followed by either }, or end
+        const faqItemPattern =
+          /"question":\s*"[^"]*",\s*\n\s*"answer":\s*"[^"]*"/g;
+        const matches = Array.from(
+          jsonText.matchAll(faqItemPattern)
+        ) as RegExpMatchArray[];
+
+        if (matches.length > 0) {
+          // Find the position after the last complete FAQ item
+          const lastMatch = matches[matches.length - 1];
+          const matchIndex = lastMatch.index ?? -1;
+          if (matchIndex >= 0 && lastMatch[0]) {
+            const afterLastMatch = matchIndex + lastMatch[0].length;
+
+            // Look for the closing brace of this FAQ item
+            let closingBraceIndex = jsonText.indexOf("  }", afterLastMatch);
+            if (closingBraceIndex === -1) {
+              // Try to find it in the remaining text
+              closingBraceIndex = jsonText.indexOf("\n    }", afterLastMatch);
+            }
+
+            if (closingBraceIndex > 0) {
+              // Extract up to and including the last complete FAQ
+              let fixedJson = jsonText.substring(0, closingBraceIndex + 3);
+
+              // Remove trailing comma if present
+              fixedJson = fixedJson.replace(/,\s*$/, "");
+
+              // Close the array and object properly
+              if (!fixedJson.trim().endsWith("]")) {
+                fixedJson += "\n  ]";
+              }
+              if (!fixedJson.trim().endsWith("}")) {
+                fixedJson += "\n}";
+              }
+
+              const partialResult = JSON.parse(fixedJson);
+              if (
+                partialResult.faqs &&
+                Array.isArray(partialResult.faqs) &&
+                partialResult.faqs.length > 0
+              ) {
+                console.warn(
+                  `Extracted ${partialResult.faqs.length} FAQs from truncated response`
+                );
+                return partialResult.faqs.slice(0, 5);
+              }
+            }
+          }
+        }
+
+        // Fallback: Try to find last complete closing brace pattern
+        const lastBraceMatch = jsonText.lastIndexOf("\n    },\n");
+        if (lastBraceMatch > 0) {
+          let fixedJson = jsonText.substring(0, lastBraceMatch + 5);
+          fixedJson = fixedJson.replace(/,\s*$/, "");
+          if (!fixedJson.trim().endsWith("]")) fixedJson += "\n  ]";
+          if (!fixedJson.trim().endsWith("}")) fixedJson += "\n}";
+
+          const partialResult = JSON.parse(fixedJson);
+          if (
+            partialResult.faqs &&
+            Array.isArray(partialResult.faqs) &&
+            partialResult.faqs.length > 0
+          ) {
+            console.warn(
+              `Extracted ${partialResult.faqs.length} FAQs from truncated response (fallback method)`
+            );
+            return partialResult.faqs.slice(0, 5);
+          }
+        }
+      } catch (parseError) {
+        // If we can't parse partial JSON, fall through to fallback
+        console.warn(
+          "Could not extract partial results from truncated JSON:",
+          parseError
+        );
+      }
+    }
+
     // Return filtered raw FAQs as fallback
     return rawFAQs
       .filter(
@@ -486,7 +571,7 @@ Return only properly formatted FAQs that preserve the original scraped content. 
           !faq.question.toLowerCase().includes("contact us") &&
           !faq.question.match(/^\d+\.\s*$/) // Not just a number
       )
-      .slice(0, 10); // Changed from 8 to 10 to match schema limit
+      .slice(0, 5); // Limit to 5 FAQs to match schema limit
   }
 }
 
@@ -504,7 +589,7 @@ export async function generateFAQsWithAI(
     return [];
   }
 
-  const prompt = `Generate 5-8 frequently asked questions (FAQs) for a brick-and-mortar ${
+  const prompt = `Generate 3-5 frequently asked questions (FAQs) for a brick-and-mortar ${
     entityType || "business"
   } location${location ? ` in ${location}` : ""} called ${brand}.
 

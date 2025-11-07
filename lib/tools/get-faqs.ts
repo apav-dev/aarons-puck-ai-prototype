@@ -46,8 +46,8 @@ export const getFAQs = tool({
       );
 
       if (extractedFAQs.length > 0) {
-        // Return extracted FAQs (limit to 10)
-        return extractedFAQs.slice(0, 10);
+        // Return extracted FAQs (limit to 5)
+        return extractedFAQs.slice(0, 5);
       }
 
       // If no FAQs found, generate them using AI
