@@ -12,7 +12,7 @@ import classnames from "classnames";
 const getClassName = getClassNameFactory("HeroSection", styles);
 
 export type HeroSectionProps = {
-  variant?: "Classic" | "Spotlight";
+  variant?: "Classic" | "Spotlight" | "Immersive";
   businessNameLabel: string;
   businessName: string;
   statusText: string;
@@ -114,30 +114,53 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
   }, [headingFont, bodyFont]);
 
   const isSpotlight = variant === "Spotlight";
+  const isImmersive = variant === "Immersive";
+
+  // Override text colors for Immersive variant (white text on dark background)
+  const immersiveTextColorStyle = isImmersive
+    ? { color: "#ffffff" }
+    : undefined;
+  const immersiveTextStyle = isImmersive
+    ? { ...bodyStyle, ...immersiveTextColorStyle }
+    : { ...bodyStyle, ...textColorStyle };
+  const immersiveHeadingStyle = isImmersive
+    ? { ...headingStyle, ...immersiveTextColorStyle }
+    : { ...headingStyle, ...textColorStyle };
 
   const contentElement = (
     <div className={getClassName("content")}>
       <div
         className={getClassName("label")}
-        style={{ ...bodyStyle, ...textColorStyle }}
+        style={
+          isImmersive ? immersiveTextStyle : { ...bodyStyle, ...textColorStyle }
+        }
       >
         {businessNameLabel}
       </div>
       <h1
         className={getClassName("title")}
-        style={{ ...headingStyle, ...textColorStyle }}
+        style={
+          isImmersive
+            ? immersiveHeadingStyle
+            : { ...headingStyle, ...textColorStyle }
+        }
       >
         {businessName}
       </h1>
       <div
         className={getClassName("status")}
-        style={{ ...bodyStyle, ...textColorStyle }}
+        style={
+          isImmersive ? immersiveTextStyle : { ...bodyStyle, ...textColorStyle }
+        }
       >
         {statusText}
       </div>
 
       <div className={getClassName("rating")}>
-        <span className={getClassName("ratingValue")} style={textColorStyle}>
+        <span
+          className={getClassName("ratingValue")}
+          style={isImmersive ? immersiveTextColorStyle : textColorStyle}
+        >
           {rating}
         </span>
         <div className={getClassName("stars")}>
@@ -189,7 +212,11 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
         </div>
         <span
           className={getClassName("reviewCount")}
-          style={{ ...bodyStyle, ...textColorStyle }}
+          style={
+            isImmersive
+              ? immersiveTextStyle
+              : { ...bodyStyle, ...textColorStyle }
+          }
         >
           ({reviewCount} reviews)
         </span>
@@ -244,6 +271,37 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
     );
   }
 
+  if (isImmersive) {
+    return (
+      <Section
+        className={classnames(getClassName(), getClassName("immersive"))}
+        style={{
+          ...sectionStyle,
+          paddingTop: 0,
+          paddingBottom: 0,
+          paddingLeft: 0,
+          paddingRight: 0,
+          paddingInlineStart: 0,
+          paddingInlineEnd: 0,
+        }}
+      >
+        <div className={getClassName("immersiveInner")}>
+          <div className={getClassName("immersiveImageWrapper")}>
+            <div className={getClassName("immersiveOverlay")} />
+            <img
+              src={imageUrl}
+              alt={businessName}
+              className={getClassName("immersiveImage")}
+            />
+          </div>
+          <div className={getClassName("immersiveContent")}>
+            {contentElement}
+          </div>
+        </div>
+      </Section>
+    );
+  }
+
   return (
     <Section className={getClassName()} style={sectionStyle}>
       <div className={getClassName("inner")}>
@@ -268,6 +326,7 @@ export const HeroSectionConfig: ComponentConfig<HeroSectionProps> = {
       options: [
         { label: "Classic", value: "Classic" },
         { label: "Spotlight", value: "Spotlight" },
+        { label: "Immersive", value: "Immersive" },
       ],
     },
     businessNameLabel: {
