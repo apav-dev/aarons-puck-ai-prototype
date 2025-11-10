@@ -446,8 +446,7 @@ Consider the business type, available imagery quality, and desired emotional ton
     },
   },
   ai: {
-    instructions:
-      "Create a hero section for a brick-and-mortar store landing page. Always place this section at the top of the page. The image should be a stock image of a storefront.",
+    instructions: "This section should go below the header section.",
   },
   defaultProps: {
     variant: "Classic",
@@ -467,6 +466,7 @@ Consider the business type, available imagery quality, and desired emotional ton
     imageUrl:
       "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop",
   },
+
   render: HeroSection,
 };
 

@@ -24,7 +24,6 @@ export async function POST(request: Request) {
   - If the user mentions an entity type (e.g., "location", "restaurant", "hotel", etc.) in their prompt, respect and use that entity type to inform your component selection and page structure
   - When a business name or entity type is specified in the user's prompt, ensure all generated content appropriately reflects that business and entity type
   - CRITICAL: When creating multiple components with image fields, you MUST call the getImage tool separately for EACH component's image fields. Do not reuse a single image across multiple components. Each component (Hero, PromoSection, ProductsSection, InsightsSection, EventsSection, TeamSection) requires its own image(s) gathered via the getImage tool. For array fields (like products, insights, events, team members), gather an image for EACH item in the array.
-  - When creating an FAQsSection component, you MUST use the getFAQs tool to retrieve FAQs. The tool accepts brand (required), locationUrl (optional), entityType (optional), and location (optional) parameters. Provide as much context as available to get the most relevant FAQs. The tool will return an array of FAQs that should be used directly to populate the faqs field.
 </rules>
 
 <thinking-instructions>
@@ -33,7 +32,8 @@ export async function POST(request: Request) {
   2. How should these components be configured or arranged?
   3. Are there any SEO or accessibility considerations?
   4. Which components have image fields that require calling getImage? Make sure to call getImage for ALL of them, not just one.
-</thinking-instructions>`,
+</thinking-instructions>
+`,
       tools: {
         getImage,
         getFAQs,

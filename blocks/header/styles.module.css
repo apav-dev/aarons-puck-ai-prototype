@@ -1,0 +1,133 @@
+.HeaderSection {
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.HeaderSection-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .HeaderSection-inner {
+    padding: 20px 32px;
+    gap: 32px;
+  }
+}
+
+.HeaderSection-logoWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.HeaderSection-logo {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+@media (min-width: 768px) {
+  .HeaderSection-logo {
+    height: 48px;
+  }
+}
+
+.HeaderSection-nav {
+  display: none;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .HeaderSection-nav {
+    display: flex;
+  }
+}
+
+.HeaderSection-navLink {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  text-decoration: none;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.HeaderSection-navLink:hover {
+  color: #dc2626;
+}
+
+.HeaderSection-ctas {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.HeaderSection-primaryCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.HeaderSection-primaryCta:hover {
+  background-color: #b91c1c;
+}
+
+.HeaderSection-secondaryCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background-color: white;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.HeaderSection-secondaryCta:hover {
+  background-color: #fef2f2;
+}
+
+/* Mobile menu - hide CTAs on very small screens */
+@media (max-width: 640px) {
+  .HeaderSection-ctas {
+    gap: 8px;
+  }
+
+  .HeaderSection-primaryCta,
+  .HeaderSection-secondaryCta {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
+

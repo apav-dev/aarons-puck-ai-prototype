@@ -226,8 +226,7 @@ export const FAQsSectionConfig: ComponentConfig<FAQsSectionProps> = {
       getItemSummary: (item) => item.question || "FAQ",
       ai: {
         instructions:
-          "Always use the getFAQs tool to populate the FAQs array. Use the returned FAQs directly without modification.",
-        stream: false,
+          "CRITICAL: You MUST use the getFAQs tool to populate the FAQs array. Call getFAQs with the business name as the brand parameter, and optionally include entityType and location if available. Use the returned FAQs array directly without modification - do not generate FAQs manually. The getFAQs tool will return an array of FAQ objects with 'question' and 'answer' properties that should be used exactly as returned.",
       },
       arrayFields: {
         question: {

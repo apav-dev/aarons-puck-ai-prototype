@@ -37,7 +37,7 @@
 [LOG] 
 🤖 Calling searchAndExtractFAQs...
 [LOG] 
-✅ Success! (took 18100ms)
+✅ Success! (took 14965ms)
 [LOG] 
 📊 Found 5 FAQ(s):
 
@@ -101,40 +101,33 @@
 [LOG] 
 🤖 Calling searchAndExtractFAQs...
 [LOG] 
-✅ Success! (took 28170ms)
+✅ Success! (took 16857ms)
 [LOG] 
-📊 Found 4 FAQ(s):
+📊 Found 3 FAQ(s):
 
-[LOG] 1. Q: What are the contact details and operating hours for TIAA Financial Services at 730 Third Avenue in New York?
+[LOG] 1. Q: What are the operating hours and contact details for TIAA Financial Services in New York, NY?
 [LOG]    A: The TIAA Financial Services office at 730 Third Avenue, 6th Floor, New York, NY 10017 is currently open and closes at 5:00 PM on Friday. Visits are by...
 [LOG] 
-[LOG] 2. Q: How can I connect with a Wealth Management Advisor?
-[LOG]    A: You can connect with Wealth Management Advisor Alexander Newman. Visit his profile here: https://locations.tiaa.org/advisors/alexander-newman for more...
+[LOG] 2. Q: How can I find information about a Wealth Management Advisor at TIAA?
+[LOG]    A: You can find information about Wealth Management Advisors, such as Alexander Newman, by visiting their profile. Alexander Newman is a Wealth Managemen...
 [LOG] 
-[LOG] 3. Q: What is the status of the TIAA Financial Services location at 2815 Broadway in New York?
-[LOG]    A: The TIAA Financial Services location at 2815 Broadway, New York, NY 10025 is temporarily closed. You can call (800) 842-2733 for assistance. More deta...
-[LOG] 
-[LOG] 4. Q: What are the contact details and operating hours for TIAA Financial Services in Roseland, NJ?
-[LOG]    A: The TIAA Financial Services office at 5 Becker Farm Rd. Suite 140, Roseland, NJ 07068 is currently open and closes at 5:00 PM on Friday. You can reach...
+[LOG] 3. Q: Is the TIAA Financial Services location at 2815 Broadway in New York, NY currently open?
+[LOG]    A: The TIAA Financial Services location at 2815 Broadway, New York, NY 10025 is temporarily closed. You can contact them at (800) 842-2733.
 [LOG] 
 [LOG] 
 📋 Full FAQ data:
 [LOG] [
   {
-    "question": "What are the contact details and operating hours for TIAA Financial Services at 730 Third Avenue in New York?",
-    "answer": "The TIAA Financial Services office at 730 Third Avenue, 6th Floor, New York, NY 10017 is currently open and closes at 5:00 PM on Friday. Visits are by appointment only. You can get directions here: https://maps.google.com/maps/search/?api=1&query=730%20Third%20Avenue,%206th%20Floor,%20New%20York,%20NY,%2010017,%20US. The direct line is (212) 916-5800 and the toll-free number is (800) 842-2733."
+    "question": "What are the operating hours and contact details for TIAA Financial Services in New York, NY?",
+    "answer": "The TIAA Financial Services office at 730 Third Avenue, 6th Floor, New York, NY 10017 is currently open and closes at 5:00 PM on Friday. Visits are by appointment only. You can get directions to this location. The direct line is (212) 916-5800, and the toll-free number is (800) 842-2733."
   },
   {
-    "question": "How can I connect with a Wealth Management Advisor?",
-    "answer": "You can connect with Wealth Management Advisor Alexander Newman. Visit his profile here: https://locations.tiaa.org/advisors/alexander-newman for more information."
+    "question": "How can I find information about a Wealth Management Advisor at TIAA?",
+    "answer": "You can find information about Wealth Management Advisors, such as Alexander Newman, by visiting their profile. Alexander Newman is a Wealth Management Advisor."
   },
   {
-    "question": "What is the status of the TIAA Financial Services location at 2815 Broadway in New York?",
-    "answer": "The TIAA Financial Services location at 2815 Broadway, New York, NY 10025 is temporarily closed. You can call (800) 842-2733 for assistance. More details can be found here: https://locations.tiaa.org/ny/new-york/2815-broadway."
-  },
-  {
-    "question": "What are the contact details and operating hours for TIAA Financial Services in Roseland, NJ?",
-    "answer": "The TIAA Financial Services office at 5 Becker Farm Rd. Suite 140, Roseland, NJ 07068 is currently open and closes at 5:00 PM on Friday. You can reach them at (866) 271-0951. More details can be found here: https://locations.tiaa.org/nj/roseland/5-becker-farm-rd."
+    "question": "Is the TIAA Financial Services location at 2815 Broadway in New York, NY currently open?",
+    "answer": "The TIAA Financial Services location at 2815 Broadway, New York, NY 10025 is temporarily closed. You can contact them at (800) 842-2733."
   }
 ]
 [LOG] 
@@ -156,47 +149,47 @@
 [LOG] 
 🤖 Calling searchAndExtractFAQs...
 [LOG] 
-✅ Success! (took 18702ms)
+✅ Success! (took 25882ms)
 [LOG] 
 📊 Found 5 FAQ(s):
 
-[LOG] 1. Q: How do I search and apply for a position?
-[LOG]    A: To search and apply for a position at Starbucks, please click on the tab labelled ‘search jobs’ at the top of the home page. This will lead you to a l...
+[LOG] 1. Q: What is a Star?
+[LOG]    A: Stars are the loyalty currency you earn as a member of Starbucks® Rewards that can be redeemed for choices of Rewards such as free or discounted items...
 [LOG] 
-[LOG] 2. Q: How will I know if my application has been received?
-[LOG]    A: Once you have submitted your application you will receive an email to say that we have received it.
+[LOG] 2. Q: What are the benefits for Green Members?
+[LOG]    A: Green members in Starbucks Rewards™ can convert collected Stars into various Reward options: 30 Stars for a Free Selected Add-On (Espresso Shot/Syrup/...
 [LOG] 
-[LOG] 3. Q: What is the best way to stay updated on career opportunities at Starbucks?
-[LOG]    A: To keep up to date on the latest career opportunities the search button is the best place to look. For retail stores we operate in licensed partnershi...
+[LOG] 3. Q: How to redeem a Reward in-App?
+[LOG]    A: To redeem a Reward in-App, first you must log-in to your Starbucks account, choose the "Redeem ☆" button, then select your Reward option by clicking "...
 [LOG] 
-[LOG] 4. Q: If I am unsuccessful, can I reapply for another position within Starbucks?
-[LOG]    A: If you are unsuccessful for a position here at Starbucks you are more than welcome to reapply for another role. We recommend that you keep an eye on a...
+[LOG] 4. Q: What is a Starbucks Card?
+[LOG]    A: A Starbucks Card is a stored value card that you can use as a payment method at any Starbucks in Indonesia. You must activate and register your Starbu...
 [LOG] 
-[LOG] 5. Q: Are there any tips on how I might better my Starbucks application?
-[LOG]    A: Ensure your CV is up to date and provide as much relevant information within your application. Making sure you give us your correct contact details is...
+[LOG] 5. Q: How do I register my card?
+[LOG]    A: To register your card, download the Starbucks® Indonesia mobile app or visit cms.starbucks.co.id/card to create an account. You will need your physica...
 [LOG] 
 [LOG] 
 📋 Full FAQ data:
 [LOG] [
   {
-    "question": "How do I search and apply for a position?",
-    "answer": "To search and apply for a position at Starbucks, please click on the tab labelled ‘search jobs’ at the top of the home page. This will lead you to a list of positions which we are currently recruiting for."
+    "question": "What is a Star?",
+    "answer": "Stars are the loyalty currency you earn as a member of Starbucks® Rewards that can be redeemed for choices of Rewards such as free or discounted items at Starbucks. Stars can only be redeemed through the Starbucks® Indonesia mobile app."
   },
   {
-    "question": "How will I know if my application has been received?",
-    "answer": "Once you have submitted your application you will receive an email to say that we have received it."
+    "question": "What are the benefits for Green Members?",
+    "answer": "Green members in Starbucks Rewards™ can convert collected Stars into various Reward options: 30 Stars for a Free Selected Add-On (Espresso Shot/Syrup/Sauce), 60 Stars for a Free Tall sized Americano or Brewed Tea, or 120 Stars for any Free Tall sized Handcrafted Beverage or any Food. Green members also receive Birthday Treats on their birthday, including 25 Bonus Stars, a Birthday Cake Reward, and 2x Stars on their transaction."
   },
   {
-    "question": "What is the best way to stay updated on career opportunities at Starbucks?",
-    "answer": "To keep up to date on the latest career opportunities the search button is the best place to look. For retail stores we operate in licensed partnership with fantastic local and international operators across the UK and the Netherlands. Job vacancies for licensed partner operators are not listed on this website, if you cannot see opportunities for your area please visit your local store to find out how to apply."
+    "question": "How to redeem a Reward in-App?",
+    "answer": "To redeem a Reward in-App, first you must log-in to your Starbucks account, choose the \"Redeem ☆\" button, then select your Reward option by clicking \"use xx ☆\" until a redemption success prompt appears. Your new Reward will then be added under the \"Reward details\" tab. If you don’t see your recently converted Rewards, please refresh the \"Reward details\" tab or page."
   },
   {
-    "question": "If I am unsuccessful, can I reapply for another position within Starbucks?",
-    "answer": "If you are unsuccessful for a position here at Starbucks you are more than welcome to reapply for another role. We recommend that you keep an eye on all the latest vacancies on the careers page."
+    "question": "What is a Starbucks Card?",
+    "answer": "A Starbucks Card is a stored value card that you can use as a payment method at any Starbucks in Indonesia. You must activate and register your Starbucks Card to join the Starbucks Rewards™ program and gain access to its features and benefits."
   },
   {
-    "question": "Are there any tips on how I might better my Starbucks application?",
-    "answer": "Ensure your CV is up to date and provide as much relevant information within your application. Making sure you give us your correct contact details is a must, so double check before you click apply."
+    "question": "How do I register my card?",
+    "answer": "To register your card, download the Starbucks® Indonesia mobile app or visit cms.starbucks.co.id/card to create an account. You will need your physical card with you and follow the instructions to register your card."
   }
 ]
 [LOG] 

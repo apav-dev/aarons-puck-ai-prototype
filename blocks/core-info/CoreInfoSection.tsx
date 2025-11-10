@@ -372,6 +372,9 @@ export const CoreInfoSectionConfig: ComponentConfig<CoreInfoSectionProps> = {
     ],
     padding: "64px",
   },
+  ai: {
+    instructions: "This section should go below the hero section.",
+  },
   render: CoreInfoSection,
 };
 

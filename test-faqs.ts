@@ -24,25 +24,31 @@ const originalError = console.error;
 const originalWarn = console.warn;
 
 console.log = (...args: any[]) => {
-  const message = args.map((arg) => 
-    typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-  ).join(' ');
+  const message = args
+    .map((arg) =>
+      typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)
+    )
+    .join(" ");
   logMessages.push(`[LOG] ${message}`);
   originalLog(...args);
 };
 
 console.error = (...args: any[]) => {
-  const message = args.map((arg) => 
-    typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-  ).join(' ');
+  const message = args
+    .map((arg) =>
+      typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)
+    )
+    .join(" ");
   logMessages.push(`[ERROR] ${message}`);
   originalError(...args);
 };
 
 console.warn = (...args: any[]) => {
-  const message = args.map((arg) => 
-    typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-  ).join(' ');
+  const message = args
+    .map((arg) =>
+      typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)
+    )
+    .join(" ");
   logMessages.push(`[WARN] ${message}`);
   originalWarn(...args);
 };
@@ -73,9 +79,9 @@ async function testGetFAQs(
   location?: string
 ): Promise<TestResult> {
   console.log(
-    `\n🧪 Testing getFAQs for: ${brand}${
-      entityType ? ` (${entityType})` : ""
-    }${location ? ` in ${location}` : ""}`
+    `\n🧪 Testing getFAQs for: ${brand}${entityType ? ` (${entityType})` : ""}${
+      location ? ` in ${location}` : ""
+    }`
   );
   if (locationUrl) {
     console.log(`   Location URL: ${locationUrl}`);
@@ -215,7 +221,7 @@ async function testGetFAQs(
     }
 
     console.error("\nFull error:", error);
-    
+
     const testResult: TestResult = {
       brand,
       locationUrl,
@@ -292,7 +298,8 @@ async function main() {
       brand: "Starbucks",
       entityType: "coffee shop",
       location: "Seattle, WA",
-      description: "Starbucks without URL (should search and extract or generate)",
+      description:
+        "Starbucks without URL (should search and extract or generate)",
     },
   ];
 

@@ -23,6 +23,20 @@ const IMAGE_EXTENSIONS = [
   ".ico",
 ];
 
+// Non-image file extensions that should be blocked even if they're in image paths
+const BLOCKED_EXTENSIONS = [
+  ".ashx", // ASP.NET handler files
+  ".aspx", // ASP.NET pages
+  ".php", // PHP scripts
+  ".html", // HTML pages
+  ".htm", // HTML pages
+  ".js", // JavaScript files
+  ".css", // CSS files
+  ".xml", // XML files
+  ".json", // JSON files
+  ".pdf", // PDF files
+];
+
 // Domains known to host direct image URLs
 const TRUSTED_IMAGE_DOMAINS = [
   "unsplash.com",
@@ -68,6 +82,14 @@ function isValidImageUrl(url: string): boolean {
       if (hostname.includes(blockedDomain)) {
         return false;
       }
+    }
+
+    // Block URLs ending with non-image extensions (even if they're in image paths)
+    const hasBlockedExtension = BLOCKED_EXTENSIONS.some((ext) =>
+      pathname.endsWith(ext)
+    );
+    if (hasBlockedExtension) {
+      return false;
     }
 
     // Check if URL ends with image extension
@@ -182,4 +204,3 @@ export const getImage = tool({
     }
   },
 });
-

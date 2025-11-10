@@ -188,9 +188,25 @@ export async function searchAndExtractFAQs(
   entityType?: string,
   location?: string
 ): Promise<Array<{ question: string; answer: string }>> {
+  // Use NYC as proxy location if no location provided or location is "N/A"
+  const searchLocation =
+    !location || location === "N/A" ? "New York City" : location;
+
+  console.log(
+    `[searchAndExtractFAQs] Starting FAQ extraction for brand: "${brand}", entityType: "${
+      entityType || "N/A"
+    }", location: "${
+      location || "N/A"
+    }", searchLocation: "${searchLocation}", locationUrl: "${
+      locationUrl || "N/A"
+    }"`
+  );
   try {
     // If locationUrl is provided, try to extract directly from it
-    if (locationUrl) {
+    if (locationUrl && locationUrl !== "N/A") {
+      console.log(
+        `[searchAndExtractFAQs] Attempting direct extraction from provided URL: ${locationUrl}`
+      );
       try {
         const extracted = await getTavilyClient().extract([locationUrl], {
           extractDepth: "advanced",
@@ -199,47 +215,87 @@ export async function searchAndExtractFAQs(
         if (extracted?.results && extracted.results.length > 0) {
           const firstResult = extracted.results[0];
           if (firstResult?.rawContent) {
+            console.log(
+              `[searchAndExtractFAQs] Successfully extracted content from URL (${firstResult.rawContent.length} chars), extracting FAQs...`
+            );
             const faqs = extractFAQsFromText(firstResult.rawContent);
+            console.log(
+              `[searchAndExtractFAQs] Found ${faqs.length} raw FAQs from URL extraction`
+            );
             if (faqs.length > 0) {
               // Refine the extracted FAQs using AI
-              return await refineFAQsWithAI(faqs, brand, entityType, location);
+              console.log(
+                `[searchAndExtractFAQs] Refining ${faqs.length} FAQs with AI...`
+              );
+              const refinedFAQs = await refineFAQsWithAI(
+                faqs,
+                brand,
+                entityType,
+                location
+              );
+              console.log(
+                `[searchAndExtractFAQs] Returning ${refinedFAQs.length} refined FAQs from URL extraction`
+              );
+              console.log(
+                `[searchAndExtractFAQs] Refined FAQs:`,
+                JSON.stringify(refinedFAQs, null, 2)
+              );
+              return refinedFAQs;
+            } else {
+              console.log(
+                `[searchAndExtractFAQs] No FAQs found on provided location page, returning empty array for AI fallback`
+              );
+              return [];
             }
+          } else {
+            console.log(
+              `[searchAndExtractFAQs] No rawContent found in extraction result, returning empty array for AI fallback`
+            );
+            return [];
           }
+        } else {
+          console.log(
+            `[searchAndExtractFAQs] No results returned from URL extraction, returning empty array for AI fallback`
+          );
+          return [];
         }
       } catch (error) {
         console.warn(
-          `Failed to extract from provided URL ${locationUrl}:`,
+          `[searchAndExtractFAQs] Failed to extract from provided URL ${locationUrl}, returning empty array for AI fallback:`,
           error
         );
+        return [];
       }
     }
 
-    // Build search query for location landing page
-    // Be more specific to avoid blog posts and forums
-    const queryParts = [brand];
-    if (location) {
-      queryParts.push(location);
-    }
-    queryParts.push(
+    // Build search query specifically for location landing pages
+    // Target URLs like: brand.com/location/STATE/CITY/ADDRESS/ID.html
+    const queryParts = [
+      brand,
+      searchLocation,
       "location",
-      "store",
+      "store location",
       "branch",
-      "FAQ",
-      "frequently asked questions"
-    );
-    // Don't use site: operators as Tavily may not support them
-    // Instead, we'll filter URLs after getting results
+    ];
     const query = queryParts.join(" ");
+
+    console.log(
+      `[searchAndExtractFAQs] Searching Tavily for location page with query: "${query}"`
+    );
 
     // Search for location landing pages
     const searchResponse = await getTavilyClient().search(query, {
       search_depth: "advanced",
-      max_results: 5,
+      max_results: 10, // Get more results to find a good location page
     });
+    console.log(
+      `[searchAndExtractFAQs] Tavily search returned ${
+        searchResponse.results?.length || 0
+      } results`
+    );
 
-    // Filter URLs that look like location landing pages
-    // Exclude blog posts, Reddit, forums, review sites
-    const relevantUrls: string[] = [];
+    // Filter URLs to find actual location pages (like the McDonald's example)
+    // Look for URLs with patterns like: /location/STATE/CITY/... or /locations/.../...
     const excludedDomains = [
       "blog",
       "reddit.com",
@@ -253,131 +309,164 @@ export async function searchAndExtractFAQs(
       "wordpress.com",
       "blogger.com",
       "tumblr.com",
+      "contact-us",
+      "faq.html",
+      "help-center",
     ];
+
+    // Find the first URL that looks like a location page
+    let locationPageUrl: string | null = null;
 
     for (const result of searchResponse.results || []) {
       const url = result.url;
-      if (url && (result.score || 0) > 0.3) {
-        const urlLower = url.toLowerCase();
-
-        // Skip if it's from an excluded domain
-        const isExcluded = excludedDomains.some((domain) =>
-          urlLower.includes(domain)
-        );
-        if (isExcluded) {
-          continue;
-        }
-
-        // Check if URL looks like a location page
-        if (
-          urlLower.includes("/location") ||
-          urlLower.includes("/locations") ||
-          urlLower.includes("/store") ||
-          urlLower.includes("/branch") ||
-          urlLower.includes("/find") ||
-          urlLower.includes("/near") ||
-          (urlLower.includes(brand.toLowerCase().replace(/[^a-z0-9]/g, "")) &&
-            !urlLower.includes("/blog") &&
-            !urlLower.includes("/news") &&
-            !urlLower.includes("/article"))
-        ) {
-          relevantUrls.push(url);
-        }
+      if (!url || (result.score || 0) < 0.3) {
+        continue;
       }
-    }
 
-    // If no location-specific URLs found, try the top results
-    if (relevantUrls.length === 0 && searchResponse.results) {
-      relevantUrls.push(
-        ...searchResponse.results
-          .slice(0, 3)
-          .map((r) => r.url)
-          .filter((url): url is string => !!url)
+      const urlLower = url.toLowerCase();
+      const brandLower = brand.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+      // Skip excluded domains
+      const isExcluded = excludedDomains.some((domain) =>
+        urlLower.includes(domain)
       );
-    }
+      if (isExcluded) {
+        continue;
+      }
 
-    // Extract content from relevant URLs (batch extract)
-    let extractedContents: string[] = [];
-    if (relevantUrls.length > 0) {
-      try {
-        const extracted = await getTavilyClient().extract(relevantUrls, {
-          extractDepth: "advanced",
-        });
+      // Check if URL looks like a specific location page
+      // Pattern: /location/STATE/CITY/ADDRESS/ID.html or similar
+      const isLocationPage =
+        // Must include brand domain
+        urlLower.includes(brandLower) &&
+        // Must have /location/ in path (not just "location" in domain)
+        urlLower.match(/\/location[s]?\//) !== null &&
+        // Should have multiple path segments after /location/ (suggests specific location)
+        (urlLower.split("/location")[1]?.split("/").filter(Boolean).length ||
+          0) >= 2 &&
+        // Not a general FAQ or contact page
+        !urlLower.includes("/faq") &&
+        !urlLower.includes("/contact") &&
+        !urlLower.includes("/help");
 
-        if (extracted?.results) {
-          extractedContents = extracted.results
-            .map((result) => result?.rawContent || "")
-            .filter((content) => content.length > 0);
-        }
-      } catch (error) {
-        console.warn(`Failed to extract from URLs:`, error);
-        // Try extracting one by one as fallback
-        extractedContents = await Promise.all(
-          relevantUrls.map(async (url) => {
-            try {
-              const extracted = await getTavilyClient().extract([url], {
-                extractDepth: "advanced",
-              });
-              return extracted?.results?.[0]?.rawContent || "";
-            } catch (err) {
-              console.warn(`Failed to extract from ${url}:`, err);
-              return "";
-            }
-          })
+      if (isLocationPage) {
+        locationPageUrl = url;
+        console.log(
+          `[searchAndExtractFAQs] Found location page: ${locationPageUrl}`
         );
+        break; // Only use the first matching location page
       }
     }
 
-    // Try to extract FAQs from all extracted content
-    let allExtractedFAQs: Array<{ question: string; answer: string }> = [];
-    for (const content of extractedContents) {
-      if (content) {
-        // Check if content looks like blog/forum content
-        const contentLower = content.toLowerCase();
-        const isBlogContent =
-          contentLower.includes("reddit") ||
-          contentLower.includes("blogger.com") ||
-          contentLower.includes("buy me a coffee") ||
-          contentLower.includes("further reading") ||
-          contentLower.includes("sponsored post") ||
-          contentLower.includes("askseattle") ||
-          (contentLower.includes("comment") &&
-            contentLower.includes("reply") &&
-            contentLower.includes("share"));
-
-        if (isBlogContent) {
-          // Skip blog/forum content
-          continue;
-        }
-
-        const faqs = extractFAQsFromText(content);
-        if (faqs.length > 0) {
-          allExtractedFAQs.push(...faqs);
-        }
-      }
+    // If no location page found, return empty array to fall back to AI generation
+    if (!locationPageUrl) {
+      console.log(
+        `[searchAndExtractFAQs] No location page found, returning empty array for AI fallback`
+      );
+      return [];
     }
 
-    // Refine the extracted FAQs using AI
-    if (allExtractedFAQs.length > 0) {
+    // Extract content from the single location page
+    console.log(
+      `[searchAndExtractFAQs] Extracting content from location page: ${locationPageUrl}`
+    );
+    try {
+      const extracted = await getTavilyClient().extract([locationPageUrl], {
+        extractDepth: "advanced",
+      });
+
+      if (!extracted?.results || extracted.results.length === 0) {
+        console.log(
+          `[searchAndExtractFAQs] No content extracted from location page, returning empty array for AI fallback`
+        );
+        return [];
+      }
+
+      const firstResult = extracted.results[0];
+      const content = firstResult?.rawContent || "";
+
+      if (!content || content.length === 0) {
+        console.log(
+          `[searchAndExtractFAQs] Empty content extracted from location page, returning empty array for AI fallback`
+        );
+        return [];
+      }
+
+      console.log(
+        `[searchAndExtractFAQs] Successfully extracted content from location page (${content.length} chars), extracting FAQs...`
+      );
+
+      // Check if content looks like blog/forum content
+      const contentLower = content.toLowerCase();
+      const isBlogContent =
+        contentLower.includes("reddit") ||
+        contentLower.includes("blogger.com") ||
+        contentLower.includes("buy me a coffee") ||
+        contentLower.includes("further reading") ||
+        contentLower.includes("sponsored post") ||
+        contentLower.includes("askseattle") ||
+        (contentLower.includes("comment") &&
+          contentLower.includes("reply") &&
+          contentLower.includes("share"));
+
+      if (isBlogContent) {
+        console.log(
+          `[searchAndExtractFAQs] Content appears to be blog/forum content, returning empty array for AI fallback`
+        );
+        return [];
+      }
+
+      // Extract FAQs from the single content source
+      const faqs = extractFAQsFromText(content);
+      console.log(
+        `[searchAndExtractFAQs] Extracted ${faqs.length} raw FAQs from location page`
+      );
+
+      if (faqs.length === 0) {
+        console.log(
+          `[searchAndExtractFAQs] No FAQs found on location page, returning empty array for AI fallback`
+        );
+        return [];
+      }
+
+      // Refine the extracted FAQs using AI
+      console.log(
+        `[searchAndExtractFAQs] Refining ${faqs.length} raw FAQs with AI...`
+      );
       const refinedFAQs = await refineFAQsWithAI(
-        allExtractedFAQs,
+        faqs,
         brand,
         entityType,
         location
       );
 
-      // If refinement filtered everything out, it might be blog content
-      // Return empty array so we can fall back to AI generation
-      if (refinedFAQs.length === 0 && allExtractedFAQs.length > 3) {
+      if (refinedFAQs.length === 0) {
+        console.log(
+          `[searchAndExtractFAQs] Refinement filtered out all FAQs, returning empty array for AI fallback`
+        );
         return [];
       }
 
+      console.log(
+        `[searchAndExtractFAQs] Successfully refined to ${refinedFAQs.length} FAQs`
+      );
+      console.log(
+        `[searchAndExtractFAQs] Refined FAQs:`,
+        JSON.stringify(refinedFAQs, null, 2)
+      );
       return refinedFAQs;
+    } catch (error) {
+      console.warn(
+        `[searchAndExtractFAQs] Failed to extract from location page ${locationPageUrl}, returning empty array for AI fallback:`,
+        error
+      );
+      return [];
     }
-
-    return [];
   } catch (error) {
-    console.error("Error in searchAndExtractFAQs:", error);
+    console.error(
+      "[searchAndExtractFAQs] Error in searchAndExtractFAQs:",
+      error
+    );
     return [];
   }
 }
@@ -583,9 +672,16 @@ export async function generateFAQsWithAI(
   entityType?: string,
   location?: string
 ): Promise<Array<{ question: string; answer: string }>> {
+  console.log(
+    `[generateFAQsWithAI] Starting AI generation for brand: "${brand}", entityType: "${
+      entityType || "N/A"
+    }", location: "${location || "N/A"}"`
+  );
   const googleApiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
   if (!googleApiKey) {
-    console.warn("GOOGLE_GENERATIVE_AI_API_KEY not set, returning empty FAQs");
+    console.warn(
+      "[generateFAQsWithAI] GOOGLE_GENERATIVE_AI_API_KEY not set, returning empty FAQs"
+    );
     return [];
   }
 
@@ -602,6 +698,9 @@ Requirements:
 - Focus on information that would be useful for someone planning to visit this location`;
 
   try {
+    console.log(
+      `[generateFAQsWithAI] Calling AI model (gemini-2.5-flash) to generate FAQs...`
+    );
     const { object } = await generateObject({
       model: google("gemini-2.5-flash"),
       system:
@@ -616,9 +715,12 @@ Requirements:
       maxOutputTokens: 2000,
     });
 
+    console.log(
+      `[generateFAQsWithAI] Successfully generated ${object.faqs.length} FAQs`
+    );
     return object.faqs;
   } catch (error) {
-    console.error("Error generating FAQs with AI:", error);
+    console.error("[generateFAQsWithAI] Error generating FAQs with AI:", error);
     return [];
   }
 }
