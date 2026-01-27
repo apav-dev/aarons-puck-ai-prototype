@@ -188,6 +188,8 @@ export async function searchAndExtractFAQs(
   entityType?: string,
   location?: string
 ): Promise<Array<{ question: string; answer: string }>> {
+  const startTime = Date.now();
+
   // Use NYC as proxy location if no location provided or location is "N/A"
   const searchLocation =
     !location || location === "N/A" ? "New York City" : location;
@@ -240,10 +242,22 @@ export async function searchAndExtractFAQs(
                 `[searchAndExtractFAQs] Refined FAQs:`,
                 JSON.stringify(refinedFAQs, null, 2)
               );
+              const duration = (Date.now() - startTime) / 1000;
+              console.log(
+                `[searchAndExtractFAQs] Execution completed in ${duration.toFixed(
+                  2
+                )}s`
+              );
               return refinedFAQs;
             } else {
               console.log(
                 `[searchAndExtractFAQs] No FAQs found on provided location page, returning empty array for AI fallback`
+              );
+              const duration = (Date.now() - startTime) / 1000;
+              console.log(
+                `[searchAndExtractFAQs] Execution completed in ${duration.toFixed(
+                  2
+                )}s`
               );
               return [];
             }
@@ -251,11 +265,23 @@ export async function searchAndExtractFAQs(
             console.log(
               `[searchAndExtractFAQs] No rawContent found in extraction result, returning empty array for AI fallback`
             );
+            const duration = (Date.now() - startTime) / 1000;
+            console.log(
+              `[searchAndExtractFAQs] Execution completed in ${duration.toFixed(
+                2
+              )}s`
+            );
             return [];
           }
         } else {
           console.log(
             `[searchAndExtractFAQs] No results returned from URL extraction, returning empty array for AI fallback`
+          );
+          const duration = (Date.now() - startTime) / 1000;
+          console.log(
+            `[searchAndExtractFAQs] Execution completed in ${duration.toFixed(
+              2
+            )}s`
           );
           return [];
         }
@@ -263,6 +289,12 @@ export async function searchAndExtractFAQs(
         console.warn(
           `[searchAndExtractFAQs] Failed to extract from provided URL ${locationUrl}, returning empty array for AI fallback:`,
           error
+        );
+        const duration = (Date.now() - startTime) / 1000;
+        console.log(
+          `[searchAndExtractFAQs] Execution completed in ${duration.toFixed(
+            2
+          )}s`
         );
         return [];
       }
@@ -363,6 +395,10 @@ export async function searchAndExtractFAQs(
       console.log(
         `[searchAndExtractFAQs] No location page found, returning empty array for AI fallback`
       );
+      const duration = (Date.now() - startTime) / 1000;
+      console.log(
+        `[searchAndExtractFAQs] Execution completed in ${duration.toFixed(2)}s`
+      );
       return [];
     }
 
@@ -379,6 +415,12 @@ export async function searchAndExtractFAQs(
         console.log(
           `[searchAndExtractFAQs] No content extracted from location page, returning empty array for AI fallback`
         );
+        const duration = (Date.now() - startTime) / 1000;
+        console.log(
+          `[searchAndExtractFAQs] Execution completed in ${duration.toFixed(
+            2
+          )}s`
+        );
         return [];
       }
 
@@ -388,6 +430,12 @@ export async function searchAndExtractFAQs(
       if (!content || content.length === 0) {
         console.log(
           `[searchAndExtractFAQs] Empty content extracted from location page, returning empty array for AI fallback`
+        );
+        const duration = (Date.now() - startTime) / 1000;
+        console.log(
+          `[searchAndExtractFAQs] Execution completed in ${duration.toFixed(
+            2
+          )}s`
         );
         return [];
       }
@@ -413,6 +461,12 @@ export async function searchAndExtractFAQs(
         console.log(
           `[searchAndExtractFAQs] Content appears to be blog/forum content, returning empty array for AI fallback`
         );
+        const duration = (Date.now() - startTime) / 1000;
+        console.log(
+          `[searchAndExtractFAQs] Execution completed in ${duration.toFixed(
+            2
+          )}s`
+        );
         return [];
       }
 
@@ -425,6 +479,12 @@ export async function searchAndExtractFAQs(
       if (faqs.length === 0) {
         console.log(
           `[searchAndExtractFAQs] No FAQs found on location page, returning empty array for AI fallback`
+        );
+        const duration = (Date.now() - startTime) / 1000;
+        console.log(
+          `[searchAndExtractFAQs] Execution completed in ${duration.toFixed(
+            2
+          )}s`
         );
         return [];
       }
@@ -444,6 +504,12 @@ export async function searchAndExtractFAQs(
         console.log(
           `[searchAndExtractFAQs] Refinement filtered out all FAQs, returning empty array for AI fallback`
         );
+        const duration = (Date.now() - startTime) / 1000;
+        console.log(
+          `[searchAndExtractFAQs] Execution completed in ${duration.toFixed(
+            2
+          )}s`
+        );
         return [];
       }
 
@@ -454,11 +520,19 @@ export async function searchAndExtractFAQs(
         `[searchAndExtractFAQs] Refined FAQs:`,
         JSON.stringify(refinedFAQs, null, 2)
       );
+      const duration = (Date.now() - startTime) / 1000;
+      console.log(
+        `[searchAndExtractFAQs] Execution completed in ${duration.toFixed(2)}s`
+      );
       return refinedFAQs;
     } catch (error) {
       console.warn(
         `[searchAndExtractFAQs] Failed to extract from location page ${locationPageUrl}, returning empty array for AI fallback:`,
         error
+      );
+      const duration = (Date.now() - startTime) / 1000;
+      console.log(
+        `[searchAndExtractFAQs] Execution completed in ${duration.toFixed(2)}s`
       );
       return [];
     }
@@ -466,6 +540,10 @@ export async function searchAndExtractFAQs(
     console.error(
       "[searchAndExtractFAQs] Error in searchAndExtractFAQs:",
       error
+    );
+    const duration = (Date.now() - startTime) / 1000;
+    console.log(
+      `[searchAndExtractFAQs] Execution completed in ${duration.toFixed(2)}s`
     );
     return [];
   }

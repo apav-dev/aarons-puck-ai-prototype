@@ -1,0 +1,46 @@
+.Card {
+  position: relative;
+  overflow: hidden;
+}
+
+.Card-hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.Card-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+.Card-hover-scale {
+  transition: transform 0.2s ease;
+}
+
+.Card-hover-scale:hover {
+  transform: scale(1.02);
+}
+
+.Card-hover-shadow {
+  transition: box-shadow 0.2s ease;
+}
+
+.Card-hover-shadow:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+.Card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
+
+
+
+
+
+
+

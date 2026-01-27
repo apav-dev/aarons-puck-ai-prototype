@@ -1,0 +1,36 @@
+.Button {
+  display: inline-block;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: inherit;
+}
+
+.Button-hover-darken:hover {
+  filter: brightness(0.9);
+}
+
+.Button-hover-lighten:hover {
+  filter: brightness(1.1);
+}
+
+.Button-hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.Button-full-width {
+  width: 100%;
+}
+
+.Button-icon {
+  display: inline-block;
+}
+
+
+
+
+
+
+
+

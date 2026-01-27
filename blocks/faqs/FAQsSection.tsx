@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { ComponentConfig } from "@measured/puck";
+import { ComponentConfig } from "@puckeditor/core";
 import { Section } from "../../components/Section/index";
-import { PuckComponent } from "@measured/puck";
+import { PuckComponent } from "@puckeditor/core";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
 import { getGoogleFontsUrl } from "../../lib/google-fonts";
@@ -39,7 +39,7 @@ export const FAQsSection: PuckComponent<FAQsSectionProps> = ({
 }) => {
   // In edit mode, show all FAQs expanded. In view mode, start with first expanded
   const [expandedIndex, setExpandedIndex] = useState<number | null>(
-    puck.isEditing ? null : 0
+    puck.isEditing ? null : 0,
   );
 
   // Prepare font styles
@@ -161,7 +161,7 @@ export const FAQsSection: PuckComponent<FAQsSectionProps> = ({
                   <svg
                     className={classnames(
                       getClassName("chevron"),
-                      isExpanded && styles["FAQsSection-chevron--expanded"]
+                      isExpanded && styles["FAQsSection-chevron--expanded"],
                     )}
                     viewBox="0 0 24 24"
                     fill="none"

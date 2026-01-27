@@ -1,7 +1,6 @@
 "use client";
 
-import type { Data } from "@measured/puck";
-import { Puck } from "@measured/puck";
+import { Data, Puck } from "@puckeditor/core";
 import config from "../../../puck.config";
 import { createAiPlugin } from "@puckeditor/plugin-ai";
 import "@puckeditor/plugin-ai/styles.css";
