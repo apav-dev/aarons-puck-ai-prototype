@@ -4,6 +4,15 @@
   padding-bottom: 64px;
 }
 
+.HeroSection--classic {
+}
+
+.HeroSection--spotlight {
+}
+
+.HeroSection--immersive {
+}
+
 .HeroSection-inner {
   display: flex;
   flex-direction: column;
@@ -184,7 +193,7 @@
   }
 }
 
-.HeroSection.spotlight .Section-inner {
+.HeroSection--spotlight .Section-inner {
   max-width: none;
   padding: 0;
 }
@@ -250,29 +259,29 @@
 }
 
 /* Spotlight variant: buttons stacked on mobile, side-by-side on desktop */
-.HeroSection.spotlight .HeroSection-actions {
+.HeroSection--spotlight .HeroSection-actions {
   flex-direction: column;
   gap: 12px;
 }
 
 @media (min-width: 768px) {
-  .HeroSection.spotlight .HeroSection-actions {
+  .HeroSection--spotlight .HeroSection-actions {
     flex-direction: row;
     gap: 16px;
   }
 }
 
 /* Spotlight variant: ensure text colors work on white card */
-.HeroSection.spotlight .HeroSection-label,
-.HeroSection.spotlight .HeroSection-title,
-.HeroSection.spotlight .HeroSection-status,
-.HeroSection.spotlight .HeroSection-ratingValue,
-.HeroSection.spotlight .HeroSection-reviewCount {
+.HeroSection--spotlight .HeroSection-label,
+.HeroSection--spotlight .HeroSection-title,
+.HeroSection--spotlight .HeroSection-status,
+.HeroSection--spotlight .HeroSection-ratingValue,
+.HeroSection--spotlight .HeroSection-reviewCount {
   color: #000;
 }
 
 /* Spotlight variant: star color */
-.HeroSection.spotlight .HeroSection-star:not(.empty) {
+.HeroSection--spotlight .HeroSection-star:not(.empty) {
   color: #dc2626;
 }
 
@@ -293,7 +302,7 @@
   }
 }
 
-.HeroSection.immersive .Section-inner {
+.HeroSection--immersive .Section-inner {
   max-width: none;
   padding: 0;
 }
@@ -368,45 +377,45 @@
 }
 
 /* Immersive variant: ensure text colors are white */
-.HeroSection.immersive .HeroSection-label,
-.HeroSection.immersive .HeroSection-title,
-.HeroSection.immersive .HeroSection-status,
-.HeroSection.immersive .HeroSection-ratingValue,
-.HeroSection.immersive .HeroSection-reviewCount {
+.HeroSection--immersive .HeroSection-label,
+.HeroSection--immersive .HeroSection-title,
+.HeroSection--immersive .HeroSection-status,
+.HeroSection--immersive .HeroSection-ratingValue,
+.HeroSection--immersive .HeroSection-reviewCount {
   color: #ffffff;
 }
 
 /* Immersive variant: star color (white) */
-.HeroSection.immersive .HeroSection-star:not(.empty) {
+.HeroSection--immersive .HeroSection-star:not(.empty) {
   color: #ffffff;
 }
 
-.HeroSection.immersive .HeroSection-star.empty {
+.HeroSection--immersive .HeroSection-star.empty {
   color: rgba(255, 255, 255, 0.4);
   stroke-width: 1.5;
 }
 
 /* Immersive variant: buttons stacked on mobile, side-by-side on desktop */
-.HeroSection.immersive .HeroSection-actions {
+.HeroSection--immersive .HeroSection-actions {
   flex-direction: column;
   gap: 12px;
 }
 
 @media (min-width: 768px) {
-  .HeroSection.immersive .HeroSection-actions {
+  .HeroSection--immersive .HeroSection-actions {
     flex-direction: row;
     gap: 16px;
   }
 }
 
 /* Immersive variant: secondary button should have white border and white text */
-.HeroSection.immersive .HeroSection-secondaryButton {
+.HeroSection--immersive .HeroSection-secondaryButton {
   background-color: transparent;
   color: #ffffff;
   border-color: #ffffff;
 }
 
-.HeroSection.immersive .HeroSection-secondaryButton:hover {
+.HeroSection--immersive .HeroSection-secondaryButton:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 

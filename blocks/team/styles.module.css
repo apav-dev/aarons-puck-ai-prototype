@@ -1,20 +1,17 @@
+/* ==========================================================================
+   Team Section - Base Styles
+   ========================================================================== */
+
 .TeamSection {
   background-color: white;
-}
-
-.TeamSection-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 48px;
 }
 
 .TeamSection-title {
   font-size: 32px;
   font-weight: 700;
-  color: #000;
+  color: #1f2937;
   margin: 0;
   line-height: 1.2;
-  text-align: center;
 }
 
 @media (min-width: 768px) {
@@ -23,21 +20,69 @@
   }
 }
 
-.TeamSection-grid {
+.TeamSection-subtitle {
+  font-size: 16px;
+  font-weight: 400;
+  color: #4b5563;
+  margin: 12px 0 0 0;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   Social Links - Shared Component
+   ========================================================================== */
+
+.TeamSection-socialLinks {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.TeamSection-socialIcon {
+  width: 20px;
+  height: 20px;
+  color: #9ca3af;
+  transition: color 0.15s ease;
+}
+
+.TeamSection-socialIcon:hover {
+  color: #6b7280;
+}
+
+.TeamSection-socialIcon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ==========================================================================
+   Cards Variant - Contact cards with phone, email, and profile button
+   ========================================================================== */
+
+.TeamSection-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.TeamSection-cardsHeader {
+  max-width: 600px;
+}
+
+.TeamSection-cardsGrid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
 }
 
 @media (min-width: 768px) {
-  .TeamSection-grid {
+  .TeamSection-cardsGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: 32px;
   }
 }
 
 @media (min-width: 1024px) {
-  .TeamSection-grid {
+  .TeamSection-cardsGrid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
@@ -54,7 +99,8 @@
 }
 
 .TeamSection-card:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .TeamSection-cardHeader {
@@ -63,7 +109,7 @@
   gap: 16px;
 }
 
-.TeamSection-profileImage {
+.TeamSection-cardAvatar {
   width: 64px;
   height: 64px;
   border-radius: 50%;
@@ -71,11 +117,11 @@
   flex-shrink: 0;
 }
 
-.TeamSection-profilePlaceholder {
+.TeamSection-cardAvatarPlaceholder {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background-color: #f3f4f6;
+  background-color: #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -83,92 +129,371 @@
   color: #9ca3af;
 }
 
-.TeamSection-profilePlaceholder svg {
+.TeamSection-cardAvatarPlaceholder svg {
   width: 32px;
   height: 32px;
 }
 
-.TeamSection-memberInfo {
+.TeamSection-cardInfo {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.TeamSection-memberName {
+.TeamSection-cardName {
   font-size: 20px;
   font-weight: 700;
-  color: #000;
+  color: #1f2937;
   margin: 0;
   line-height: 1.2;
 }
 
-.TeamSection-memberRole {
+.TeamSection-cardRole {
   font-size: 16px;
   font-weight: 400;
-  color: #000;
+  color: #1f2937;
   margin: 0;
   line-height: 1.4;
 }
 
-.TeamSection-separator {
+.TeamSection-cardDescription {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.TeamSection-cardSeparator {
   height: 1px;
   background-color: #e5e7eb;
   width: 100%;
 }
 
-.TeamSection-contactInfo {
+.TeamSection-cardContact {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.TeamSection-contactItem {
+.TeamSection-cardContactItem {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 16px;
   font-weight: 400;
-  color: #000;
+  color: #6366f1;
 }
 
-.TeamSection-icon {
+.TeamSection-cardIcon {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
+  color: #6366f1;
 }
 
-.TeamSection-emailLink {
-  color: #000;
+.TeamSection-cardEmailLink {
+  color: #6366f1;
   text-decoration: none;
   transition: opacity 0.2s ease;
 }
 
-.TeamSection-emailLink:hover {
+.TeamSection-cardEmailLink:hover {
   opacity: 0.8;
   text-decoration: underline;
 }
 
-.TeamSection-profileLink {
+.TeamSection-cardButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #ffffff;
+  background-color: #6b7280;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+  margin-top: auto;
+  width: fit-content;
+}
+
+.TeamSection-cardButton:hover {
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   Portrait Variant - Large vertical portrait images
+   ========================================================================== */
+
+.TeamSection-portrait {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.TeamSection-portraitHeader {
+  max-width: 600px;
+}
+
+.TeamSection-portraitGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .TeamSection-portraitGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .TeamSection-portraitGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.TeamSection-portraitItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.TeamSection-portraitImageWrapper {
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+@media (min-width: 640px) {
+  .TeamSection-portraitImageWrapper {
+    height: 208px;
+  }
+}
+
+@media (min-width: 768px) {
+  .TeamSection-portraitImageWrapper {
+    height: 224px;
+  }
+}
+
+.TeamSection-portraitImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.TeamSection-portraitImagePlaceholder {
+  width: 100%;
+  height: 100%;
+  background-color: #e5e7eb;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  color: #9ca3af;
+}
+
+.TeamSection-portraitImagePlaceholder svg {
+  width: 64px;
+  height: 64px;
+}
+
+.TeamSection-portraitInfo {
+  margin-top: 16px;
+}
+
+.TeamSection-portraitName {
+  font-size: 18px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.TeamSection-portraitRole {
   font-size: 16px;
   font-weight: 400;
-  color: #000;
-  text-decoration: none;
-  margin-top: auto;
-  transition: opacity 0.2s ease;
+  color: #6366f1;
+  margin: 0;
 }
 
-.TeamSection-profileLink:hover {
-  opacity: 0.8;
-  text-decoration: underline;
+.TeamSection-portraitDescription {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6b7280;
+  margin: 8px 0 0 0;
+  line-height: 1.5;
 }
 
-.TeamSection-arrowIcon {
-  width: 16px;
-  height: 16px;
+/* ==========================================================================
+   Avatar Variant - Circular avatars with configurable size and alignment
+   ========================================================================== */
+
+.TeamSection-avatar {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.TeamSection-avatarCentered {
+  text-align: center;
+}
+
+.TeamSection-avatarHeader {
+  max-width: 600px;
+}
+
+.TeamSection-avatarHeaderCentered {
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.TeamSection-avatarGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .TeamSection-avatarGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .TeamSection-avatarGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.TeamSection-avatarGridCentered {
+  gap: 32px;
+}
+
+@media (min-width: 640px) {
+  .TeamSection-avatarGridCentered {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .TeamSection-avatarGridCentered {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Avatar Item */
+.TeamSection-avatarItem {
+  display: flex;
+}
+
+/* Avatar Item - Left Aligned (horizontal layout) */
+.TeamSection-avatarItemLeft {
+  flex-direction: row;
+  gap: 16px;
+  align-items: center;
+}
+
+/* Avatar Item - Centered (vertical layout) */
+.TeamSection-avatarItemCentered {
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Avatar Image Wrapper - Base styles */
+.TeamSection-avatarImageWrapper {
   flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #e5e7eb;
 }
 
+/* Avatar Image Wrapper - Size Variations (explicit dimensions) */
+.TeamSection-avatarImageSmall {
+  width: 80px;
+  height: 80px;
+}
+
+.TeamSection-avatarImageMedium {
+  width: 96px;
+  height: 96px;
+}
+
+.TeamSection-avatarImageLarge {
+  width: 120px;
+  height: 120px;
+}
+
+.TeamSection-avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.TeamSection-avatarImagePlaceholder {
+  width: 100%;
+  height: 100%;
+  background-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+}
+
+.TeamSection-avatarImagePlaceholder svg {
+  width: 50%;
+  height: 50%;
+}
+
+/* Avatar Info */
+.TeamSection-avatarInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.TeamSection-avatarInfoCentered {
+  align-items: center;
+  margin-top: 8px;
+}
+
+.TeamSection-avatarName {
+  font-size: 18px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.TeamSection-avatarRole {
+  font-size: 16px;
+  font-weight: 400;
+  color: #6366f1;
+  margin: 0;
+}
+
+.TeamSection-avatarDescription {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6b7280;
+  margin: 8px 0 0 0;
+  line-height: 1.5;
+}
+
+/* Social Links positioning for centered avatar */
+.TeamSection-avatarInfoCentered .TeamSection-socialLinks {
+  justify-content: center;
+}

@@ -1,172 +1,64 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useEffect } from "react";
+import React from "react";
 import { ComponentConfig } from "@measured/puck";
 import { Section } from "../../components/Section/index";
 import { PuckComponent } from "@measured/puck";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
-import { getGoogleFontsUrl } from "../../lib/google-fonts";
+import { InsightsSectionProps } from "./types";
+import { ClassicVariant } from "./variants/ClassicVariant";
+import { EditorialVariant } from "./variants/EditorialVariant";
+import { ImmersiveVariant } from "./variants/ImmersiveVariant";
 
 const getClassName = getClassNameFactory("InsightsSection", styles);
 
-export type InsightItem = {
-  title: string;
-  category: string;
-  date: string;
-  description: string;
-  imageUrl: string;
-  link: string;
-};
-
-export type InsightsSectionProps = {
-  heading: string;
-  insights: InsightItem[];
-  seeAllButton: {
-    label: string;
-    href: string;
-  };
-  padding: string;
-  headingFont?: string;
-  bodyFont?: string;
-  colors?: {
-    primary: string;
-    secondary: string;
-    background: string;
-    text: string;
-  };
-};
+export type {
+  InsightsSectionProps,
+  InsightItem,
+  InsightVariant,
+} from "./types";
 
 export const InsightsSection: PuckComponent<InsightsSectionProps> = ({
   heading,
   insights,
+  variant,
   seeAllButton,
-  padding,
-  headingFont,
-  bodyFont,
-  colors,
+  showCategory,
+  showDate,
+  showDescription,
+  showReadMore,
   puck,
 }) => {
-  // Prepare font styles
-  const headingStyle = headingFont
-    ? { fontFamily: `"${headingFont}", sans-serif` }
-    : undefined;
-  const bodyStyle = bodyFont
-    ? { fontFamily: `"${bodyFont}", sans-serif` }
-    : undefined;
+  const renderVariant = () => {
+    const commonProps = {
+      insights,
+      showCategory,
+      showDate,
+      showDescription,
+      showReadMore,
+      isEditing: puck.isEditing,
+    };
 
-  // Prepare color styles
-  const sectionStyle = colors
-    ? { backgroundColor: colors.background }
-    : undefined;
-  const textColorStyle = colors ? { color: colors.text } : undefined;
-  const titleColorStyle = colors ? { color: colors.primary } : undefined;
-  const readMoreColorStyle = colors ? { color: colors.primary } : undefined;
-  const seeAllButtonStyle = colors
-    ? {
-        color: colors.secondary,
-        borderColor: colors.secondary,
-      }
-    : undefined;
-
-  // Load Google Fonts into document head
-  useEffect(() => {
-    if (headingFont) {
-      const linkId = `font-heading-${headingFont}`;
-      if (!document.getElementById(linkId)) {
-        const link = document.createElement("link");
-        link.id = linkId;
-        link.rel = "stylesheet";
-        link.href = getGoogleFontsUrl(headingFont);
-        document.head.appendChild(link);
-      }
+    switch (variant) {
+      case "editorial":
+        return <EditorialVariant {...commonProps} />;
+      case "immersive":
+        return <ImmersiveVariant {...commonProps} />;
+      case "classic":
+      default:
+        return <ClassicVariant {...commonProps} />;
     }
-    if (bodyFont && bodyFont !== headingFont) {
-      const linkId = `font-body-${bodyFont}`;
-      if (!document.getElementById(linkId)) {
-        const link = document.createElement("link");
-        link.id = linkId;
-        link.rel = "stylesheet";
-        link.href = getGoogleFontsUrl(bodyFont);
-        document.head.appendChild(link);
-      }
-    }
-  }, [headingFont, bodyFont]);
+  };
 
   return (
-    <Section
-      className={getClassName()}
-      style={{
-        paddingTop: padding,
-        paddingBottom: padding,
-        ...sectionStyle,
-      }}
-    >
-      <h2
-        className={getClassName("heading")}
-        style={{ ...headingStyle, ...textColorStyle }}
-      >
-        {heading}
-      </h2>
-      <div className={getClassName("grid")}>
-        {insights.map((insight, index) => (
-          <article key={index} className={getClassName("card")}>
-            <div className={getClassName("imageWrapper")}>
-              <img
-                src={insight.imageUrl}
-                alt={insight.title}
-                className={getClassName("image")}
-              />
-            </div>
-            <div className={getClassName("cardContent")}>
-              <div
-                className={getClassName("metadata")}
-                style={{ ...bodyStyle, ...textColorStyle }}
-              >
-                <span className={getClassName("category")}>
-                  {insight.category}
-                </span>
-                <span className={getClassName("separator")}>|</span>
-                <span className={getClassName("date")}>{insight.date}</span>
-              </div>
-              <h3
-                className={getClassName("title")}
-                style={{ ...headingStyle, ...titleColorStyle }}
-              >
-                {insight.title}
-              </h3>
-              <p
-                className={getClassName("description")}
-                style={{ ...bodyStyle, ...textColorStyle }}
-              >
-                {insight.description}
-              </p>
-              <a
-                href={insight.link}
-                className={getClassName("readMore")}
-                style={readMoreColorStyle}
-                tabIndex={puck.isEditing ? -1 : undefined}
-              >
-                Read more
-                <svg
-                  className={getClassName("arrow")}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </a>
-            </div>
-          </article>
-        ))}
-      </div>
+    <Section className={getClassName({ [variant]: true })}>
+      <h2 className={getClassName("heading")}>{heading}</h2>
+      {renderVariant()}
       {seeAllButton.label && seeAllButton.href && (
         <div className={getClassName("seeAllWrapper")}>
           <a
             href={seeAllButton.href}
             className={getClassName("seeAllButton")}
-            style={seeAllButtonStyle}
             tabIndex={puck.isEditing ? -1 : undefined}
           >
             {seeAllButton.label}
@@ -179,6 +71,15 @@ export const InsightsSection: PuckComponent<InsightsSectionProps> = ({
 
 export const InsightsSectionConfig: ComponentConfig<InsightsSectionProps> = {
   fields: {
+    variant: {
+      type: "radio",
+      label: "Variant",
+      options: [
+        { label: "Classic", value: "classic" },
+        { label: "Editorial", value: "editorial" },
+        { label: "Immersive", value: "immersive" },
+      ],
+    },
     heading: {
       type: "text",
       label: "Heading",
@@ -186,6 +87,39 @@ export const InsightsSectionConfig: ComponentConfig<InsightsSectionProps> = {
         instructions:
           "The main heading for the insights section. For brick-and-mortar location landing pages, use SEO-friendly titles like 'Insights & Resources' or 'Helpful Articles from [Business Name]' or 'Local Insights for [Location]'.",
       },
+    },
+    // Visibility options
+    showCategory: {
+      type: "radio",
+      label: "Show Category",
+      options: [
+        { label: "Yes", value: true },
+        { label: "No", value: false },
+      ],
+    },
+    showDate: {
+      type: "radio",
+      label: "Show Date",
+      options: [
+        { label: "Yes", value: true },
+        { label: "No", value: false },
+      ],
+    },
+    showDescription: {
+      type: "radio",
+      label: "Show Description",
+      options: [
+        { label: "Yes", value: true },
+        { label: "No", value: false },
+      ],
+    },
+    showReadMore: {
+      type: "radio",
+      label: "Show Read More Link",
+      options: [
+        { label: "Yes", value: true },
+        { label: "No", value: false },
+      ],
     },
     insights: {
       type: "array",
@@ -243,6 +177,14 @@ export const InsightsSectionConfig: ComponentConfig<InsightsSectionProps> = {
               "The URL to the full article. Should be a valid, accessible URL to the complete article content.",
           },
         },
+        linkText: {
+          type: "text",
+          label: "Link Text",
+          ai: {
+            instructions:
+              "Optional custom text for the read more link. Defaults to 'Read more' for classic/immersive or 'READ BLOG' for editorial variant.",
+          },
+        },
       },
       defaultItemProps: {
         title: "Article Name Lorem Ipsum",
@@ -253,6 +195,7 @@ export const InsightsSectionConfig: ComponentConfig<InsightsSectionProps> = {
         imageUrl:
           "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=450&fit=crop",
         link: "#",
+        linkText: "",
       },
     },
     seeAllButton: {
@@ -263,46 +206,14 @@ export const InsightsSectionConfig: ComponentConfig<InsightsSectionProps> = {
         href: { type: "text" },
       },
     },
-    padding: {
-      type: "text",
-      label: "Padding",
-    },
-    headingFont: {
-      type: "text",
-      label: "Heading Font",
-      ai: {
-        instructions:
-          "Always use the getFontFamily tool. Use the business name as the brand, 'heading' as the fontType, and any available entity type context.",
-        stream: false,
-      },
-    },
-    bodyFont: {
-      type: "text",
-      label: "Body Font",
-      ai: {
-        instructions:
-          "Always use the getFontFamily tool. Use the business name as the brand, 'body' as the fontType, and any available entity type context.",
-        stream: false,
-      },
-    },
-    colors: {
-      type: "object",
-      label: "Brand Colors",
-      objectFields: {
-        primary: { type: "text", label: "Primary Color" },
-        secondary: { type: "text", label: "Secondary Color" },
-        background: { type: "text", label: "Background Color" },
-        text: { type: "text", label: "Text Color" },
-      },
-      ai: {
-        instructions:
-          "Always use the getBrandColors tool. Use the business name as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
-        stream: false,
-      },
-    },
   },
   defaultProps: {
+    variant: "classic",
     heading: "Insights",
+    showCategory: true,
+    showDate: true,
+    showDescription: true,
+    showReadMore: true,
     insights: [
       {
         title: "Article Name Lorem Ipsum",
@@ -313,6 +224,7 @@ export const InsightsSectionConfig: ComponentConfig<InsightsSectionProps> = {
         imageUrl:
           "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=450&fit=crop",
         link: "#",
+        linkText: "",
       },
       {
         title: "Article Name Lorem Ipsum",
@@ -323,6 +235,7 @@ export const InsightsSectionConfig: ComponentConfig<InsightsSectionProps> = {
         imageUrl:
           "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=450&fit=crop",
         link: "#",
+        linkText: "",
       },
       {
         title: "Article Name Lorem Ipsum",
@@ -333,17 +246,17 @@ export const InsightsSectionConfig: ComponentConfig<InsightsSectionProps> = {
         imageUrl:
           "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=450&fit=crop",
         link: "#",
+        linkText: "",
       },
     ],
     seeAllButton: {
       label: "See All Articles",
       href: "#",
     },
-    padding: "64px",
   },
   ai: {
     instructions:
-      "Create an insights section for a brick-and-mortar location landing page that showcases helpful articles, blog posts, or resources related to the location and its services. The section should be SEO-optimized with location-specific content, relevant keywords, and compelling titles that help establish the business as a local authority. Articles should be relevant to potential customers visiting the location page.",
+      "Create an insights section for a brick-and-mortar location landing page that showcases helpful articles, blog posts, or resources related to the location and its services. This component has three variants: 'classic' for traditional card layouts, 'editorial' for magazine-style horizontal cards with prominent dates, and 'immersive' for full-bleed image cards with text overlay. The section should be SEO-optimized with location-specific content, relevant keywords, and compelling titles that help establish the business as a local authority. Articles should be relevant to potential customers visiting the location page.",
   },
   render: InsightsSection,
 };

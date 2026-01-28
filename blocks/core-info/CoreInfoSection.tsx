@@ -1,12 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useEffect } from "react";
+import React from "react";
 import { ComponentConfig } from "@measured/puck";
 import { Section } from "../../components/Section/index";
 import { PuckComponent } from "@measured/puck";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
-import { getGoogleFontsUrl } from "../../lib/google-fonts";
-import { isLightColor } from "../../lib/color-utils";
 
 const getClassName = getClassNameFactory("CoreInfoSection", styles);
 
@@ -29,101 +27,28 @@ export type CoreInfoSectionProps = {
     specialNote?: string;
   };
   services: Array<{ value: string }>;
-  padding: string;
-  headingFont?: string;
-  bodyFont?: string;
-  colors?: {
-    primary: string;
-    secondary: string;
-    background: string;
-    text: string;
-  };
 };
 
 export const CoreInfoSection: PuckComponent<CoreInfoSectionProps> = ({
   information,
   hours,
   services,
-  padding,
-  headingFont,
-  bodyFont,
-  colors,
   puck,
 }) => {
-  // Prepare font styles
-  const headingStyle = headingFont
-    ? { fontFamily: `"${headingFont}", sans-serif` }
-    : undefined;
-  const bodyStyle = bodyFont
-    ? { fontFamily: `"${bodyFont}", sans-serif` }
-    : undefined;
-
-  // Prepare color styles
-  const sectionStyle = colors
-    ? { backgroundColor: colors.background }
-    : undefined;
-  const textColorStyle = colors ? { color: colors.text } : undefined;
-  const linkColorStyle = colors ? { color: colors.primary } : undefined;
-
-  // Load Google Fonts into document head
-  useEffect(() => {
-    if (headingFont) {
-      const linkId = `font-heading-${headingFont}`;
-      if (!document.getElementById(linkId)) {
-        const link = document.createElement("link");
-        link.id = linkId;
-        link.rel = "stylesheet";
-        link.href = getGoogleFontsUrl(headingFont);
-        document.head.appendChild(link);
-      }
-    }
-    if (bodyFont && bodyFont !== headingFont) {
-      const linkId = `font-body-${bodyFont}`;
-      if (!document.getElementById(linkId)) {
-        const link = document.createElement("link");
-        link.id = linkId;
-        link.rel = "stylesheet";
-        link.href = getGoogleFontsUrl(bodyFont);
-        document.head.appendChild(link);
-      }
-    }
-  }, [headingFont, bodyFont]);
-
   return (
-    <Section
-      className={getClassName()}
-      style={{
-        paddingTop: padding,
-        paddingBottom: padding,
-        ...sectionStyle,
-      }}
-    >
+    <Section className={getClassName()}>
       <div className={getClassName("inner")}>
         <div className={getClassName("column")}>
-          <h2
-            className={getClassName("heading")}
-            style={{ ...headingStyle, ...textColorStyle }}
-          >
-            Information
-          </h2>
-          <div
-            className={getClassName("address")}
-            style={{ ...bodyStyle, ...textColorStyle }}
-          >
-            {information.address}
-          </div>
+          <h2 className={getClassName("heading")}>Information</h2>
+          <div className={getClassName("address")}>{information.address}</div>
           <a
             href={information.directionsLink}
             className={getClassName("link")}
-            style={{ ...bodyStyle, ...linkColorStyle }}
             tabIndex={puck.isEditing ? -1 : undefined}
           >
             Get Directions &gt;
           </a>
-          <div
-            className={getClassName("contactItem")}
-            style={{ ...bodyStyle, ...textColorStyle }}
-          >
+          <div className={getClassName("contactItem")}>
             <svg
               className={getClassName("icon")}
               viewBox="0 0 24 24"
@@ -136,10 +61,7 @@ export const CoreInfoSection: PuckComponent<CoreInfoSectionProps> = ({
             <span>Phone {information.phone}</span>
           </div>
           {information.tollFree && (
-            <div
-              className={getClassName("contactItem")}
-              style={{ ...bodyStyle, ...textColorStyle }}
-            >
+            <div className={getClassName("contactItem")}>
               <svg
                 className={getClassName("icon")}
                 viewBox="0 0 24 24"
@@ -152,10 +74,7 @@ export const CoreInfoSection: PuckComponent<CoreInfoSectionProps> = ({
               <span>Toll-free {information.tollFree}</span>
             </div>
           )}
-          <div
-            className={getClassName("contactItem")}
-            style={{ ...bodyStyle, ...textColorStyle }}
-          >
+          <div className={getClassName("contactItem")}>
             <svg
               className={getClassName("icon")}
               viewBox="0 0 24 24"
@@ -169,7 +88,6 @@ export const CoreInfoSection: PuckComponent<CoreInfoSectionProps> = ({
             <a
               href={`mailto:${information.email}`}
               className={getClassName("link")}
-              style={{ ...bodyStyle, ...linkColorStyle }}
               tabIndex={puck.isEditing ? -1 : undefined}
             >
               {information.email}
@@ -178,87 +96,49 @@ export const CoreInfoSection: PuckComponent<CoreInfoSectionProps> = ({
         </div>
 
         <div className={getClassName("column")}>
-          <h2
-            className={getClassName("heading")}
-            style={{ ...headingStyle, ...textColorStyle }}
-          >
-            Hours
-          </h2>
+          <h2 className={getClassName("heading")}>Hours</h2>
           <div className={getClassName("hoursList")}>
-            <div
-              className={getClassName("hoursItem")}
-              style={{ ...bodyStyle, ...textColorStyle }}
-            >
+            <div className={getClassName("hoursItem")}>
               <span className={getClassName("day")}>Monday:</span>
               <span>{hours.monday}</span>
             </div>
-            <div
-              className={getClassName("hoursItem")}
-              style={{ ...bodyStyle, ...textColorStyle }}
-            >
+            <div className={getClassName("hoursItem")}>
               <span className={getClassName("day")}>Tuesday:</span>
               <span>{hours.tuesday}</span>
             </div>
-            <div
-              className={getClassName("hoursItem")}
-              style={{ ...bodyStyle, ...textColorStyle }}
-            >
+            <div className={getClassName("hoursItem")}>
               <span className={getClassName("day")}>Wednesday:</span>
               <span>{hours.wednesday}</span>
             </div>
-            <div
-              className={getClassName("hoursItem")}
-              style={{ ...bodyStyle, ...textColorStyle }}
-            >
+            <div className={getClassName("hoursItem")}>
               <span className={getClassName("day")}>Thursday:</span>
               <span>{hours.thursday}</span>
             </div>
-            <div
-              className={getClassName("hoursItem")}
-              style={{ ...bodyStyle, ...textColorStyle }}
-            >
+            <div className={getClassName("hoursItem")}>
               <span className={getClassName("day")}>Friday:</span>
               <span>{hours.friday}</span>
             </div>
-            <div
-              className={getClassName("hoursItem")}
-              style={{ ...bodyStyle, ...textColorStyle }}
-            >
+            <div className={getClassName("hoursItem")}>
               <span className={getClassName("day")}>Saturday:</span>
               <span>{hours.saturday}</span>
             </div>
-            <div
-              className={getClassName("hoursItem")}
-              style={{ ...bodyStyle, ...textColorStyle }}
-            >
+            <div className={getClassName("hoursItem")}>
               <span className={getClassName("day")}>Sunday:</span>
               <span>{hours.sunday}</span>
             </div>
           </div>
           {hours.specialNote && (
-            <div
-              className={getClassName("specialNote")}
-              style={{ ...bodyStyle, ...textColorStyle }}
-            >
+            <div className={getClassName("specialNote")}>
               {hours.specialNote}
             </div>
           )}
         </div>
 
         <div className={getClassName("column")}>
-          <h2
-            className={getClassName("heading")}
-            style={{ ...headingStyle, ...textColorStyle }}
-          >
-            Services
-          </h2>
+          <h2 className={getClassName("heading")}>Services</h2>
           <ul className={getClassName("servicesList")}>
             {services.map((service, index) => (
-              <li
-                key={index}
-                className={getClassName("serviceItem")}
-                style={{ ...bodyStyle, ...textColorStyle }}
-              >
+              <li key={index} className={getClassName("serviceItem")}>
                 {service.value || ""}
               </li>
             ))}
@@ -307,43 +187,6 @@ export const CoreInfoSectionConfig: ComponentConfig<CoreInfoSectionProps> = {
         value: "",
       },
     },
-    padding: {
-      type: "text",
-      label: "Padding",
-    },
-    headingFont: {
-      type: "text",
-      label: "Heading Font",
-      ai: {
-        instructions:
-          "Always use the getFontFamily tool. Use the business name as the brand, 'heading' as the fontType, and any available entity type context.",
-        stream: false,
-      },
-    },
-    bodyFont: {
-      type: "text",
-      label: "Body Font",
-      ai: {
-        instructions:
-          "Always use the getFontFamily tool. Use the business name as the brand, 'body' as the fontType, and any available entity type context.",
-        stream: false,
-      },
-    },
-    colors: {
-      type: "object",
-      label: "Brand Colors",
-      objectFields: {
-        primary: { type: "text", label: "Primary Color" },
-        secondary: { type: "text", label: "Secondary Color" },
-        background: { type: "text", label: "Background Color" },
-        text: { type: "text", label: "Text Color" },
-      },
-      ai: {
-        instructions:
-          "Always use the getBrandColors tool. Use the business name as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
-        stream: false,
-      },
-    },
   },
   defaultProps: {
     information: {
@@ -370,7 +213,6 @@ export const CoreInfoSectionConfig: ComponentConfig<CoreInfoSectionProps> = {
       { value: "Ultrices dui sapien" },
       { value: "Deserunt mollit anim id est" },
     ],
-    padding: "64px",
   },
   ai: {
     instructions: "This section should go below the hero section.",

@@ -1,12 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useEffect } from "react";
+import React from "react";
 import { ComponentConfig } from "@measured/puck";
 import { Section } from "../../components/Section/index";
 import { PuckComponent } from "@measured/puck";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
-import { getGoogleFontsUrl } from "../../lib/google-fonts";
-import { isLightColor } from "../../lib/color-utils";
 import classnames from "classnames";
 
 const getClassName = getClassNameFactory("HeroSection", styles);
@@ -27,14 +25,6 @@ export type HeroSectionProps = {
     href: string;
   };
   imageUrl: string;
-  headingFont?: string;
-  bodyFont?: string;
-  colors?: {
-    primary: string;
-    secondary: string;
-    background: string;
-    text: string;
-  };
 };
 
 export const HeroSection: PuckComponent<HeroSectionProps> = ({
@@ -47,9 +37,6 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
   primaryButton,
   secondaryButton,
   imageUrl,
-  headingFont,
-  bodyFont,
-  colors,
   puck,
 }) => {
   // Generate star rating display
@@ -57,112 +44,21 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
   const hasHalfStar = rating % 1 >= 0.5;
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
-  // Prepare font styles
-  const headingStyle = headingFont
-    ? { fontFamily: `"${headingFont}", sans-serif` }
-    : undefined;
-  const bodyStyle = bodyFont
-    ? { fontFamily: `"${bodyFont}", sans-serif` }
-    : undefined;
-
-  // Prepare color styles
-  const primaryTextColor = colors?.primary
-    ? isLightColor(colors.primary)
-      ? colors.text
-      : "#ffffff"
-    : undefined;
-  const sectionStyle = colors
-    ? { backgroundColor: colors.background }
-    : undefined;
-  const textColorStyle = colors ? { color: colors.text } : undefined;
-  const primaryButtonStyle = colors
-    ? {
-        backgroundColor: colors.primary,
-        color: primaryTextColor,
-      }
-    : undefined;
-  const secondaryButtonStyle = colors
-    ? {
-        backgroundColor: "transparent",
-        color: colors.secondary,
-        borderColor: colors.secondary,
-      }
-    : undefined;
-
-  // Load Google Fonts into document head
-  useEffect(() => {
-    if (headingFont) {
-      const linkId = `font-heading-${headingFont}`;
-      if (!document.getElementById(linkId)) {
-        const link = document.createElement("link");
-        link.id = linkId;
-        link.rel = "stylesheet";
-        link.href = getGoogleFontsUrl(headingFont);
-        document.head.appendChild(link);
-      }
-    }
-    if (bodyFont && bodyFont !== headingFont) {
-      const linkId = `font-body-${bodyFont}`;
-      if (!document.getElementById(linkId)) {
-        const link = document.createElement("link");
-        link.id = linkId;
-        link.rel = "stylesheet";
-        link.href = getGoogleFontsUrl(bodyFont);
-        document.head.appendChild(link);
-      }
-    }
-  }, [headingFont, bodyFont]);
-
   const isSpotlight = variant === "Spotlight";
   const isImmersive = variant === "Immersive";
-
-  // Override text colors for Immersive variant (white text on dark background)
-  const immersiveTextColorStyle = isImmersive
-    ? { color: "#ffffff" }
-    : undefined;
-  const immersiveTextStyle = isImmersive
-    ? { ...bodyStyle, ...immersiveTextColorStyle }
-    : { ...bodyStyle, ...textColorStyle };
-  const immersiveHeadingStyle = isImmersive
-    ? { ...headingStyle, ...immersiveTextColorStyle }
-    : { ...headingStyle, ...textColorStyle };
+  const variantKey = variant.toLowerCase() as
+    | "classic"
+    | "spotlight"
+    | "immersive";
 
   const contentElement = (
     <div className={getClassName("content")}>
-      <div
-        className={getClassName("label")}
-        style={
-          isImmersive ? immersiveTextStyle : { ...bodyStyle, ...textColorStyle }
-        }
-      >
-        {businessNameLabel}
-      </div>
-      <h1
-        className={getClassName("title")}
-        style={
-          isImmersive
-            ? immersiveHeadingStyle
-            : { ...headingStyle, ...textColorStyle }
-        }
-      >
-        {businessName}
-      </h1>
-      <div
-        className={getClassName("status")}
-        style={
-          isImmersive ? immersiveTextStyle : { ...bodyStyle, ...textColorStyle }
-        }
-      >
-        {statusText}
-      </div>
+      <div className={getClassName("label")}>{businessNameLabel}</div>
+      <h1 className={getClassName("title")}>{businessName}</h1>
+      <div className={getClassName("status")}>{statusText}</div>
 
       <div className={getClassName("rating")}>
-        <span
-          className={getClassName("ratingValue")}
-          style={isImmersive ? immersiveTextColorStyle : textColorStyle}
-        >
-          {rating}
-        </span>
+        <span className={getClassName("ratingValue")}>{rating}</span>
         <div className={getClassName("stars")}>
           {Array.from({ length: fullStars }).map((_, i) => (
             <svg
@@ -210,14 +106,7 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
             </svg>
           ))}
         </div>
-        <span
-          className={getClassName("reviewCount")}
-          style={
-            isImmersive
-              ? immersiveTextStyle
-              : { ...bodyStyle, ...textColorStyle }
-          }
-        >
+        <span className={getClassName("reviewCount")}>
           ({reviewCount} reviews)
         </span>
       </div>
@@ -226,7 +115,6 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
         <a
           href={primaryButton.href}
           className={getClassName("primaryButton")}
-          style={primaryButtonStyle}
           tabIndex={puck.isEditing ? -1 : undefined}
         >
           {primaryButton.label}
@@ -234,7 +122,6 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
         <a
           href={secondaryButton.href}
           className={getClassName("secondaryButton")}
-          style={secondaryButtonStyle}
           tabIndex={puck.isEditing ? -1 : undefined}
         >
           {secondaryButton.label}
@@ -245,18 +132,7 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
 
   if (isSpotlight) {
     return (
-      <Section
-        className={classnames(getClassName(), getClassName("spotlight"))}
-        style={{
-          ...sectionStyle,
-          paddingTop: 0,
-          paddingBottom: 0,
-          paddingLeft: 0,
-          paddingRight: 0,
-          paddingInlineStart: 0,
-          paddingInlineEnd: 0,
-        }}
-      >
+      <Section className={getClassName({ [variantKey]: true })} maxWidth="100%">
         <div className={getClassName("spotlightInner")}>
           <div className={getClassName("spotlightImageWrapper")}>
             <img
@@ -273,18 +149,7 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
 
   if (isImmersive) {
     return (
-      <Section
-        className={classnames(getClassName(), getClassName("immersive"))}
-        style={{
-          ...sectionStyle,
-          paddingTop: 0,
-          paddingBottom: 0,
-          paddingLeft: 0,
-          paddingRight: 0,
-          paddingInlineStart: 0,
-          paddingInlineEnd: 0,
-        }}
-      >
+      <Section className={getClassName({ [variantKey]: true })} maxWidth="100%">
         <div className={getClassName("immersiveInner")}>
           <div className={getClassName("immersiveImageWrapper")}>
             <div className={getClassName("immersiveOverlay")} />
@@ -303,9 +168,8 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
   }
 
   return (
-    <Section className={getClassName()} style={sectionStyle}>
+    <Section className={getClassName({ [variantKey]: true })}>
       <div className={getClassName("inner")}>
-        {contentElement}
         <div className={getClassName("imageWrapper")}>
           <img
             src={imageUrl}
@@ -313,6 +177,7 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
             className={getClassName("image")}
           />
         </div>
+        {contentElement}
       </div>
     </Section>
   );
@@ -408,39 +273,6 @@ Consider the business type, available imagery quality, and desired emotional ton
       ai: {
         instructions:
           "Always use an image URL provided by the getImage tool. Use the business name from the businessName field as the brand, 'Hero' as the component, and the entity type if available.",
-        stream: false,
-      },
-    },
-    headingFont: {
-      type: "text",
-      label: "Heading Font",
-      ai: {
-        instructions:
-          "Always use the getFontFamily tool. Use the business name from the businessName field as the brand, 'heading' as the fontType, and any available entity type context.",
-        stream: false,
-      },
-    },
-    bodyFont: {
-      type: "text",
-      label: "Body Font",
-      ai: {
-        instructions:
-          "Always use the getFontFamily tool. Use the business name from the businessName field as the brand, 'body' as the fontType, and any available entity type context.",
-        stream: false,
-      },
-    },
-    colors: {
-      type: "object",
-      label: "Brand Colors",
-      objectFields: {
-        primary: { type: "text", label: "Primary Color" },
-        secondary: { type: "text", label: "Secondary Color" },
-        background: { type: "text", label: "Background Color" },
-        text: { type: "text", label: "Text Color" },
-      },
-      ai: {
-        instructions:
-          "Always use the getBrandColors tool. Use the business name from the businessName field as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
         stream: false,
       },
     },

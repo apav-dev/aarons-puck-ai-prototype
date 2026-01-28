@@ -1,5 +1,6 @@
 .PhotoGridSection {
   background-color: white;
+  padding: 64px 0;
 }
 
 .PhotoGridSection-heading {
@@ -19,6 +20,7 @@
 
 .PhotoGridSection-grid {
   display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 24px;
 }
 

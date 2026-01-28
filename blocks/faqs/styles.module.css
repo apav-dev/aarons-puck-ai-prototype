@@ -1,17 +1,15 @@
-.FAQsSection {
-  background-color: white;
-}
+/* ===========================================
+   FAQs Section - Base Styles
+   =========================================== */
 
-.FAQsSection-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
+.FAQsSection {
+  padding: 64px 0;
 }
 
 .FAQsSection-title {
   font-size: 32px;
   font-weight: 700;
-  color: #000;
+  color: #1f2937;
   margin: 0;
   line-height: 1.2;
 }
@@ -22,21 +20,41 @@
   }
 }
 
-.FAQsSection-faqsList {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+.FAQsSection-answerLink {
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
 }
 
-.FAQsSection-faqItem {
+.FAQsSection-answerLink:hover {
+  opacity: 0.7;
+}
+
+/* ===========================================
+   Classic Variant - Accordion Style
+   =========================================== */
+
+.FAQsSection-classic {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.FAQsSection-classicList {
+  display: flex;
+  flex-direction: column;
+}
+
+.FAQsSection-classicItem {
   border-bottom: 1px solid #e5e7eb;
 }
 
-.FAQsSection-faqItem:first-child {
+.FAQsSection-classicItem:first-child {
   border-top: 1px solid #e5e7eb;
 }
 
-.FAQsSection-faqQuestion {
+.FAQsSection-classicQuestion {
   width: 100%;
   display: flex;
   align-items: center;
@@ -46,17 +64,17 @@
   border: none;
   cursor: pointer;
   text-align: left;
-  font-size: 18px;
-  font-weight: 600;
-  color: #000;
+  font-size: 16px;
+  font-weight: 400;
+  color: #1f2937;
   transition: color 0.2s ease;
 }
 
-.FAQsSection-faqQuestion:hover:not(:disabled) {
+.FAQsSection-classicQuestion:hover:not(:disabled) {
   color: #4b5563;
 }
 
-.FAQsSection-faqQuestion:disabled {
+.FAQsSection-classicQuestion:disabled {
   cursor: default;
 }
 
@@ -66,33 +84,235 @@
 }
 
 .FAQsSection-chevron {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
-  transition: transform 0.2s ease;
-  color: #000;
+  color: #1f2937;
 }
 
 .FAQsSection-chevron--expanded {
-  transform: rotate(180deg);
+  /* No transform needed - we swap the path */
 }
 
-.FAQsSection-faqAnswer {
+.FAQsSection-classicAnswer {
   padding-bottom: 20px;
   font-size: 16px;
   font-weight: 400;
-  color: #000;
+  color: #4b5563;
   line-height: 1.6;
 }
 
-.FAQsSection-answerLink {
-  color: #000;
-  text-decoration: underline;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
+/* ===========================================
+   Grid Variant - Multi-column Layout
+   =========================================== */
+
+.FAQsSection-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
 }
 
-.FAQsSection-answerLink:hover {
-  opacity: 0.8;
+.FAQsSection-gridHeader {
+  text-align: center;
 }
 
+.FAQsSection-gridList {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .FAQsSection-gridList {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .FAQsSection-gridList {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.FAQsSection-gridItem {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.FAQsSection-gridQuestion {
+  font-size: 18px;
+  font-weight: 500;
+  color: #374151;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.FAQsSection-gridAnswer {
+  font-size: 15px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ===========================================
+   Sidebar Variant - Title Left, FAQs Right
+   =========================================== */
+
+.FAQsSection-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+@media (min-width: 768px) {
+  .FAQsSection-sidebar {
+    flex-direction: row;
+    gap: 48px;
+  }
+}
+
+.FAQsSection-sidebarHeader {
+  flex: 1;
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .FAQsSection-sidebarHeader {
+    max-width: 400px;
+  }
+}
+
+.FAQsSection-sidebarLabel {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4f46e5;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.FAQsSection-sidebarTitle {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1f2937;
+  margin: 0;
+  line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  .FAQsSection-sidebarTitle {
+    font-size: 32px;
+  }
+}
+
+.FAQsSection-sidebarContent {
+  flex: 1;
+}
+
+.FAQsSection-sidebarList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.FAQsSection-sidebarItem {
+  padding: 20px 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.FAQsSection-sidebarItem:last-child {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.FAQsSection-sidebarQuestion {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+}
+
+.FAQsSection-sidebarAnswer {
+  font-size: 15px;
+  color: #4b5563;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ===========================================
+   Elevated Variant - Card with Shadow
+   =========================================== */
+
+.FAQsSection-elevated {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.FAQsSection-elevatedHeader {
+  text-align: center;
+}
+
+.FAQsSection-elevatedCard {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 7px 20px 7px #f1f1f1;
+  max-width: 1024px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.FAQsSection-elevatedGrid {
+  display: grid;
+  gap: 24px;
+  padding: 32px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .FAQsSection-elevatedGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+    padding: 40px;
+  }
+}
+
+.FAQsSection-elevatedItem {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.FAQsSection-elevatedQuestion {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.FAQsSection-elevatedAnswer {
+  font-size: 15px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.FAQsSection-elevatedDivider {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background-color: #e5e7eb;
+}
+
+@media (min-width: 768px) {
+  .FAQsSection-elevatedDivider {
+    display: block;
+  }
+}
