@@ -13,6 +13,8 @@ type SpotlightVariantProps = {
   ctaButton: PromoButton;
   imageUrl: string;
   isEditing: boolean;
+  /** Image is rendered as Section background (full-bleed); only card layout here. */
+  imageAsBackground?: boolean;
 };
 
 export const SpotlightVariant = ({
@@ -21,7 +23,23 @@ export const SpotlightVariant = ({
   ctaButton,
   imageUrl,
   isEditing,
+  imageAsBackground,
 }: SpotlightVariantProps) => {
+  const card = (
+    <div className={getClassName("spotlightCard")}>
+      <PromoInfo
+        title={title}
+        description={description}
+        ctaButton={ctaButton}
+        isEditing={isEditing}
+      />
+    </div>
+  );
+
+  if (imageAsBackground) {
+    return <div className={getClassName("spotlightInner")}>{card}</div>;
+  }
+
   return (
     <div className={getClassName("spotlight")}>
       <div className={getClassName("spotlightInner")}>
@@ -32,14 +50,7 @@ export const SpotlightVariant = ({
             className={getClassName("spotlightImage")}
           />
         </div>
-        <div className={getClassName("spotlightCard")}>
-          <PromoInfo
-            title={title}
-            description={description}
-            ctaButton={ctaButton}
-            isEditing={isEditing}
-          />
-        </div>
+        {card}
       </div>
     </div>
   );

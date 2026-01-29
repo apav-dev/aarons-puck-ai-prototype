@@ -131,16 +131,21 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
   );
 
   if (isSpotlight) {
+    const spotlightBackground = (
+      <div className={getClassName("spotlightImageWrapper")}>
+        <img
+          src={imageUrl}
+          alt={businessName}
+          className={getClassName("spotlightImage")}
+        />
+      </div>
+    );
     return (
-      <Section className={getClassName({ [variantKey]: true })} maxWidth="100%">
+      <Section
+        className={getClassName({ [variantKey]: true })}
+        background={spotlightBackground}
+      >
         <div className={getClassName("spotlightInner")}>
-          <div className={getClassName("spotlightImageWrapper")}>
-            <img
-              src={imageUrl}
-              alt={businessName}
-              className={getClassName("spotlightImage")}
-            />
-          </div>
           <div className={getClassName("spotlightCard")}>{contentElement}</div>
         </div>
       </Section>

@@ -176,26 +176,11 @@
   display: block;
 }
 
-/* Spotlight Variant Styles */
-:global(.Section).HeroSection.spotlight {
+/* Spotlight Variant — bg in Section outer (full-bleed), card in inner */
+.HeroSection--spotlight {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
-  padding-inline-start: 0 !important;
-  padding-inline-end: 0 !important;
   background-color: transparent;
-  position: relative;
-}
-
-@media (min-width: 768px) {
-  :global(.Section).HeroSection.spotlight {
-    padding-inline-start: 0 !important;
-    padding-inline-end: 0 !important;
-  }
-}
-
-.HeroSection--spotlight .Section-inner {
-  max-width: none;
-  padding: 0;
 }
 
 .HeroSection-spotlightInner {
@@ -213,10 +198,10 @@
   }
 }
 
+/* Lives in Section backgroundLayer (full-bleed); fills outer */
 .HeroSection-spotlightImageWrapper {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   z-index: 0;
@@ -264,7 +249,7 @@
   gap: 12px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .HeroSection--spotlight .HeroSection-actions {
     flex-direction: row;
     gap: 16px;
@@ -297,7 +282,7 @@
   width: 100%;
   min-height: 500px;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: flex-start;
 }
 
@@ -386,7 +371,7 @@
   gap: 12px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .HeroSection--immersive .HeroSection-actions {
     flex-direction: row;
     gap: 16px;
