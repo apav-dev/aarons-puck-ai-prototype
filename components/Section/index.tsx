@@ -9,24 +9,30 @@ export type SectionProps = {
   children: ReactNode;
   maxWidth?: string;
   style?: CSSProperties;
+  /** Renders in outer div, full-bleed; content stays in constrained inner. */
+  background?: ReactNode;
 };
 
 export const Section = forwardRef<HTMLDivElement, SectionProps>(
-  ({ children, className, maxWidth = "1280px", style = {} }, ref) => {
+  (
+    { children, className, maxWidth = "1280px", style = {}, background },
+    ref,
+  ) => {
+    const hasFullBleed = !!background;
+    const rootClass = `${getClassName()}${hasFullBleed ? ` ${getClassName("fullBleed")}` : ""}${className ? ` ${className}` : ""}`;
     return (
-      <div
-        className={`${getClassName()}${className ? ` ${className}` : ""}`}
-        style={{
-          ...style,
-        }}
-        ref={ref}
-      >
+      <div className={rootClass} style={style} ref={ref}>
+        {hasFullBleed && (
+          <div className={getClassName("backgroundLayer")} aria-hidden="true">
+            {background}
+          </div>
+        )}
         <div className={getClassName("inner")} style={{ maxWidth }}>
           {children}
         </div>
       </div>
     );
-  }
+  },
 );
 
-Section.displayName = 'Section';
+Section.displayName = "Section";

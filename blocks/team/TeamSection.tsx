@@ -37,13 +37,20 @@ export const TeamSection: PuckComponent<TeamSectionProps> = ({
       isEditing: puck.isEditing,
     };
 
+    const contactProps = {
+      showPhone,
+      showEmail,
+      showProfileButton,
+    };
+
     switch (variant) {
       case "portrait":
-        return <PortraitVariant {...commonProps} />;
+        return <PortraitVariant {...commonProps} {...contactProps} />;
       case "avatar":
         return (
           <AvatarVariant
             {...commonProps}
+            {...contactProps}
             avatarSize={avatarSize}
             avatarAlignment={avatarAlignment}
           />
@@ -323,13 +330,6 @@ export const TeamSectionConfig: ComponentConfig<TeamSectionProps> = {
     if (variant !== "avatar") {
       delete filteredFields.avatarSize;
       delete filteredFields.avatarAlignment;
-    }
-
-    // Cards-specific fields only show for cards variant
-    if (variant !== "cards") {
-      delete filteredFields.showPhone;
-      delete filteredFields.showEmail;
-      delete filteredFields.showProfileButton;
     }
 
     return filteredFields;

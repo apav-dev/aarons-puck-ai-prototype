@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
-import React from "react";
-import { ComponentConfig } from "@measured/puck";
+import React, { useState } from "react";
+import { ComponentConfig } from "@puckeditor/core";
 import { Section } from "../../components/Section/index";
-import { PuckComponent } from "@measured/puck";
+import { PuckComponent } from "@puckeditor/core";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
 
@@ -15,14 +15,110 @@ export type PhotoGridItem = {
 };
 
 export type PhotoGridSectionProps = {
+  type: "Gallery" | "Carousel";
   heading: string;
   items: PhotoGridItem[];
 };
 
+// Arrow icons as inline SVGs
+const ArrowLeft = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M19 12H5M12 19l-7-7 7-7" />
+  </svg>
+);
+
+const ArrowRight = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M5 12h14M12 5l7 7-7 7" />
+  </svg>
+);
+
 export const PhotoGridSection: PuckComponent<PhotoGridSectionProps> = ({
+  type = "Gallery",
   heading,
   items,
 }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handlePrevious = () => {
+    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : prev));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev < items.length - 1 ? prev + 1 : prev));
+  };
+
+  const isAtStart = currentIndex === 0;
+  const isAtEnd = currentIndex === items.length - 1;
+
+  if (type === "Carousel") {
+    return (
+      <Section className={getClassName()}>
+        <h2 className={getClassName("heading")}>{heading}</h2>
+        <div className={getClassName("carousel")}>
+          <button
+            className={getClassName("carouselArrow")}
+            onClick={handlePrevious}
+            disabled={isAtStart}
+            aria-label="Previous image"
+            data-position="left"
+          >
+            <ArrowLeft />
+          </button>
+
+          <div className={getClassName("carouselImageContainer")}>
+            <img
+              src={items[currentIndex]?.imageUrl}
+              alt={items[currentIndex]?.label || "Carousel image"}
+              className={getClassName("carouselImage")}
+            />
+          </div>
+
+          <button
+            className={getClassName("carouselArrow")}
+            onClick={handleNext}
+            disabled={isAtEnd}
+            aria-label="Next image"
+            data-position="right"
+          >
+            <ArrowRight />
+          </button>
+        </div>
+
+        <div className={getClassName("carouselPagination")}>
+          {items.map((_, index) => (
+            <button
+              key={index}
+              className={getClassName("carouselIndicator")}
+              data-active={index === currentIndex}
+              onClick={() => setCurrentIndex(index)}
+              aria-label={`Go to image ${index + 1}`}
+            />
+          ))}
+        </div>
+      </Section>
+    );
+  }
+
+  // Gallery type (default)
   return (
     <Section className={getClassName()}>
       <h2 className={getClassName("heading")}>{heading}</h2>
@@ -55,6 +151,14 @@ export const PhotoGridSection: PuckComponent<PhotoGridSectionProps> = ({
 
 export const PhotoGridSectionConfig: ComponentConfig<PhotoGridSectionProps> = {
   fields: {
+    type: {
+      type: "radio",
+      label: "Type",
+      options: [
+        { label: "Gallery", value: "Gallery" },
+        { label: "Carousel", value: "Carousel" },
+      ],
+    },
     heading: {
       type: "text",
       label: "Heading",
@@ -92,6 +196,7 @@ export const PhotoGridSectionConfig: ComponentConfig<PhotoGridSectionProps> = {
     },
   },
   defaultProps: {
+    type: "Gallery",
     heading: "Find the best coverage for you",
     items: [
       {

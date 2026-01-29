@@ -80,3 +80,74 @@
   line-height: 1.4;
 }
 
+/* Carousel styles */
+.PhotoGridSection-carousel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.PhotoGridSection-carouselArrow {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #722F37;
+  transition: color 0.2s ease, opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.PhotoGridSection-carouselArrow:disabled {
+  color: #9CA3AF;
+  cursor: default;
+}
+
+.PhotoGridSection-carouselArrow:not(:disabled):hover {
+  opacity: 0.7;
+}
+
+.PhotoGridSection-carouselImageContainer {
+  flex: 1;
+  max-width: 800px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.PhotoGridSection-carouselImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.PhotoGridSection-carouselPagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.PhotoGridSection-carouselIndicator {
+  width: 48px;
+  height: 4px;
+  border: none;
+  border-radius: 2px;
+  background-color: #D1D5DB;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.2s ease;
+}
+
+.PhotoGridSection-carouselIndicator[data-active="true"] {
+  background-color: #722F37;
+}
+
+.PhotoGridSection-carouselIndicator:hover:not([data-active="true"]) {
+  background-color: #9CA3AF;
+}
+

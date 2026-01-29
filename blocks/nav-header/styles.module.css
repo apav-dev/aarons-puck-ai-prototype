@@ -1,4 +1,4 @@
-.HeaderSection {
+.NavHeaderSection {
   background-color: white;
   border-bottom: 1px solid #e5e7eb;
   position: sticky;
@@ -7,7 +7,7 @@
 }
 
 /* Two-row layout on desktop */
-.HeaderSection-inner {
+.NavHeaderSection-inner {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -16,7 +16,7 @@
 }
 
 /* Top row: secondary links */
-.HeaderSection-topRow {
+.NavHeaderSection-topRow {
   display: none;
   align-items: center;
   justify-content: flex-end;
@@ -26,12 +26,12 @@
 }
 
 @media (min-width: 1024px) {
-  .HeaderSection-topRow {
+  .NavHeaderSection-topRow {
     display: flex;
   }
 }
 
-.HeaderSection-secondaryLink {
+.NavHeaderSection-secondaryLink {
   font-size: 14px;
   color: #374151;
   text-decoration: none;
@@ -39,12 +39,12 @@
   transition: color 0.2s;
 }
 
-.HeaderSection-secondaryLink:hover {
+.NavHeaderSection-secondaryLink:hover {
   color: #dc2626;
 }
 
 /* Bottom row: logo, primary nav, CTAs */
-.HeaderSection-bottomRow {
+.NavHeaderSection-bottomRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -54,14 +54,14 @@
 }
 
 @media (min-width: 1024px) {
-  .HeaderSection-bottomRow {
+  .NavHeaderSection-bottomRow {
     padding: 16px 32px;
     gap: 32px;
     min-height: 72px;
   }
 }
 
-.HeaderSection-logoWrapper {
+.NavHeaderSection-logoWrapper {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -70,7 +70,7 @@
   color: inherit;
 }
 
-.HeaderSection-logoIcon {
+.NavHeaderSection-logoIcon {
   width: 40px;
   height: 40px;
   min-width: 40px;
@@ -80,20 +80,20 @@
 }
 
 @media (min-width: 1024px) {
-  .HeaderSection-logoIcon {
+  .NavHeaderSection-logoIcon {
     width: 44px;
     height: 44px;
   }
 }
 
-.HeaderSection-logoText {
+.NavHeaderSection-logoText {
   font-size: 18px;
   font-weight: 700;
   color: #dc2626;
 }
 
 /* Primary nav: visible on desktop when not collapsed */
-.HeaderSection-primaryNav {
+.NavHeaderSection-primaryNav {
   display: none;
   align-items: center;
   flex: 1;
@@ -103,16 +103,16 @@
 }
 
 @media (min-width: 1024px) {
-  .HeaderSection-primaryNav {
+  .NavHeaderSection-primaryNav {
     display: flex;
   }
 }
 
-.HeaderSection-primaryNav--collapsed {
+.NavHeaderSection-primaryNav--collapsed {
   display: none;
 }
 
-.HeaderSection-primaryNavList {
+.NavHeaderSection-primaryNavList {
   display: flex;
   align-items: center;
   gap: 28px;
@@ -121,7 +121,7 @@
   padding: 0;
 }
 
-.HeaderSection-primaryLink {
+.NavHeaderSection-primaryLink {
   font-size: 15px;
   font-weight: 600;
   color: #1f2937;
@@ -131,12 +131,12 @@
   flex-shrink: 0;
 }
 
-.HeaderSection-primaryLink:hover {
+.NavHeaderSection-primaryLink:hover {
   color: #dc2626;
 }
 
 /* CTAs – always visible on desktop, in flyout on mobile */
-.HeaderSection-ctas {
+.NavHeaderSection-ctas {
   display: none;
   align-items: center;
   gap: 12px;
@@ -144,12 +144,12 @@
 }
 
 @media (min-width: 1024px) {
-  .HeaderSection-ctas {
+  .NavHeaderSection-ctas {
     display: flex;
   }
 }
 
-.HeaderSection-primaryCta {
+.NavHeaderSection-primaryCta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -166,11 +166,11 @@
   white-space: nowrap;
 }
 
-.HeaderSection-primaryCta:hover {
+.NavHeaderSection-primaryCta:hover {
   background-color: #b91c1c;
 }
 
-.HeaderSection-secondaryCta {
+.NavHeaderSection-secondaryCta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -187,12 +187,12 @@
   white-space: nowrap;
 }
 
-.HeaderSection-secondaryCta:hover {
+.NavHeaderSection-secondaryCta:hover {
   background-color: #fef2f2;
 }
 
 /* Hamburger: visible on mobile; on desktop only when primary nav collapsed */
-.HeaderSection-hamburger {
+.NavHeaderSection-hamburger {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -206,22 +206,22 @@
   transition: background-color 0.2s;
 }
 
-.HeaderSection-hamburger:hover {
+.NavHeaderSection-hamburger:hover {
   background-color: #f3f4f6;
 }
 
 @media (min-width: 1024px) {
-  .HeaderSection-hamburger {
+  .NavHeaderSection-hamburger {
     display: none;
   }
 
-  .HeaderSection-hamburger--visible {
+  .NavHeaderSection-hamburger--visible {
     display: flex;
   }
 }
 
 /* Flyout overlay */
-.HeaderSection-flyoutOverlay {
+.NavHeaderSection-flyoutOverlay {
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.3);
@@ -231,13 +231,13 @@
   transition: opacity 0.2s, visibility 0.2s;
 }
 
-.HeaderSection-flyoutOverlay--open {
+.NavHeaderSection-flyoutOverlay--open {
   opacity: 1;
   visibility: visible;
 }
 
 /* Flyout panel */
-.HeaderSection-flyout {
+.NavHeaderSection-flyout {
   position: fixed;
   top: 0;
   right: 0;
@@ -254,11 +254,11 @@
   overflow-y: auto;
 }
 
-.HeaderSection-flyout--open {
+.NavHeaderSection-flyout--open {
   transform: translateX(0);
 }
 
-.HeaderSection-flyoutHeader {
+.NavHeaderSection-flyoutHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -267,7 +267,7 @@
   flex-shrink: 0;
 }
 
-.HeaderSection-flyoutClose {
+.NavHeaderSection-flyoutClose {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -281,11 +281,11 @@
   transition: background-color 0.2s;
 }
 
-.HeaderSection-flyoutClose:hover {
+.NavHeaderSection-flyoutClose:hover {
   background-color: #f3f4f6;
 }
 
-.HeaderSection-flyoutBody {
+.NavHeaderSection-flyoutBody {
   flex: 1;
   padding: 24px;
   display: flex;
@@ -293,13 +293,13 @@
   gap: 32px;
 }
 
-.HeaderSection-flyoutPrimary {
+.NavHeaderSection-flyoutPrimary {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.HeaderSection-flyoutPrimaryLink {
+.NavHeaderSection-flyoutPrimaryLink {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -311,17 +311,17 @@
   transition: color 0.2s;
 }
 
-.HeaderSection-flyoutPrimaryLink:hover {
+.NavHeaderSection-flyoutPrimaryLink:hover {
   color: #dc2626;
 }
 
-.HeaderSection-flyoutSecondary {
+.NavHeaderSection-flyoutSecondary {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.HeaderSection-flyoutSecondaryLink {
+.NavHeaderSection-flyoutSecondaryLink {
   padding: 10px 0;
   font-size: 15px;
   font-weight: 400;
@@ -330,11 +330,11 @@
   transition: color 0.2s;
 }
 
-.HeaderSection-flyoutSecondaryLink:hover {
+.NavHeaderSection-flyoutSecondaryLink:hover {
   color: #dc2626;
 }
 
-.HeaderSection-flyoutCtas {
+.NavHeaderSection-flyoutCtas {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -343,7 +343,7 @@
   border-top: 1px solid #e5e7eb;
 }
 
-.HeaderSection-flyoutPrimaryCta {
+.NavHeaderSection-flyoutPrimaryCta {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -360,11 +360,11 @@
   transition: background-color 0.2s;
 }
 
-.HeaderSection-flyoutPrimaryCta:hover {
+.NavHeaderSection-flyoutPrimaryCta:hover {
   background-color: #b91c1c;
 }
 
-.HeaderSection-flyoutSecondaryCta {
+.NavHeaderSection-flyoutSecondaryCta {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -381,11 +381,11 @@
   transition: background-color 0.2s;
 }
 
-.HeaderSection-flyoutSecondaryCta:hover {
+.NavHeaderSection-flyoutSecondaryCta:hover {
   background-color: #fef2f2;
 }
 
-.HeaderSection-chevron {
+.NavHeaderSection-chevron {
   flex-shrink: 0;
   color: #991b1b;
 }

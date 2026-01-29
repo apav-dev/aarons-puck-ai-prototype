@@ -13,6 +13,8 @@ type ImmersiveVariantProps = {
   ctaButton: PromoButton;
   imageUrl: string;
   isEditing: boolean;
+  /** Image is rendered as Section background (full-bleed); only content layout here. */
+  imageAsBackground?: boolean;
 };
 
 export const ImmersiveVariant = ({
@@ -21,7 +23,23 @@ export const ImmersiveVariant = ({
   ctaButton,
   imageUrl,
   isEditing,
+  imageAsBackground,
 }: ImmersiveVariantProps) => {
+  const content = (
+    <div className={getClassName("immersiveContent")}>
+      <PromoInfo
+        title={title}
+        description={description}
+        ctaButton={ctaButton}
+        isEditing={isEditing}
+      />
+    </div>
+  );
+
+  if (imageAsBackground) {
+    return <div className={getClassName("immersiveInner")}>{content}</div>;
+  }
+
   return (
     <div className={getClassName("immersive")}>
       <div className={getClassName("immersiveInner")}>
@@ -33,14 +51,7 @@ export const ImmersiveVariant = ({
             className={getClassName("immersiveImage")}
           />
         </div>
-        <div className={getClassName("immersiveContent")}>
-          <PromoInfo
-            title={title}
-            description={description}
-            ctaButton={ctaButton}
-            isEditing={isEditing}
-          />
-        </div>
+        {content}
       </div>
     </div>
   );

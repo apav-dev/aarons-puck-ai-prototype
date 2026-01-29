@@ -4,6 +4,7 @@
 
 .TeamSection {
   background-color: white;
+  padding: 64px 0;
 }
 
 .TeamSection-title {
@@ -334,6 +335,61 @@
   line-height: 1.5;
 }
 
+/* Portrait contact (phone, email, profile) */
+.TeamSection-portraitContact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.TeamSection-portraitContactItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #6366f1;
+}
+
+.TeamSection-portraitContactIcon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: #6366f1;
+}
+
+.TeamSection-portraitEmailLink {
+  color: #6366f1;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.TeamSection-portraitEmailLink:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.TeamSection-portraitProfileButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  background-color: #6366f1;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+  margin-top: 12px;
+  width: fit-content;
+}
+
+.TeamSection-portraitProfileButton:hover {
+  opacity: 0.9;
+}
+
 /* ==========================================================================
    Avatar Variant - Circular avatars with configurable size and alignment
    ========================================================================== */
@@ -496,4 +552,72 @@
 /* Social Links positioning for centered avatar */
 .TeamSection-avatarInfoCentered .TeamSection-socialLinks {
   justify-content: center;
+}
+
+/* Avatar contact (phone, email, profile) */
+.TeamSection-avatarContact {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.TeamSection-avatarContactItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #6366f1;
+}
+
+.TeamSection-avatarContactIcon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: #6366f1;
+}
+
+.TeamSection-avatarEmailLink {
+  color: #6366f1;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.TeamSection-avatarEmailLink:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.TeamSection-avatarProfileButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  background-color: #6366f1;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+  margin-top: 10px;
+  width: fit-content;
+}
+
+.TeamSection-avatarProfileButton:hover {
+  opacity: 0.9;
+}
+
+/* Centered avatar: center contact and profile button */
+.TeamSection-avatarInfoCentered .TeamSection-avatarContact {
+  align-items: center;
+}
+
+.TeamSection-avatarInfoCentered .TeamSection-avatarContactItem {
+  justify-content: center;
+}
+
+.TeamSection-avatarInfoCentered .TeamSection-avatarProfileButton {
+  align-self: center;
 }

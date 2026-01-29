@@ -1,15 +1,12 @@
-import type { Config } from "@measured/puck";
-import { Header, HeaderProps } from "./blocks/header";
+import type { Config } from "@puckeditor/core";
 import { Hero, HeroProps } from "./blocks/hero";
 import { CoreInfoSection, CoreInfoSectionProps } from "./blocks/core-info";
 import { PromoSection, PromoSectionProps } from "./blocks/promo";
 import { ProductsSection, ProductsSectionProps } from "./blocks/products";
 import { FAQsSection, FAQsSectionProps } from "./blocks/faqs";
 import { InsightsSection, InsightsSectionProps } from "./blocks/insights";
-import { EventsSection, EventsSectionProps } from "./blocks/events";
 import { TeamSection, TeamSectionProps } from "./blocks/team";
 import { PhotoGridSection, PhotoGridSectionProps } from "./blocks/photo-grid";
-import { Card, CardProps } from "./blocks/atoms/card";
 import { Heading, HeadingProps } from "./blocks/atoms/heading";
 import { Text, TextProps } from "./blocks/atoms/text";
 import { Button, ButtonProps } from "./blocks/atoms/button";
@@ -17,6 +14,7 @@ import { Image, ImageProps } from "./blocks/atoms/image";
 import { Spacer, SpacerProps } from "./blocks/atoms/spacer";
 import { Flex, FlexProps } from "./blocks/atoms/flex";
 import { Grid, GridProps } from "./blocks/atoms/grid";
+import { NavHeader, NavHeaderProps } from "./blocks/nav-header";
 
 // Page Sections Props Type
 type PageSectionsProps = {
@@ -27,7 +25,6 @@ type PageSectionsProps = {
   ProductsSection: ProductsSectionProps;
   FAQsSection: FAQsSectionProps;
   InsightsSection: InsightsSectionProps;
-  EventsSection: EventsSectionProps;
   TeamSection: TeamSectionProps;
   PhotoGridSection: PhotoGridSectionProps;
 };
@@ -50,14 +47,13 @@ type Props = PageSectionsProps & AtomsProps;
 // Full Pages Config: Only Page Sections
 const fullPagesConfig: Config<PageSectionsProps> = {
   components: {
-    Header: Header,
+    Header: NavHeader,
     Hero: Hero,
     CoreInfoSection: CoreInfoSection,
     PromoSection: PromoSection,
     ProductsSection: ProductsSection,
     FAQsSection: FAQsSection,
     InsightsSection: InsightsSection,
-    EventsSection: EventsSection,
     TeamSection: TeamSection,
     PhotoGridSection: PhotoGridSection,
   },

@@ -10,11 +10,31 @@
   }
 }
 
+.Section-fullBleed {
+  padding-inline-start: 0 !important;
+  padding-inline-end: 0 !important;
+  position: relative;
+}
+
+.Section-backgroundLayer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
+
 .Section-inner {
   margin-inline-start: auto;
   margin-inline-end: auto;
   height: 100%;
   width: 100%;
+}
+
+.Section-fullBleed .Section-inner {
+  position: relative;
+  z-index: 1;
 }
 
 .Section .Section .Section-inner {

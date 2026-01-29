@@ -148,17 +148,22 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
   }
 
   if (isImmersive) {
+    const immersiveBackground = (
+      <div className={getClassName("immersiveImageWrapper")}>
+        <div className={getClassName("immersiveOverlay")} />
+        <img
+          src={imageUrl}
+          alt={businessName}
+          className={getClassName("immersiveImage")}
+        />
+      </div>
+    );
     return (
-      <Section className={getClassName({ [variantKey]: true })} maxWidth="100%">
+      <Section
+        className={getClassName({ [variantKey]: true })}
+        background={immersiveBackground}
+      >
         <div className={getClassName("immersiveInner")}>
-          <div className={getClassName("immersiveImageWrapper")}>
-            <div className={getClassName("immersiveOverlay")} />
-            <img
-              src={imageUrl}
-              alt={businessName}
-              className={getClassName("immersiveImage")}
-            />
-          </div>
           <div className={getClassName("immersiveContent")}>
             {contentElement}
           </div>

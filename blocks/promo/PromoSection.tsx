@@ -37,7 +37,7 @@ export const PromoSection: PuckComponent<PromoSectionProps> = ({
       case "spotlight":
         return <SpotlightVariant {...infoProps} />;
       case "immersive":
-        return <ImmersiveVariant {...infoProps} />;
+        return <ImmersiveVariant {...infoProps} imageAsBackground />;
       case "compact":
       default:
         return (
@@ -52,12 +52,24 @@ export const PromoSection: PuckComponent<PromoSectionProps> = ({
     }
   };
 
-  const isFullBleed = variant === "spotlight" || variant === "immersive";
+  const isSpotlight = variant === "spotlight";
+  const isImmersive = variant === "immersive";
+  const immersiveBackground = isImmersive ? (
+    <div className={getClassName("immersiveImageWrapper")}>
+      <div className={getClassName("immersiveOverlay")} />
+      <img
+        src={imageUrl}
+        alt={title}
+        className={getClassName("immersiveImage")}
+      />
+    </div>
+  ) : undefined;
 
   return (
     <Section
       className={getClassName({ [variant]: true })}
-      maxWidth={isFullBleed ? "100%" : undefined}
+      maxWidth={isSpotlight ? "100%" : undefined}
+      background={immersiveBackground}
     >
       {renderVariant()}
     </Section>
