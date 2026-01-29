@@ -1,138 +1,101 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useEffect } from "react";
-import { ComponentConfig } from "@measured/puck";
+import React from "react";
+import { ComponentConfig, PuckComponent } from "@puckeditor/core";
 import { Section } from "../../components/Section/index";
-import { PuckComponent } from "@measured/puck";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
-import { getGoogleFontsUrl } from "../../lib/google-fonts";
-import { isLightColor } from "../../lib/color-utils";
+import { PromoSectionProps } from "./types";
+import { CompactVariant } from "./variants/CompactVariant";
+import { ClassicVariant } from "./variants/ClassicVariant";
+import { ImmersiveVariant } from "./variants/ImmersiveVariant";
+import { SpotlightVariant } from "./variants/SpotlightVariant";
 
 const getClassName = getClassNameFactory("PromoSection", styles);
 
-export type PromoSectionProps = {
-  title: string;
-  description: string;
-  ctaButton: {
-    label: string;
-    href: string;
-  };
-  imageUrl: string;
-  padding: string;
-  headingFont?: string;
-  bodyFont?: string;
-  colors?: {
-    primary: string;
-    secondary: string;
-    background: string;
-    text: string;
-  };
-};
+export type { PromoSectionProps } from "./types";
 
 export const PromoSection: PuckComponent<PromoSectionProps> = ({
+  variant,
   title,
   description,
   ctaButton,
   imageUrl,
-  padding,
-  headingFont,
-  bodyFont,
-  colors,
   puck,
 }) => {
-  // Prepare font styles
-  const headingStyle = headingFont
-    ? { fontFamily: `"${headingFont}", sans-serif` }
-    : undefined;
-  const bodyStyle = bodyFont
-    ? { fontFamily: `"${bodyFont}", sans-serif` }
-    : undefined;
+  const renderVariant = () => {
+    const infoProps = {
+      title,
+      description,
+      ctaButton,
+      imageUrl,
+      isEditing: puck.isEditing,
+    };
 
-  // Prepare color styles
-  const primaryTextColor = colors?.primary
-    ? isLightColor(colors.primary)
-      ? colors.text
-      : "#ffffff"
-    : undefined;
-  const sectionStyle = colors
-    ? { backgroundColor: colors.background }
-    : undefined;
-  const textColorStyle = colors ? { color: colors.text } : undefined;
-  const primaryButtonStyle = colors
-    ? {
-        backgroundColor: colors.primary,
-        color: primaryTextColor,
-      }
-    : undefined;
+    switch (variant) {
+      case "classic":
+        return <ClassicVariant {...infoProps} />;
+      case "spotlight":
+        return <SpotlightVariant {...infoProps} imageAsBackground />;
+      case "immersive":
+        return <ImmersiveVariant {...infoProps} imageAsBackground />;
+      case "compact":
+      default:
+        return (
+          <CompactVariant
+            title={title}
+            description={description}
+            ctaButton={ctaButton}
+            imageUrl={imageUrl}
+            isEditing={puck.isEditing}
+          />
+        );
+    }
+  };
 
-  // Load Google Fonts into document head
-  useEffect(() => {
-    if (headingFont) {
-      const linkId = `font-heading-${headingFont}`;
-      if (!document.getElementById(linkId)) {
-        const link = document.createElement("link");
-        link.id = linkId;
-        link.rel = "stylesheet";
-        link.href = getGoogleFontsUrl(headingFont);
-        document.head.appendChild(link);
-      }
-    }
-    if (bodyFont && bodyFont !== headingFont) {
-      const linkId = `font-body-${bodyFont}`;
-      if (!document.getElementById(linkId)) {
-        const link = document.createElement("link");
-        link.id = linkId;
-        link.rel = "stylesheet";
-        link.href = getGoogleFontsUrl(bodyFont);
-        document.head.appendChild(link);
-      }
-    }
-  }, [headingFont, bodyFont]);
+  const isSpotlight = variant === "spotlight";
+  const isImmersive = variant === "immersive";
+  const spotlightBackground = isSpotlight ? (
+    <div className={getClassName("spotlightImageWrapper")}>
+      <img
+        src={imageUrl}
+        alt={title}
+        className={getClassName("spotlightImage")}
+      />
+    </div>
+  ) : undefined;
+  const immersiveBackground = isImmersive ? (
+    <div className={getClassName("immersiveImageWrapper")}>
+      <div className={getClassName("immersiveOverlay")} />
+      <img
+        src={imageUrl}
+        alt={title}
+        className={getClassName("immersiveImage")}
+      />
+    </div>
+  ) : undefined;
 
   return (
     <Section
-      className={getClassName()}
-      style={{
-        paddingTop: padding,
-        paddingBottom: padding,
-        ...sectionStyle,
-      }}
+      className={getClassName({ [variant]: true })}
+      background={spotlightBackground ?? immersiveBackground}
     >
-      <div className={getClassName("inner")}>
-        <div className={getClassName("imageWrapper")}>
-          <img src={imageUrl} alt={title} className={getClassName("image")} />
-        </div>
-
-        <div className={getClassName("content")}>
-          <h2
-            className={getClassName("title")}
-            style={{ ...headingStyle, ...textColorStyle }}
-          >
-            {title}
-          </h2>
-          <p
-            className={getClassName("description")}
-            style={{ ...bodyStyle, ...textColorStyle }}
-          >
-            {description}
-          </p>
-
-          <a
-            href={ctaButton.href}
-            className={getClassName("ctaButton")}
-            style={primaryButtonStyle}
-            tabIndex={puck.isEditing ? -1 : undefined}
-          >
-            {ctaButton.label}
-          </a>
-        </div>
-      </div>
+      {renderVariant()}
     </Section>
   );
 };
 
 export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
   fields: {
+    variant: {
+      type: "radio",
+      label: "Variant",
+      options: [
+        { label: "Compact", value: "compact" },
+        { label: "Classic", value: "classic" },
+        { label: "Immersive", value: "immersive" },
+        { label: "Spotlight", value: "spotlight" },
+      ],
+    },
     title: {
       type: "text",
       label: "Title",
@@ -158,45 +121,9 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
         stream: false,
       },
     },
-    padding: {
-      type: "text",
-      label: "Padding",
-    },
-    headingFont: {
-      type: "text",
-      label: "Heading Font",
-      ai: {
-        instructions:
-          "Always use the getFontFamily tool. Use the business name as the brand, 'heading' as the fontType, and any available entity type context.",
-        stream: false,
-      },
-    },
-    bodyFont: {
-      type: "text",
-      label: "Body Font",
-      ai: {
-        instructions:
-          "Always use the getFontFamily tool. Use the business name as the brand, 'body' as the fontType, and any available entity type context.",
-        stream: false,
-      },
-    },
-    colors: {
-      type: "object",
-      label: "Brand Colors",
-      objectFields: {
-        primary: { type: "text", label: "Primary Color" },
-        secondary: { type: "text", label: "Secondary Color" },
-        background: { type: "text", label: "Background Color" },
-        text: { type: "text", label: "Text Color" },
-      },
-      ai: {
-        instructions:
-          "Always use the getBrandColors tool. Use the business name as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
-        stream: false,
-      },
-    },
   },
   defaultProps: {
+    variant: "compact",
     title: "Featured Promotion",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing. Maecenas finibus placerat justo. 100 characters",
@@ -206,7 +133,6 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
     },
     imageUrl:
       "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop",
-    padding: "64px",
   },
   render: PromoSection,
 };

@@ -1,5 +1,12 @@
 .PromoSection {
   background-color: white;
+  padding: 64px 0;
+}
+
+.PromoSection--compact {
+}
+
+.PromoSection--classic {
 }
 
 .PromoSection-inner {
@@ -110,5 +117,259 @@
 
 .PromoSection-appBadge:hover {
   opacity: 0.8;
+}
+
+/* ===========================================
+   Promo Variants - Shared Info Styles
+   =========================================== */
+
+.PromoSection-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.PromoSection-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ===========================================
+   Classic Variant
+   =========================================== */
+
+.PromoSection-classic {
+  display: flex;
+  flex-direction: column;
+}
+
+.PromoSection-classicInner {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+@media (min-width: 1024px) {
+  .PromoSection-classicInner {
+    flex-direction: row;
+    align-items: center;
+    gap: 48px;
+  }
+}
+
+.PromoSection-classicImageWrapper {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+}
+
+@media (min-width: 1024px) {
+  .PromoSection-classicImageWrapper {
+    flex: 1;
+    max-width: 50%;
+    aspect-ratio: 4 / 3;
+  }
+}
+
+.PromoSection-classicImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.PromoSection-classicContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .PromoSection-classicContent {
+    flex: 1;
+    max-width: 50%;
+  }
+}
+
+/* ===========================================
+   Spotlight Variant — bg in Section outer (full-bleed), card in inner
+   =========================================== */
+
+.PromoSection--spotlight {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  background-color: transparent;
+}
+
+.PromoSection-spotlightInner {
+  position: relative;
+  width: 100%;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+@media (min-width: 1024px) {
+  .PromoSection-spotlightInner {
+    min-height: 600px;
+  }
+}
+
+/* Lives in Section backgroundLayer (full-bleed); fills outer */
+.PromoSection-spotlightImageWrapper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.PromoSection-spotlightImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.PromoSection-spotlightCard {
+  position: relative;
+  z-index: 1;
+  background-color: white;
+  border-radius: 12px;
+  padding: 32px;
+  margin: 32px;
+  width: calc(100% - 64px);
+  max-width: 500px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+@media (min-width: 768px) {
+  .PromoSection-spotlightCard {
+    padding: 40px;
+    margin: 48px;
+    max-width: 550px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .PromoSection-spotlightCard {
+    padding: 48px;
+    margin: 64px;
+    max-width: 600px;
+  }
+}
+
+.PromoSection--spotlight .PromoSection-actions {
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 1024px) {
+  .PromoSection--spotlight .PromoSection-actions {
+    flex-direction: row;
+    gap: 16px;
+  }
+}
+
+/* ===========================================
+   Immersive Variant — bg in Section outer (full-bleed), content in inner
+   =========================================== */
+
+.PromoSection--immersive {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  background-color: transparent;
+}
+
+.PromoSection-immersiveInner {
+  position: relative;
+  width: 100%;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+@media (min-width: 1024px) {
+  .PromoSection-immersiveInner {
+    min-height: 600px;
+  }
+}
+
+/* Lives in Section backgroundLayer (full-bleed); fills outer */
+.PromoSection-immersiveImageWrapper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.PromoSection-immersiveOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.5) 50%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  z-index: 1;
+}
+
+.PromoSection-immersiveImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: brightness(0.6);
+}
+
+.PromoSection-immersiveContent {
+  position: relative;
+  z-index: 2;
+  padding: 32px;
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .PromoSection-immersiveContent {
+    padding: 48px;
+    max-width: 600px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .PromoSection-immersiveContent {
+    padding: 64px;
+    max-width: 700px;
+  }
+}
+
+.PromoSection--immersive .PromoSection-title,
+.PromoSection--immersive .PromoSection-description {
+  color: #ffffff;
+}
+
+.PromoSection--immersive .PromoSection-actions {
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 1024px) {
+  .PromoSection--immersive .PromoSection-actions {
+    flex-direction: row;
+    gap: 16px;
+  }
 }
 

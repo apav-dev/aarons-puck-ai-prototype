@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { ComponentConfig } from "@measured/puck";
+import React, { useState } from "react";
+import { ComponentConfig } from "@puckeditor/core";
 import { Section } from "../../components/Section/index";
-import { PuckComponent } from "@measured/puck";
+import { PuckComponent } from "@puckeditor/core";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
-import { getGoogleFontsUrl } from "../../lib/google-fonts";
 import classnames from "classnames";
 
 const getClassName = getClassNameFactory("FAQsSection", styles);
@@ -14,210 +13,294 @@ export type FAQItem = {
   answer: string;
 };
 
+export type FAQVariant = "classic" | "grid" | "sidebar" | "elevated";
+
 export type FAQsSectionProps = {
   title: string;
   faqs: FAQItem[];
-  padding: string;
-  headingFont?: string;
-  bodyFont?: string;
-  colors?: {
-    primary: string;
-    secondary: string;
-    background: string;
-    text: string;
+  variant: FAQVariant;
+};
+
+// Parse answer text to support links (simple markdown-style links: [text](url))
+const parseAnswer = (answer: string) => {
+  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = linkRegex.exec(answer)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({
+        type: "text",
+        content: answer.slice(lastIndex, match.index),
+      });
+    }
+    parts.push({
+      type: "link",
+      text: match[1],
+      href: match[2],
+    });
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < answer.length) {
+    parts.push({ type: "text", content: answer.slice(lastIndex) });
+  }
+
+  if (parts.length === 0) {
+    return [{ type: "text", content: answer }];
+  }
+
+  return parts;
+};
+
+// Render answer with parsed links
+const AnswerContent = ({
+  answer,
+  isEditing,
+}: {
+  answer: string;
+  isEditing: boolean;
+}) => {
+  const parts = parseAnswer(answer);
+  return (
+    <>
+      {parts.map((part, partIndex) => {
+        if (part.type === "link") {
+          return (
+            <a
+              key={partIndex}
+              href={part.href}
+              className={getClassName("answerLink")}
+              tabIndex={isEditing ? -1 : undefined}
+            >
+              {part.text}
+            </a>
+          );
+        }
+        return <span key={partIndex}>{part.content}</span>;
+      })}
+    </>
+  );
+};
+
+// Classic variant - Accordion style with expandable items
+const ClassicVariant = ({
+  title,
+  faqs,
+  isEditing,
+}: {
+  title: string;
+  faqs: FAQItem[];
+  isEditing: boolean;
+}) => {
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(
+    isEditing ? null : 0,
+  );
+
+  const toggleFAQ = (index: number) => {
+    if (isEditing) return;
+    setExpandedIndex(expandedIndex === index ? null : index);
   };
+
+  return (
+    <div className={getClassName("classic")}>
+      <h2 className={getClassName("title")}>{title}</h2>
+      <div className={getClassName("classicList")}>
+        {faqs.map((faq, index) => {
+          const isExpanded = isEditing || expandedIndex === index;
+          return (
+            <div key={index} className={getClassName("classicItem")}>
+              <button
+                className={getClassName("classicQuestion")}
+                onClick={() => toggleFAQ(index)}
+                disabled={isEditing}
+                aria-expanded={isExpanded}
+                aria-controls={`faq-answer-${index}`}
+              >
+                <span className={getClassName("questionText")}>
+                  {faq.question}
+                </span>
+                <svg
+                  className={classnames(
+                    getClassName("chevron"),
+                    isExpanded && styles["FAQsSection-chevron--expanded"],
+                  )}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d={isExpanded ? "M18 15l-6-6-6 6" : "M6 9l6 6 6-6"} />
+                </svg>
+              </button>
+              {isExpanded && (
+                <div
+                  id={`faq-answer-${index}`}
+                  className={getClassName("classicAnswer")}
+                >
+                  <AnswerContent answer={faq.answer} isEditing={isEditing} />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// Grid variant - Multi-column grid layout
+const GridVariant = ({
+  title,
+  faqs,
+  isEditing,
+}: {
+  title: string;
+  faqs: FAQItem[];
+  isEditing: boolean;
+}) => {
+  return (
+    <div className={getClassName("grid")}>
+      <div className={getClassName("gridHeader")}>
+        <h2 className={getClassName("title")}>{title}</h2>
+      </div>
+      <div className={getClassName("gridList")}>
+        {faqs.map((faq, index) => (
+          <div key={index} className={getClassName("gridItem")}>
+            <h4 className={getClassName("gridQuestion")}>{faq.question}</h4>
+            <p className={getClassName("gridAnswer")}>
+              <AnswerContent answer={faq.answer} isEditing={isEditing} />
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Sidebar variant - Title on left, FAQs on right
+const SidebarVariant = ({
+  title,
+  faqs,
+  isEditing,
+}: {
+  title: string;
+  faqs: FAQItem[];
+  isEditing: boolean;
+}) => {
+  return (
+    <div className={getClassName("sidebar")}>
+      <div className={getClassName("sidebarHeader")}>
+        <span className={getClassName("sidebarLabel")}>
+          Frequently asked questions
+        </span>
+        <h2 className={getClassName("sidebarTitle")}>{title}</h2>
+      </div>
+      <div className={getClassName("sidebarContent")}>
+        <ul className={getClassName("sidebarList")}>
+          {faqs.map((faq, index) => (
+            <li key={index} className={getClassName("sidebarItem")}>
+              <h4 className={getClassName("sidebarQuestion")}>{faq.question}</h4>
+              <p className={getClassName("sidebarAnswer")}>
+                <AnswerContent answer={faq.answer} isEditing={isEditing} />
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+// Elevated variant - Centered card with shadow
+const ElevatedVariant = ({
+  title,
+  faqs,
+  isEditing,
+}: {
+  title: string;
+  faqs: FAQItem[];
+  isEditing: boolean;
+}) => {
+  return (
+    <div className={getClassName("elevated")}>
+      <div className={getClassName("elevatedHeader")}>
+        <h2 className={getClassName("title")}>{title}</h2>
+      </div>
+      <div className={getClassName("elevatedCard")}>
+        <div className={getClassName("elevatedGrid")}>
+          {faqs.map((faq, index) => (
+            <div key={index} className={getClassName("elevatedItem")}>
+              <h4 className={getClassName("elevatedQuestion")}>{faq.question}</h4>
+              <p className={getClassName("elevatedAnswer")}>
+                <AnswerContent answer={faq.answer} isEditing={isEditing} />
+              </p>
+            </div>
+          ))}
+        </div>
+        <span className={getClassName("elevatedDivider")} />
+      </div>
+    </div>
+  );
 };
 
 export const FAQsSection: PuckComponent<FAQsSectionProps> = ({
   title,
   faqs,
-  padding,
-  headingFont,
-  bodyFont,
-  colors,
+  variant,
   puck,
 }) => {
-  // In edit mode, show all FAQs expanded. In view mode, start with first expanded
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(
-    puck.isEditing ? null : 0
-  );
-
-  // Prepare font styles
-  const headingStyle = headingFont
-    ? { fontFamily: `"${headingFont}", sans-serif` }
-    : undefined;
-  const bodyStyle = bodyFont
-    ? { fontFamily: `"${bodyFont}", sans-serif` }
-    : undefined;
-
-  // Prepare color styles
-  const sectionStyle = colors
-    ? { backgroundColor: colors.background }
-    : undefined;
-  const textColorStyle = colors ? { color: colors.text } : undefined;
-  const linkColorStyle = colors ? { color: colors.primary } : undefined;
-  const chevronColorStyle = colors ? { color: colors.primary } : undefined;
-
-  // Load Google Fonts into document head
-  useEffect(() => {
-    if (headingFont) {
-      const linkId = `font-heading-${headingFont}`;
-      if (!document.getElementById(linkId)) {
-        const link = document.createElement("link");
-        link.id = linkId;
-        link.rel = "stylesheet";
-        link.href = getGoogleFontsUrl(headingFont);
-        document.head.appendChild(link);
-      }
+  const renderVariant = () => {
+    switch (variant) {
+      case "grid":
+        return (
+          <GridVariant title={title} faqs={faqs} isEditing={puck.isEditing} />
+        );
+      case "sidebar":
+        return (
+          <SidebarVariant title={title} faqs={faqs} isEditing={puck.isEditing} />
+        );
+      case "elevated":
+        return (
+          <ElevatedVariant
+            title={title}
+            faqs={faqs}
+            isEditing={puck.isEditing}
+          />
+        );
+      case "classic":
+      default:
+        return (
+          <ClassicVariant
+            title={title}
+            faqs={faqs}
+            isEditing={puck.isEditing}
+          />
+        );
     }
-    if (bodyFont && bodyFont !== headingFont) {
-      const linkId = `font-body-${bodyFont}`;
-      if (!document.getElementById(linkId)) {
-        const link = document.createElement("link");
-        link.id = linkId;
-        link.rel = "stylesheet";
-        link.href = getGoogleFontsUrl(bodyFont);
-        document.head.appendChild(link);
-      }
-    }
-  }, [headingFont, bodyFont]);
-
-  const toggleFAQ = (index: number) => {
-    if (puck.isEditing) return;
-    setExpandedIndex(expandedIndex === index ? null : index);
-  };
-
-  // Parse answer text to support links (simple markdown-style links: [text](url))
-  const parseAnswer = (answer: string) => {
-    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-    const parts = [];
-    let lastIndex = 0;
-    let match;
-
-    while ((match = linkRegex.exec(answer)) !== null) {
-      // Add text before the link
-      if (match.index > lastIndex) {
-        parts.push({
-          type: "text",
-          content: answer.slice(lastIndex, match.index),
-        });
-      }
-      // Add the link
-      parts.push({
-        type: "link",
-        text: match[1],
-        href: match[2],
-      });
-      lastIndex = match.index + match[0].length;
-    }
-
-    // Add remaining text
-    if (lastIndex < answer.length) {
-      parts.push({ type: "text", content: answer.slice(lastIndex) });
-    }
-
-    if (parts.length === 0) {
-      return [{ type: "text", content: answer }];
-    }
-
-    return parts;
   };
 
   return (
-    <Section
-      className={getClassName()}
-      style={{
-        paddingTop: padding,
-        paddingBottom: padding,
-        ...sectionStyle,
-      }}
-    >
-      <div className={getClassName("inner")}>
-        <h2
-          className={getClassName("title")}
-          style={{ ...headingStyle, ...textColorStyle }}
-        >
-          {title}
-        </h2>
-        <div className={getClassName("faqsList")}>
-          {faqs.map((faq, index) => {
-            // In edit mode, show all FAQs expanded; otherwise use state
-            const isExpanded = puck.isEditing || expandedIndex === index;
-            const answerParts = parseAnswer(faq.answer);
-
-            return (
-              <div key={index} className={getClassName("faqItem")}>
-                <button
-                  className={getClassName("faqQuestion")}
-                  onClick={() => toggleFAQ(index)}
-                  style={{ ...bodyStyle, ...textColorStyle }}
-                  disabled={puck.isEditing}
-                  aria-expanded={isExpanded}
-                  aria-controls={`faq-answer-${index}`}
-                >
-                  <span className={getClassName("questionText")}>
-                    {faq.question}
-                  </span>
-                  <svg
-                    className={classnames(
-                      getClassName("chevron"),
-                      isExpanded && styles["FAQsSection-chevron--expanded"]
-                    )}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    style={chevronColorStyle}
-                  >
-                    {isExpanded ? (
-                      <path d="M18 15l-6-6-6 6" />
-                    ) : (
-                      <path d="M6 9l6 6 6-6" />
-                    )}
-                  </svg>
-                </button>
-                {isExpanded && (
-                  <div
-                    id={`faq-answer-${index}`}
-                    className={getClassName("faqAnswer")}
-                    style={{ ...bodyStyle, ...textColorStyle }}
-                  >
-                    {answerParts.map((part, partIndex) => {
-                      if (part.type === "link") {
-                        return (
-                          <a
-                            key={partIndex}
-                            href={part.href}
-                            className={getClassName("answerLink")}
-                            style={linkColorStyle}
-                            tabIndex={puck.isEditing ? -1 : undefined}
-                          >
-                            {part.text}
-                          </a>
-                        );
-                      }
-                      return <span key={partIndex}>{part.content}</span>;
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </Section>
+    <Section className={getClassName({ [variant]: true })}>{renderVariant()}</Section>
   );
 };
 
 export const FAQsSectionConfig: ComponentConfig<FAQsSectionProps> = {
   fields: {
+    variant: {
+      type: "radio",
+      label: "Variant",
+      options: [
+        { label: "Classic", value: "classic" },
+        { label: "Grid", value: "grid" },
+        { label: "Sidebar", value: "sidebar" },
+        { label: "Elevated", value: "elevated" },
+      ],
+    },
     title: {
       type: "text",
       label: "Title",
-      ai: {
-        instructions:
-          "The main heading for the FAQs section. For brick-and-mortar location landing pages, use SEO-friendly titles like 'Frequently Asked Questions about [Business Name]' or 'Common Questions about [Location] [Service Type]'.",
-      },
     },
     faqs: {
       type: "array",
@@ -232,96 +315,50 @@ export const FAQsSectionConfig: ComponentConfig<FAQsSectionProps> = {
         question: {
           type: "text",
           label: "Question",
-          // ai: {
-          //   instructions:
-          //     "Create SEO-optimized questions that potential customers would search for about this brick-and-mortar location. Include location-specific questions (e.g., 'Where is [Business Name] located?', 'What are your hours?', 'Do you offer [service] at your [location] location?'). Questions should be natural and match common search queries.",
-          // },
         },
         answer: {
           type: "textarea",
           label: "Answer",
-          // ai: {
-          //   instructions:
-          //     "Provide comprehensive, SEO-optimized answers that include location-specific details, business name, services offered, and relevant information. Include internal links to other pages using markdown format: [link text](url). Answers should be detailed enough to satisfy search intent while maintaining readability. Include local keywords naturally.",
-          // },
         },
       },
       defaultItemProps: {
         question: "Question Lorem ipsum dolor sit amet?",
         answer:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea [commodo consequat](https://example.com).",
-      },
-    },
-    padding: {
-      type: "text",
-      label: "Padding",
-    },
-    headingFont: {
-      type: "text",
-      label: "Heading Font",
-      ai: {
-        instructions:
-          "Always use the getFontFamily tool. Use the business name as the brand, 'heading' as the fontType, and any available entity type context.",
-      },
-    },
-    bodyFont: {
-      type: "text",
-      label: "Body Font",
-      ai: {
-        instructions:
-          "Always use the getFontFamily tool. Use the business name as the brand, 'body' as the fontType, and any available entity type context.",
-      },
-    },
-    colors: {
-      type: "object",
-      label: "Brand Colors",
-      objectFields: {
-        primary: { type: "text", label: "Primary Color" },
-        secondary: { type: "text", label: "Secondary Color" },
-        background: { type: "text", label: "Background Color" },
-        text: { type: "text", label: "Text Color" },
-      },
-      ai: {
-        instructions:
-          "Always use the getBrandColors tool. Use the business name as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
       },
     },
   },
   defaultProps: {
+    variant: "classic",
     title: "Frequently Asked Questions",
     faqs: [
       {
-        question: "Question Lorem ipsum dolor sit amet?",
+        question: "What are some random questions to ask?",
         answer:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea [commodo consequat](https://example.com).",
+          "That's exactly the reason we created this random question generator. There are hundreds of random questions to choose from so you're able to find the perfect random question.",
       },
       {
-        question: "Question Lorem ipsum dolor sit amet?",
+        question: "Do you include common questions?",
         answer:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+          "This generator doesn't include most common questions. The thought is that you can come up with common questions on your own so most of the questions in this generator.",
       },
       {
-        question: "Question Lorem ipsum dolor sit amet?",
+        question: "Can I use this for 21 questions?",
         answer:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+          "Yes! There are two ways that you can use this question generator depending on what you're after. You can indicate that you want 21 questions generated.",
       },
       {
-        question: "Question Lorem ipsum dolor sit amet?",
+        question: "Are these questions for girls or for boys?",
         answer:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+          "The questions in this generator are gender neutral and can be used to ask either male or females (or any other gender the person identifies with).",
       },
       {
-        question: "Question Lorem ipsum dolor sit amet?",
+        question: "What do you wish you had more talent doing?",
         answer:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+          "If you've been searching for a way to get random questions, you've landed on the correct webpage. We created the Random Question Generator to ask you as many random questions as your heart desires.",
       },
     ],
-    padding: "64px",
   },
-  // ai: {
-  //   instructions:
-  //     "Aa comprehensive FAQs section for a brick-and-mortar location landing page. Always use the getFAQs tool to retrieve FAQs for the business. The tool will attempt to extract FAQs from the brand's location landing page if a locationUrl is provided, or generate appropriate FAQs using AI based on the brand, entity type, and location. The FAQs should address common customer questions about the location, services, hours, policies, and other relevant information. Questions and answers should be optimized for local SEO and include location-specific details when available.",
-  // },
   render: FAQsSection,
 };
 

@@ -4,6 +4,15 @@
   padding-bottom: 64px;
 }
 
+.HeroSection--classic {
+}
+
+.HeroSection--spotlight {
+}
+
+.HeroSection--immersive {
+}
+
 .HeroSection-inner {
   display: flex;
   flex-direction: column;
@@ -167,26 +176,11 @@
   display: block;
 }
 
-/* Spotlight Variant Styles */
-:global(.Section).HeroSection.spotlight {
+/* Spotlight Variant — bg in Section outer (full-bleed), card in inner */
+.HeroSection--spotlight {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
-  padding-inline-start: 0 !important;
-  padding-inline-end: 0 !important;
   background-color: transparent;
-  position: relative;
-}
-
-@media (min-width: 768px) {
-  :global(.Section).HeroSection.spotlight {
-    padding-inline-start: 0 !important;
-    padding-inline-end: 0 !important;
-  }
-}
-
-.HeroSection.spotlight .Section-inner {
-  max-width: none;
-  padding: 0;
 }
 
 .HeroSection-spotlightInner {
@@ -204,10 +198,10 @@
   }
 }
 
+/* Lives in Section backgroundLayer (full-bleed); fills outer */
 .HeroSection-spotlightImageWrapper {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   z-index: 0;
@@ -250,52 +244,37 @@
 }
 
 /* Spotlight variant: buttons stacked on mobile, side-by-side on desktop */
-.HeroSection.spotlight .HeroSection-actions {
+.HeroSection--spotlight .HeroSection-actions {
   flex-direction: column;
   gap: 12px;
 }
 
-@media (min-width: 768px) {
-  .HeroSection.spotlight .HeroSection-actions {
+@media (min-width: 1024px) {
+  .HeroSection--spotlight .HeroSection-actions {
     flex-direction: row;
     gap: 16px;
   }
 }
 
 /* Spotlight variant: ensure text colors work on white card */
-.HeroSection.spotlight .HeroSection-label,
-.HeroSection.spotlight .HeroSection-title,
-.HeroSection.spotlight .HeroSection-status,
-.HeroSection.spotlight .HeroSection-ratingValue,
-.HeroSection.spotlight .HeroSection-reviewCount {
+.HeroSection--spotlight .HeroSection-label,
+.HeroSection--spotlight .HeroSection-title,
+.HeroSection--spotlight .HeroSection-status,
+.HeroSection--spotlight .HeroSection-ratingValue,
+.HeroSection--spotlight .HeroSection-reviewCount {
   color: #000;
 }
 
 /* Spotlight variant: star color */
-.HeroSection.spotlight .HeroSection-star:not(.empty) {
+.HeroSection--spotlight .HeroSection-star:not(.empty) {
   color: #dc2626;
 }
 
-/* Immersive Variant Styles */
-:global(.Section).HeroSection.immersive {
+/* Immersive Variant Styles — bg in Section outer (full-bleed), content in inner */
+.HeroSection--immersive {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
-  padding-inline-start: 0 !important;
-  padding-inline-end: 0 !important;
   background-color: transparent;
-  position: relative;
-}
-
-@media (min-width: 768px) {
-  :global(.Section).HeroSection.immersive {
-    padding-inline-start: 0 !important;
-    padding-inline-end: 0 !important;
-  }
-}
-
-.HeroSection.immersive .Section-inner {
-  max-width: none;
-  padding: 0;
 }
 
 .HeroSection-immersiveInner {
@@ -303,7 +282,7 @@
   width: 100%;
   min-height: 500px;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: flex-start;
 }
 
@@ -313,10 +292,10 @@
   }
 }
 
+/* Lives in Section backgroundLayer (full-bleed); fills outer */
 .HeroSection-immersiveImageWrapper {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   z-index: 0;
@@ -368,45 +347,45 @@
 }
 
 /* Immersive variant: ensure text colors are white */
-.HeroSection.immersive .HeroSection-label,
-.HeroSection.immersive .HeroSection-title,
-.HeroSection.immersive .HeroSection-status,
-.HeroSection.immersive .HeroSection-ratingValue,
-.HeroSection.immersive .HeroSection-reviewCount {
+.HeroSection--immersive .HeroSection-label,
+.HeroSection--immersive .HeroSection-title,
+.HeroSection--immersive .HeroSection-status,
+.HeroSection--immersive .HeroSection-ratingValue,
+.HeroSection--immersive .HeroSection-reviewCount {
   color: #ffffff;
 }
 
 /* Immersive variant: star color (white) */
-.HeroSection.immersive .HeroSection-star:not(.empty) {
+.HeroSection--immersive .HeroSection-star:not(.empty) {
   color: #ffffff;
 }
 
-.HeroSection.immersive .HeroSection-star.empty {
+.HeroSection--immersive .HeroSection-star.empty {
   color: rgba(255, 255, 255, 0.4);
   stroke-width: 1.5;
 }
 
 /* Immersive variant: buttons stacked on mobile, side-by-side on desktop */
-.HeroSection.immersive .HeroSection-actions {
+.HeroSection--immersive .HeroSection-actions {
   flex-direction: column;
   gap: 12px;
 }
 
-@media (min-width: 768px) {
-  .HeroSection.immersive .HeroSection-actions {
+@media (min-width: 1024px) {
+  .HeroSection--immersive .HeroSection-actions {
     flex-direction: row;
     gap: 16px;
   }
 }
 
 /* Immersive variant: secondary button should have white border and white text */
-.HeroSection.immersive .HeroSection-secondaryButton {
+.HeroSection--immersive .HeroSection-secondaryButton {
   background-color: transparent;
   color: #ffffff;
   border-color: #ffffff;
 }
 
-.HeroSection.immersive .HeroSection-secondaryButton:hover {
+.HeroSection--immersive .HeroSection-secondaryButton:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 

@@ -1,0 +1,153 @@
+.PhotoGridSection {
+  background-color: white;
+  padding: 64px 0;
+}
+
+.PhotoGridSection-heading {
+  font-size: 28px;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 32px 0;
+  text-align: center;
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .PhotoGridSection-heading {
+    font-size: 36px;
+  }
+}
+
+.PhotoGridSection-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.PhotoGridSection-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.PhotoGridSection-imageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.PhotoGridSection-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.PhotoGridSection-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.PhotoGridSection-overlayText {
+  font-size: 48px;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  line-height: 1;
+}
+
+@media (min-width: 768px) {
+  .PhotoGridSection-overlayText {
+    font-size: 64px;
+  }
+}
+
+.PhotoGridSection-label {
+  font-size: 16px;
+  font-weight: 400;
+  color: #000;
+  text-align: center;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Carousel styles */
+.PhotoGridSection-carousel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.PhotoGridSection-carouselArrow {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #722F37;
+  transition: color 0.2s ease, opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.PhotoGridSection-carouselArrow:disabled {
+  color: #9CA3AF;
+  cursor: default;
+}
+
+.PhotoGridSection-carouselArrow:not(:disabled):hover {
+  opacity: 0.7;
+}
+
+.PhotoGridSection-carouselImageContainer {
+  flex: 1;
+  max-width: 800px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.PhotoGridSection-carouselImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.PhotoGridSection-carouselPagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.PhotoGridSection-carouselIndicator {
+  width: 48px;
+  height: 4px;
+  border: none;
+  border-radius: 2px;
+  background-color: #D1D5DB;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.2s ease;
+}
+
+.PhotoGridSection-carouselIndicator[data-active="true"] {
+  background-color: #722F37;
+}
+
+.PhotoGridSection-carouselIndicator:hover:not([data-active="true"]) {
+  background-color: #9CA3AF;
+}
+

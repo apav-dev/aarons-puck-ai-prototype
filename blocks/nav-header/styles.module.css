@@ -1,0 +1,458 @@
+.NavHeaderSection {
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* Two-row layout on desktop */
+.NavHeaderSection-inner {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* Top row: secondary links */
+.NavHeaderSection-topRow {
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px 24px;
+  gap: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+@media (min-width: 1024px) {
+  .NavHeaderSection-topRow {
+    display: flex;
+  }
+}
+
+.NavHeaderSection-secondaryLink {
+  font-size: 14px;
+  color: #374151;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.NavHeaderSection-secondaryLink:hover {
+  color: #dc2626;
+}
+
+/* Bottom row: logo, primary nav, CTAs */
+.NavHeaderSection-bottomRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  gap: 24px;
+  min-height: 64px;
+}
+
+@media (min-width: 1024px) {
+  .NavHeaderSection-bottomRow {
+    padding: 16px 32px;
+    gap: 32px;
+    min-height: 72px;
+  }
+}
+
+.NavHeaderSection-logoWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.NavHeaderSection-logoIcon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #f3f4f6;
+}
+
+@media (min-width: 1024px) {
+  .NavHeaderSection-logoIcon {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.NavHeaderSection-logoText {
+  font-size: 18px;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+/* Primary nav: visible on desktop when not collapsed */
+.NavHeaderSection-primaryNav {
+  display: none;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+  min-width: 0;
+  overflow: visible;
+}
+
+@media (min-width: 1024px) {
+  .NavHeaderSection-primaryNav {
+    display: flex;
+  }
+}
+
+.NavHeaderSection-primaryNav--collapsed {
+  display: none;
+}
+
+.NavHeaderSection-primaryNavList {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.NavHeaderSection-primaryLink {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.NavHeaderSection-primaryFlyout {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.NavHeaderSection-primaryLinkButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.NavHeaderSection-primaryLinkIcon {
+  width: 16px;
+  height: 16px;
+  color: #6b7280;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.NavHeaderSection-primaryFlyout[data-headlessui-state="open"]
+  .NavHeaderSection-primaryLinkIcon {
+  transform: rotate(180deg);
+  color: #dc2626;
+}
+
+.NavHeaderSection-primaryFlyoutPanel {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 220px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+  padding: 12px;
+  z-index: 300;
+}
+
+.NavHeaderSection-primaryFlyoutContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.NavHeaderSection-primaryFlyoutLink {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.NavHeaderSection-primaryFlyoutLink:hover {
+  background-color: #f3f4f6;
+  color: #b91c1c;
+}
+
+.NavHeaderSection-primaryLink:hover {
+  color: #dc2626;
+}
+
+/* CTAs – always visible on desktop, in flyout on mobile */
+.NavHeaderSection-ctas {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+@media (min-width: 1024px) {
+  .NavHeaderSection-ctas {
+    display: flex;
+  }
+}
+
+.NavHeaderSection-primaryCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.NavHeaderSection-primaryCta:hover {
+  background-color: #b91c1c;
+}
+
+.NavHeaderSection-secondaryCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background-color: white;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.NavHeaderSection-secondaryCta:hover {
+  background-color: #fef2f2;
+}
+
+/* Hamburger: visible on mobile; on desktop only when primary nav collapsed */
+.NavHeaderSection-hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  color: #1f2937;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.NavHeaderSection-hamburger:hover {
+  background-color: #f3f4f6;
+}
+
+@media (min-width: 1024px) {
+  .NavHeaderSection-hamburger {
+    display: none;
+  }
+
+  .NavHeaderSection-hamburger--visible {
+    display: flex;
+  }
+}
+
+/* Flyout overlay */
+.NavHeaderSection-flyoutOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 200;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+
+.NavHeaderSection-flyoutOverlay--open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Flyout panel */
+.NavHeaderSection-flyout {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: 400px;
+  background: white;
+  z-index: 201;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  overflow-y: auto;
+}
+
+.NavHeaderSection-flyout--open {
+  transform: translateX(0);
+}
+
+.NavHeaderSection-flyoutHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.NavHeaderSection-flyoutClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  color: #1f2937;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.NavHeaderSection-flyoutClose:hover {
+  background-color: #f3f4f6;
+}
+
+.NavHeaderSection-flyoutBody {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.NavHeaderSection-flyoutPrimary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.NavHeaderSection-flyoutPrimaryLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.NavHeaderSection-flyoutPrimaryLink:hover {
+  color: #dc2626;
+}
+
+.NavHeaderSection-flyoutSecondary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.NavHeaderSection-flyoutSecondaryLink {
+  padding: 10px 0;
+  font-size: 15px;
+  font-weight: 400;
+  color: #374151;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.NavHeaderSection-flyoutSecondaryLink:hover {
+  color: #dc2626;
+}
+
+.NavHeaderSection-flyoutCtas {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.NavHeaderSection-flyoutPrimaryCta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 20px;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.NavHeaderSection-flyoutPrimaryCta:hover {
+  background-color: #b91c1c;
+}
+
+.NavHeaderSection-flyoutSecondaryCta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 20px;
+  background-color: white;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.NavHeaderSection-flyoutSecondaryCta:hover {
+  background-color: #fef2f2;
+}
+
+.NavHeaderSection-chevron {
+  flex-shrink: 0;
+  color: #991b1b;
+}

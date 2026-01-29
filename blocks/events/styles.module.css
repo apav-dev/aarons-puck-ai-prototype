@@ -1,5 +1,6 @@
 .EventsSection {
   background-color: white;
+  padding: 64px 0;
 }
 
 .EventsSection-inner {
@@ -133,4 +134,11 @@
   height: 20px;
   flex-shrink: 0;
 }
+
+
+
+
+
+
+
 

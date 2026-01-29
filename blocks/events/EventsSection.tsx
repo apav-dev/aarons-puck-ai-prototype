@@ -1,11 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useEffect } from "react";
+import React from "react";
 import { ComponentConfig } from "@measured/puck";
 import { Section } from "../../components/Section/index";
 import { PuckComponent } from "@measured/puck";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
-import { getGoogleFontsUrl } from "../../lib/google-fonts";
 
 const getClassName = getClassNameFactory("EventsSection", styles);
 
@@ -22,81 +21,17 @@ export type EventItem = {
 export type EventsSectionProps = {
   title: string;
   events: EventItem[];
-  padding: string;
-  headingFont?: string;
-  bodyFont?: string;
-  colors?: {
-    primary: string;
-    secondary: string;
-    background: string;
-    text: string;
-  };
 };
 
 export const EventsSection: PuckComponent<EventsSectionProps> = ({
   title,
   events,
-  padding,
-  headingFont,
-  bodyFont,
-  colors,
   puck,
 }) => {
-  // Prepare font styles
-  const headingStyle = headingFont
-    ? { fontFamily: `"${headingFont}", sans-serif` }
-    : undefined;
-  const bodyStyle = bodyFont
-    ? { fontFamily: `"${bodyFont}", sans-serif` }
-    : undefined;
-
-  // Prepare color styles
-  const sectionStyle = colors
-    ? { backgroundColor: colors.background }
-    : undefined;
-  const textColorStyle = colors ? { color: colors.text } : undefined;
-  const linkColorStyle = colors ? { color: colors.text } : undefined;
-
-  // Load Google Fonts into document head
-  useEffect(() => {
-    if (headingFont) {
-      const linkId = `font-heading-${headingFont}`;
-      if (!document.getElementById(linkId)) {
-        const link = document.createElement("link");
-        link.id = linkId;
-        link.rel = "stylesheet";
-        link.href = getGoogleFontsUrl(headingFont);
-        document.head.appendChild(link);
-      }
-    }
-    if (bodyFont && bodyFont !== headingFont) {
-      const linkId = `font-body-${bodyFont}`;
-      if (!document.getElementById(linkId)) {
-        const link = document.createElement("link");
-        link.id = linkId;
-        link.rel = "stylesheet";
-        link.href = getGoogleFontsUrl(bodyFont);
-        document.head.appendChild(link);
-      }
-    }
-  }, [headingFont, bodyFont]);
-
   return (
-    <Section
-      className={getClassName()}
-      style={{
-        paddingTop: padding,
-        paddingBottom: padding,
-        ...sectionStyle,
-      }}
-    >
+    <Section className={getClassName()}>
       <div className={getClassName("inner")}>
-        <h2
-          className={getClassName("title")}
-          style={{ ...headingStyle, ...textColorStyle }}
-        >
-          {title}
-        </h2>
+        <h2 className={getClassName("title")}>{title}</h2>
         <div className={getClassName("eventsList")}>
           {events.map((event, index) => (
             <article
@@ -114,17 +49,10 @@ export const EventsSection: PuckComponent<EventsSectionProps> = ({
                 />
               </div>
               <div className={getClassName("eventContent")}>
-                <h3
-                  className={getClassName("eventTitle")}
-                  style={{ ...headingStyle, ...textColorStyle }}
-                  itemProp="name"
-                >
+                <h3 className={getClassName("eventTitle")} itemProp="name">
                   {event.eventTitle}
                 </h3>
-                <div
-                  className={getClassName("eventDateTime")}
-                  style={{ ...bodyStyle, ...textColorStyle }}
-                >
+                <div className={getClassName("eventDateTime")}>
                   <time itemProp="startDate" dateTime={event.eventDate}>
                     {event.eventDate}
                   </time>
@@ -133,7 +61,6 @@ export const EventsSection: PuckComponent<EventsSectionProps> = ({
                 </div>
                 <p
                   className={getClassName("eventDescription")}
-                  style={{ ...bodyStyle, ...textColorStyle }}
                   itemProp="description"
                 >
                   {event.eventDescription}
@@ -141,7 +68,6 @@ export const EventsSection: PuckComponent<EventsSectionProps> = ({
                 <a
                   href={event.learnMoreLink}
                   className={getClassName("learnMoreLink")}
-                  style={linkColorStyle}
                   tabIndex={puck.isEditing ? -1 : undefined}
                   itemProp="url"
                 >
@@ -247,43 +173,6 @@ export const EventsSectionConfig: ComponentConfig<EventsSectionProps> = {
         learnMoreText: "Learn More",
       },
     },
-    padding: {
-      type: "text",
-      label: "Padding",
-    },
-    headingFont: {
-      type: "text",
-      label: "Heading Font",
-      ai: {
-        instructions:
-          "Always use the getFontFamily tool. Use the business name as the brand, 'heading' as the fontType, and any available entity type context.",
-        stream: false,
-      },
-    },
-    bodyFont: {
-      type: "text",
-      label: "Body Font",
-      ai: {
-        instructions:
-          "Always use the getFontFamily tool. Use the business name as the brand, 'body' as the fontType, and any available entity type context.",
-        stream: false,
-      },
-    },
-    colors: {
-      type: "object",
-      label: "Brand Colors",
-      objectFields: {
-        primary: { type: "text", label: "Primary Color" },
-        secondary: { type: "text", label: "Secondary Color" },
-        background: { type: "text", label: "Background Color" },
-        text: { type: "text", label: "Text Color" },
-      },
-      ai: {
-        instructions:
-          "Always use the getBrandColors tool. Use the business name as the brand and any available entity type context. Ensure colors maintain accessibility with proper contrast ratios.",
-        stream: false,
-      },
-    },
   },
   defaultProps: {
     title: "Upcoming Events",
@@ -322,7 +211,6 @@ export const EventsSectionConfig: ComponentConfig<EventsSectionProps> = {
         learnMoreText: "Learn More",
       },
     ],
-    padding: "64px",
   },
   ai: {
     instructions:
