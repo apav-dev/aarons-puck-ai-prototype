@@ -99,7 +99,7 @@
   flex: 1;
   justify-content: center;
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 @media (min-width: 1024px) {
@@ -129,6 +129,73 @@
   white-space: nowrap;
   transition: color 0.2s;
   flex-shrink: 0;
+}
+
+.NavHeaderSection-primaryFlyout {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.NavHeaderSection-primaryLinkButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.NavHeaderSection-primaryLinkIcon {
+  width: 16px;
+  height: 16px;
+  color: #6b7280;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.NavHeaderSection-primaryFlyout[data-headlessui-state="open"]
+  .NavHeaderSection-primaryLinkIcon {
+  transform: rotate(180deg);
+  color: #dc2626;
+}
+
+.NavHeaderSection-primaryFlyoutPanel {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 220px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+  padding: 12px;
+  z-index: 300;
+}
+
+.NavHeaderSection-primaryFlyoutContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.NavHeaderSection-primaryFlyoutLink {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.NavHeaderSection-primaryFlyoutLink:hover {
+  background-color: #f3f4f6;
+  color: #b91c1c;
 }
 
 .NavHeaderSection-primaryLink:hover {

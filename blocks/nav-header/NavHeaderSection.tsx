@@ -4,6 +4,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ComponentConfig, PuckComponent } from "@puckeditor/core";
 import { Menu, X, ChevronRight } from "lucide-react";
+import {
+  Popover,
+  PopoverButton,
+  PopoverGroup,
+  PopoverPanel,
+} from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
 import classnames from "classnames";
@@ -13,7 +20,12 @@ const getClassName = getClassNameFactory("NavHeaderSection", styles);
 export type NavHeaderSectionProps = {
   logoUrl: string;
   logoText?: string;
-  primaryLinks: Array<{ label: string; href: string }>;
+  primaryLinks: Array<{
+    label: string;
+    href: string;
+    useFlyout?: boolean;
+    flyoutLinks?: Array<{ label: string; href: string }>;
+  }>;
   secondaryLinks: Array<{ label: string; href: string }>;
   primaryCta: { label: string; href: string };
   secondaryCta: { label: string; href: string };
@@ -30,6 +42,9 @@ export const NavHeaderSection: PuckComponent<NavHeaderSectionProps> = ({
 }) => {
   const [flyoutOpen, setFlyoutOpen] = useState(false);
   const [primaryNavCollapsed, setPrimaryNavCollapsed] = useState(false);
+  const [mobileFlyoutIndex, setMobileFlyoutIndex] = useState<number | null>(
+    null,
+  );
   const primaryNavRef = useRef<HTMLDivElement>(null);
   const primaryNavListRef = useRef<HTMLUListElement>(null);
   const isEditing = puck?.isEditing ?? false;
@@ -42,6 +57,9 @@ export const NavHeaderSection: PuckComponent<NavHeaderSectionProps> = ({
 
   const showHamburger = primaryNavCollapsed;
   const showFlyout = flyoutOpen;
+  const toggleMobileFlyout = (index: number) => {
+    setMobileFlyoutIndex((prev) => (prev === index ? null : index));
+  };
 
   // Lock body scroll when flyout is open
   useEffect(() => {
@@ -119,22 +137,57 @@ export const NavHeaderSection: PuckComponent<NavHeaderSectionProps> = ({
             )}
             aria-label="Primary navigation"
           >
-            <ul
+            <PopoverGroup
+              as="ul"
               ref={primaryNavListRef}
               className={getClassName("primaryNavList")}
             >
               {primaryLinks.map((link, i) => (
-                <li key={i}>
-                  <a
-                    href={link.href}
-                    className={getClassName("primaryLink")}
-                    tabIndex={isEditing ? -1 : undefined}
-                  >
-                    {link.label}
-                  </a>
+                <li key={i} className={getClassName("primaryNavItem")}>
+                  {link.useFlyout ? (
+                    <Popover className={getClassName("primaryFlyout")}>
+                      <PopoverButton
+                        className={classnames(
+                          getClassName("primaryLink"),
+                          getClassName("primaryLinkButton"),
+                        )}
+                        tabIndex={isEditing ? -1 : undefined}
+                      >
+                        {link.label}
+                        <ChevronDownIcon
+                          aria-hidden="true"
+                          className={getClassName("primaryLinkIcon")}
+                        />
+                      </PopoverButton>
+                      <PopoverPanel
+                        className={getClassName("primaryFlyoutPanel")}
+                      >
+                        <div className={getClassName("primaryFlyoutContent")}>
+                          {(link.flyoutLinks ?? []).map((item, index) => (
+                            <a
+                              key={index}
+                              href={item.href}
+                              className={getClassName("primaryFlyoutLink")}
+                              tabIndex={isEditing ? -1 : undefined}
+                            >
+                              {item.label}
+                            </a>
+                          ))}
+                        </div>
+                      </PopoverPanel>
+                    </Popover>
+                  ) : (
+                    <a
+                      href={link.href}
+                      className={getClassName("primaryLink")}
+                      tabIndex={isEditing ? -1 : undefined}
+                    >
+                      {link.label}
+                    </a>
+                  )}
                 </li>
               ))}
-            </ul>
+            </PopoverGroup>
           </nav>
 
           {/* CTAs: desktop only, always visible when row visible */}
@@ -220,16 +273,56 @@ export const NavHeaderSection: PuckComponent<NavHeaderSectionProps> = ({
           {primaryLinks.length > 0 && (
             <div className={getClassName("flyoutPrimary")}>
               {primaryLinks.map((link, i) => (
-                <a
-                  key={i}
-                  href={link.href}
-                  className={getClassName("flyoutPrimaryLink")}
-                  onClick={closeFlyout}
-                  tabIndex={isEditing ? -1 : undefined}
-                >
-                  {link.label}
-                  <ChevronRight size={20} className={getClassName("chevron")} />
-                </a>
+                <div key={i} className={getClassName("flyoutPrimaryItem")}>
+                  {link.useFlyout ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => toggleMobileFlyout(i)}
+                        className={getClassName("flyoutPrimaryButton")}
+                        aria-expanded={mobileFlyoutIndex === i}
+                      >
+                        {link.label}
+                        <ChevronRight
+                          size={20}
+                          className={classnames(
+                            getClassName("chevron"),
+                            mobileFlyoutIndex === i &&
+                              getClassName("chevron--open"),
+                          )}
+                        />
+                      </button>
+                      {mobileFlyoutIndex === i && (
+                        <div className={getClassName("flyoutPrimarySubmenu")}>
+                          {(link.flyoutLinks ?? []).map((item, index) => (
+                            <a
+                              key={index}
+                              href={item.href}
+                              className={getClassName("flyoutPrimarySubLink")}
+                              onClick={closeFlyout}
+                              tabIndex={isEditing ? -1 : undefined}
+                            >
+                              {item.label}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <a
+                      href={link.href}
+                      className={getClassName("flyoutPrimaryLink")}
+                      onClick={closeFlyout}
+                      tabIndex={isEditing ? -1 : undefined}
+                    >
+                      {link.label}
+                      <ChevronRight
+                        size={20}
+                        className={getClassName("chevron")}
+                      />
+                    </a>
+                  )}
+                </div>
               ))}
             </div>
           )}
@@ -301,11 +394,34 @@ export const NavHeaderSectionConfig: ComponentConfig<NavHeaderSectionProps> = {
       arrayFields: {
         label: { type: "text", label: "Label" },
         href: { type: "text", label: "URL" },
+        useFlyout: {
+          type: "radio",
+          label: "Use flyout menu",
+          options: [
+            { label: "Yes", value: true },
+            { label: "No", value: false },
+          ],
+        },
+        flyoutLinks: {
+          type: "array",
+          label: "Flyout links",
+          getItemSummary: (item) => item.label || "Flyout link",
+          arrayFields: {
+            label: { type: "text", label: "Label" },
+            href: { type: "text", label: "URL" },
+          },
+          defaultItemProps: { label: "Flyout link", href: "#" },
+        },
       },
-      defaultItemProps: { label: "Main Header Link", href: "#" },
+      defaultItemProps: {
+        label: "Main Header Link",
+        href: "#",
+        useFlyout: false,
+        flyoutLinks: [],
+      },
       ai: {
         instructions:
-          "Main navigation links (e.g. Home, About, Services, Products, Contact). Shown in the primary row on desktop; collapse into hamburger when they don't fit.",
+          "Main navigation links (e.g. Home, About, Services, Products, Contact). Enable a flyout when needed; otherwise shown as a standard link. Shown in the primary row on desktop; collapse into hamburger when they don't fit.",
       },
     },
     secondaryLinks: {
@@ -352,11 +468,22 @@ export const NavHeaderSectionConfig: ComponentConfig<NavHeaderSectionProps> = {
       "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=200&h=200&fit=crop",
     logoText: "Logo",
     primaryLinks: [
-      { label: "Main Header Link", href: "#" },
-      { label: "Main Header Link", href: "#" },
-      { label: "Main Header Link", href: "#" },
-      { label: "Main Header Link", href: "#" },
-      { label: "Main Header Link", href: "#" },
+      { label: "Home", href: "#" },
+      {
+        label: "Company",
+        href: "#",
+        useFlyout: true,
+        flyoutLinks: [
+          { label: "About us", href: "#" },
+          { label: "Careers", href: "#" },
+          { label: "Support", href: "#" },
+          { label: "Press", href: "#" },
+          { label: "Blog", href: "#" },
+        ],
+      },
+      { label: "Services", href: "#" },
+      { label: "Case Studies", href: "#" },
+      { label: "Contact", href: "#" },
     ],
     secondaryLinks: [
       { label: "Secondary Header Link", href: "#" },
