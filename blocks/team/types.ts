@@ -23,6 +23,9 @@ export type AvatarAlignment = "left" | "center";
 export type TeamSectionProps = {
   title: string;
   subtitle?: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
   teamMembers: TeamMember[];
   variant: TeamVariant;
   // Visibility options

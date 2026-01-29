@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "../styles.module.css";
 import getClassNameFactory from "../../../lib/get-class-name-factory";
+import classnames from "classnames";
 import { TeamMember } from "../types";
 import { SocialIcons } from "../SocialIcons";
 import { ProfilePlaceholder } from "../ProfilePlaceholder";
@@ -10,6 +11,9 @@ const getClassName = getClassNameFactory("TeamSection", styles);
 type PortraitVariantProps = {
   title: string;
   subtitle?: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
   teamMembers: TeamMember[];
   showDescription: boolean;
   showPhone: boolean;
@@ -22,6 +26,9 @@ type PortraitVariantProps = {
 export const PortraitVariant = ({
   title,
   subtitle,
+  subheading,
+  subheadingPosition = "above",
+  headingAlign = "left",
   teamMembers,
   showDescription,
   showPhone,
@@ -30,10 +37,18 @@ export const PortraitVariant = ({
   showProfileButton,
   isEditing,
 }: PortraitVariantProps) => {
+  const headerClass =
+    headingAlign === "center" ? getClassName("portraitHeader--center") : "";
   return (
     <div className={getClassName("portrait")}>
-      <div className={getClassName("portraitHeader")}>
+      <div className={classnames(getClassName("portraitHeader"), headerClass)}>
+        {subheading && subheadingPosition === "above" && (
+          <p className={getClassName("subheading")}>{subheading}</p>
+        )}
         <h2 className={getClassName("title")}>{title}</h2>
+        {subheading && subheadingPosition === "below" && (
+          <p className={getClassName("subheading")}>{subheading}</p>
+        )}
         {subtitle && <p className={getClassName("subtitle")}>{subtitle}</p>}
       </div>
       <ul className={getClassName("portraitGrid")}>

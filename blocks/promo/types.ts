@@ -8,6 +8,9 @@ export type PromoButton = {
 export type PromoSectionProps = {
   variant: PromoVariant;
   title: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
   description: string;
   ctaButton: PromoButton;
   imageUrl: string;

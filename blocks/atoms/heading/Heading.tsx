@@ -8,6 +8,8 @@ const getClassName = getClassNameFactory("Heading", styles);
 
 export type HeadingProps = {
   text: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
   level?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   fontSize?: string;
   fontWeight?: "300" | "400" | "500" | "600" | "700" | "800" | "900";
@@ -23,6 +25,8 @@ export type HeadingProps = {
 
 export const Heading: PuckComponent<HeadingProps> = ({
   text,
+  subheading,
+  subheadingPosition = "above",
   level = "h2",
   fontSize,
   fontWeight = "700",
@@ -40,10 +44,10 @@ export const Heading: PuckComponent<HeadingProps> = ({
     fontWeight,
     fontFamily: fontFamily ? `"${fontFamily}", sans-serif` : undefined,
     color,
-    textAlign,
+    textAlign: textAlign as CSSProperties["textAlign"],
     lineHeight,
     letterSpacing,
-    textTransform,
+    textTransform: textTransform as CSSProperties["textTransform"],
     marginTop,
     marginBottom,
   };
@@ -61,12 +65,32 @@ export const Heading: PuckComponent<HeadingProps> = ({
     }
   }, [fontFamily]);
 
-  const HeadingTag = level;
+  const headingElement = React.createElement(
+    level,
+    { className: getClassName(), style: headingStyle },
+    text,
+  );
+
+  if (!subheading) {
+    return headingElement;
+  }
+
+  const subheadingStyle: CSSProperties = {};
+  if (textAlign)
+    subheadingStyle.textAlign = textAlign as CSSProperties["textAlign"];
+  if (color) subheadingStyle.color = color;
+  const subheadingEl = (
+    <p className={getClassName("subheading")} style={subheadingStyle}>
+      {subheading}
+    </p>
+  );
 
   return (
-    <HeadingTag className={getClassName()} style={headingStyle}>
-      {text}
-    </HeadingTag>
+    <div className={getClassName("wrapper")}>
+      {subheadingPosition === "above" && subheadingEl}
+      {headingElement}
+      {subheadingPosition === "below" && subheadingEl}
+    </div>
   );
 };
 
@@ -79,6 +103,18 @@ export const HeadingConfig: ComponentConfig<HeadingProps> = {
         instructions:
           "The heading text content. Keep headings concise and descriptive. Use clear, action-oriented language when appropriate.",
       },
+    },
+    subheading: {
+      type: "text",
+      label: "Subheading",
+    },
+    subheadingPosition: {
+      type: "radio",
+      label: "Subheading position",
+      options: [
+        { label: "Above heading", value: "above" },
+        { label: "Below heading", value: "below" },
+      ],
     },
     level: {
       type: "select",
@@ -202,14 +238,9 @@ export const HeadingConfig: ComponentConfig<HeadingProps> = {
     fontWeight: "700",
     textAlign: "left",
     textTransform: "none",
+    subheadingPosition: "above",
   },
   render: Heading,
 };
 
 export default Heading;
-
-
-
-
-
-

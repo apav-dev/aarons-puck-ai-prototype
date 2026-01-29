@@ -5,6 +5,7 @@ import { Section } from "../../components/Section/index";
 import { PuckComponent } from "@puckeditor/core";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
+import classnames from "classnames";
 
 const getClassName = getClassNameFactory("PhotoGridSection", styles);
 
@@ -17,6 +18,9 @@ export type PhotoGridItem = {
 export type PhotoGridSectionProps = {
   type: "Gallery" | "Carousel";
   heading: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
   items: PhotoGridItem[];
 };
 
@@ -51,9 +55,38 @@ const ArrowRight = () => (
   </svg>
 );
 
+const PhotoGridHeadingBlock = ({
+  heading,
+  subheading,
+  subheadingPosition,
+  headingAlign,
+}: {
+  heading: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
+}) => {
+  const blockClass =
+    headingAlign === "center" ? getClassName("headingBlock--center") : "";
+  return (
+    <div className={classnames(getClassName("headingBlock"), blockClass)}>
+      {subheading && subheadingPosition === "above" && (
+        <p className={getClassName("subheading")}>{subheading}</p>
+      )}
+      <h2 className={getClassName("heading")}>{heading}</h2>
+      {subheading && subheadingPosition === "below" && (
+        <p className={getClassName("subheading")}>{subheading}</p>
+      )}
+    </div>
+  );
+};
+
 export const PhotoGridSection: PuckComponent<PhotoGridSectionProps> = ({
   type = "Gallery",
   heading,
+  subheading,
+  subheadingPosition = "above",
+  headingAlign = "left",
   items,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -69,10 +102,19 @@ export const PhotoGridSection: PuckComponent<PhotoGridSectionProps> = ({
   const isAtStart = currentIndex === 0;
   const isAtEnd = currentIndex === items.length - 1;
 
+  const headingBlock = (
+    <PhotoGridHeadingBlock
+      heading={heading}
+      subheading={subheading}
+      subheadingPosition={subheadingPosition}
+      headingAlign={headingAlign}
+    />
+  );
+
   if (type === "Carousel") {
     return (
       <Section className={getClassName()}>
-        <h2 className={getClassName("heading")}>{heading}</h2>
+        {headingBlock}
         <div className={getClassName("carousel")}>
           <button
             className={getClassName("carouselArrow")}
@@ -121,7 +163,7 @@ export const PhotoGridSection: PuckComponent<PhotoGridSectionProps> = ({
   // Gallery type (default)
   return (
     <Section className={getClassName()}>
-      <h2 className={getClassName("heading")}>{heading}</h2>
+      {headingBlock}
       <div className={getClassName("grid")}>
         {items.map((item, index) => (
           <div key={index} className={getClassName("item")}>
@@ -198,6 +240,8 @@ export const PhotoGridSectionConfig: ComponentConfig<PhotoGridSectionProps> = {
   defaultProps: {
     type: "Gallery",
     heading: "Find the best coverage for you",
+    subheadingPosition: "above",
+    headingAlign: "left",
     items: [
       {
         imageUrl:

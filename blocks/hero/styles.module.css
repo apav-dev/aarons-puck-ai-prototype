@@ -35,6 +35,34 @@
   width: 100%;
 }
 
+.HeroSection-headingBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  text-align: left;
+}
+
+.HeroSection-headingBlock--center {
+  text-align: center;
+  align-items: center;
+}
+
+.HeroSection-headingBlock--center .HeroSection-label,
+.HeroSection-headingBlock--center .HeroSection-title,
+.HeroSection-headingBlock--center .HeroSection-subheading,
+.HeroSection-headingBlock--center .HeroSection-status {
+  text-align: center;
+}
+
+.HeroSection-subheading {
+  font-size: 16px;
+  font-weight: 400;
+  color: inherit;
+  margin: 0;
+  line-height: 1.4;
+}
+
 @media (min-width: 1024px) {
   .HeroSection-content {
     flex: 1;

@@ -12,6 +12,9 @@ export type InsightVariant = "classic" | "editorial" | "immersive";
 
 export type InsightsSectionProps = {
   heading: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
   insights: InsightItem[];
   variant: InsightVariant;
   seeAllButton: {

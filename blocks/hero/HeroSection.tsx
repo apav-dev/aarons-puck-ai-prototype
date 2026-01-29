@@ -13,6 +13,9 @@ export type HeroSectionProps = {
   variant?: "Classic" | "Spotlight" | "Immersive";
   businessNameLabel: string;
   businessName: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
   statusText: string;
   rating: number;
   reviewCount: number;
@@ -31,6 +34,9 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
   variant = "Classic",
   businessNameLabel,
   businessName,
+  subheading,
+  subheadingPosition = "above",
+  headingAlign = "left",
   statusText,
   rating,
   reviewCount,
@@ -51,11 +57,23 @@ export const HeroSection: PuckComponent<HeroSectionProps> = ({
     | "spotlight"
     | "immersive";
 
+  const headingBlockAlign =
+    headingAlign === "center" ? getClassName("headingBlock--center") : "";
   const contentElement = (
     <div className={getClassName("content")}>
-      <div className={getClassName("label")}>{businessNameLabel}</div>
-      <h1 className={getClassName("title")}>{businessName}</h1>
-      <div className={getClassName("status")}>{statusText}</div>
+      <div
+        className={classnames(getClassName("headingBlock"), headingBlockAlign)}
+      >
+        <div className={getClassName("label")}>{businessNameLabel}</div>
+        {subheading && subheadingPosition === "above" && (
+          <p className={getClassName("subheading")}>{subheading}</p>
+        )}
+        <h1 className={getClassName("title")}>{businessName}</h1>
+        {subheading && subheadingPosition === "below" && (
+          <p className={getClassName("subheading")}>{subheading}</p>
+        )}
+        <div className={getClassName("status")}>{statusText}</div>
+      </div>
 
       <div className={getClassName("rating")}>
         <span className={getClassName("ratingValue")}>{rating}</span>
@@ -245,6 +263,26 @@ Consider the business type, available imagery quality, and desired emotional ton
           "The name of the business. This is typically the name of the business.",
       },
     },
+    subheading: {
+      type: "text",
+      label: "Subheading",
+    },
+    subheadingPosition: {
+      type: "radio",
+      label: "Subheading position",
+      options: [
+        { label: "Above heading", value: "above" },
+        { label: "Below heading", value: "below" },
+      ],
+    },
+    headingAlign: {
+      type: "radio",
+      label: "Heading alignment",
+      options: [
+        { label: "Left", value: "left" },
+        { label: "Center", value: "center" },
+      ],
+    },
     statusText: {
       type: "text",
       label: "Status Text",
@@ -294,6 +332,8 @@ Consider the business type, available imagery quality, and desired emotional ton
     variant: "Classic",
     businessNameLabel: "Business Name",
     businessName: "Geomodifier",
+    subheadingPosition: "above",
+    headingAlign: "left",
     statusText: "Open Now • Closes at 5:00 PM",
     rating: 4.5,
     reviewCount: 21,

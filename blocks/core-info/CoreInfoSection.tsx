@@ -5,10 +5,15 @@ import { Section } from "../../components/Section/index";
 import { PuckComponent } from "@measured/puck";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
+import classnames from "classnames";
 
 const getClassName = getClassNameFactory("CoreInfoSection", styles);
 
 export type CoreInfoSectionProps = {
+  heading?: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
   information: {
     address: string;
     directionsLink: string;
@@ -30,13 +35,36 @@ export type CoreInfoSectionProps = {
 };
 
 export const CoreInfoSection: PuckComponent<CoreInfoSectionProps> = ({
+  heading,
+  subheading,
+  subheadingPosition = "above",
+  headingAlign = "left",
   information,
   hours,
   services,
   puck,
 }) => {
+  const showHeader = heading != null && heading !== "";
+  const headerAlignClass =
+    headingAlign === "center" ? getClassName("sectionHeader--center") : "";
   return (
     <Section className={getClassName()}>
+      {showHeader && (
+        <div
+          className={classnames(
+            getClassName("sectionHeader"),
+            headerAlignClass,
+          )}
+        >
+          {subheading && subheadingPosition === "above" && (
+            <p className={getClassName("subheading")}>{subheading}</p>
+          )}
+          <h2 className={getClassName("sectionTitle")}>{heading}</h2>
+          {subheading && subheadingPosition === "below" && (
+            <p className={getClassName("subheading")}>{subheading}</p>
+          )}
+        </div>
+      )}
       <div className={getClassName("inner")}>
         <div className={getClassName("column")}>
           <h2 className={getClassName("heading")}>Information</h2>
@@ -151,6 +179,30 @@ export const CoreInfoSection: PuckComponent<CoreInfoSectionProps> = ({
 
 export const CoreInfoSectionConfig: ComponentConfig<CoreInfoSectionProps> = {
   fields: {
+    heading: {
+      type: "text",
+      label: "Section heading",
+    },
+    subheading: {
+      type: "text",
+      label: "Subheading",
+    },
+    subheadingPosition: {
+      type: "radio",
+      label: "Subheading position",
+      options: [
+        { label: "Above heading", value: "above" },
+        { label: "Below heading", value: "below" },
+      ],
+    },
+    headingAlign: {
+      type: "radio",
+      label: "Heading alignment",
+      options: [
+        { label: "Left", value: "left" },
+        { label: "Center", value: "center" },
+      ],
+    },
     information: {
       type: "object",
       label: "Information",
@@ -189,6 +241,8 @@ export const CoreInfoSectionConfig: ComponentConfig<CoreInfoSectionProps> = {
     },
   },
   defaultProps: {
+    subheadingPosition: "above",
+    headingAlign: "left",
     information: {
       address: "2145 Pennsylvania Avenue West, Suite 998, Washington, DC 20002",
       directionsLink: "#",

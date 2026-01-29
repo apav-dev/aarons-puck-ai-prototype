@@ -9,6 +9,9 @@ const getClassName = getClassNameFactory("PromoSection", styles);
 
 type SpotlightVariantProps = {
   title: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
   description: string;
   ctaButton: PromoButton;
   imageUrl: string;
@@ -19,6 +22,9 @@ type SpotlightVariantProps = {
 
 export const SpotlightVariant = ({
   title,
+  subheading,
+  subheadingPosition = "above",
+  headingAlign = "left",
   description,
   ctaButton,
   imageUrl,
@@ -29,6 +35,9 @@ export const SpotlightVariant = ({
     <div className={getClassName("spotlightCard")}>
       <PromoInfo
         title={title}
+        subheading={subheading}
+        subheadingPosition={subheadingPosition}
+        headingAlign={headingAlign}
         description={description}
         ctaButton={ctaButton}
         isEditing={isEditing}

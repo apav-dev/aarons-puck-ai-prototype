@@ -60,6 +60,31 @@
   }
 }
 
+.PromoSection-headingBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.PromoSection-headingBlock--center {
+  text-align: center;
+  align-items: center;
+}
+
+.PromoSection-headingBlock--center .PromoSection-title,
+.PromoSection-headingBlock--center .PromoSection-subheading {
+  text-align: center;
+}
+
+.PromoSection-subheading {
+  font-size: 16px;
+  font-weight: 400;
+  color: inherit;
+  margin: 0;
+  line-height: 1.4;
+}
+
 .PromoSection-title {
   font-size: 32px;
   font-weight: 700;

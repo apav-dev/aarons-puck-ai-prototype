@@ -11,6 +11,9 @@ const getClassName = getClassNameFactory("TeamSection", styles);
 type AvatarVariantProps = {
   title: string;
   subtitle?: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
   teamMembers: TeamMember[];
   showDescription: boolean;
   showPhone: boolean;
@@ -25,6 +28,9 @@ type AvatarVariantProps = {
 export const AvatarVariant = ({
   title,
   subtitle,
+  subheading,
+  subheadingPosition = "above",
+  headingAlign = "left",
   teamMembers,
   showDescription,
   showPhone,
@@ -36,6 +42,8 @@ export const AvatarVariant = ({
   isEditing,
 }: AvatarVariantProps) => {
   const isCentered = avatarAlignment === "center";
+  const headerAlignClass =
+    headingAlign === "center" ? getClassName("avatarHeader--center") : "";
 
   const getSizeClass = () => {
     switch (avatarSize) {
@@ -60,9 +68,16 @@ export const AvatarVariant = ({
         className={classnames(
           getClassName("avatarHeader"),
           isCentered && styles["TeamSection-avatarHeaderCentered"],
+          headerAlignClass,
         )}
       >
+        {subheading && subheadingPosition === "above" && (
+          <p className={getClassName("subheading")}>{subheading}</p>
+        )}
         <h2 className={getClassName("title")}>{title}</h2>
+        {subheading && subheadingPosition === "below" && (
+          <p className={getClassName("subheading")}>{subheading}</p>
+        )}
         {subtitle && <p className={getClassName("subtitle")}>{subtitle}</p>}
       </div>
       <ul

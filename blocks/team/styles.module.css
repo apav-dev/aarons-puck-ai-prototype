@@ -67,6 +67,25 @@
 
 .TeamSection-cardsHeader {
   max-width: 600px;
+  text-align: left;
+}
+
+.TeamSection-cardsHeader--center {
+  text-align: center;
+}
+
+.TeamSection-cardsHeader--center .TeamSection-title,
+.TeamSection-cardsHeader--center .TeamSection-subtitle,
+.TeamSection-cardsHeader--center .TeamSection-subheading {
+  text-align: center;
+}
+
+.TeamSection-subheading {
+  font-size: 16px;
+  font-weight: 400;
+  color: #4b5563;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
 }
 
 .TeamSection-cardsGrid {
@@ -237,6 +256,17 @@
 
 .TeamSection-portraitHeader {
   max-width: 600px;
+  text-align: left;
+}
+
+.TeamSection-portraitHeader--center {
+  text-align: center;
+}
+
+.TeamSection-portraitHeader--center .TeamSection-title,
+.TeamSection-portraitHeader--center .TeamSection-subtitle,
+.TeamSection-portraitHeader--center .TeamSection-subheading {
+  text-align: center;
 }
 
 .TeamSection-portraitGrid {
@@ -406,6 +436,17 @@
 
 .TeamSection-avatarHeader {
   max-width: 600px;
+  text-align: left;
+}
+
+.TeamSection-avatarHeader--center {
+  text-align: center;
+}
+
+.TeamSection-avatarHeader--center .TeamSection-title,
+.TeamSection-avatarHeader--center .TeamSection-subtitle,
+.TeamSection-avatarHeader--center .TeamSection-subheading {
+  text-align: center;
 }
 
 .TeamSection-avatarHeaderCentered {

@@ -17,6 +17,9 @@ export type { PromoSectionProps } from "./types";
 export const PromoSection: PuckComponent<PromoSectionProps> = ({
   variant,
   title,
+  subheading,
+  subheadingPosition = "above",
+  headingAlign = "left",
   description,
   ctaButton,
   imageUrl,
@@ -25,6 +28,9 @@ export const PromoSection: PuckComponent<PromoSectionProps> = ({
   const renderVariant = () => {
     const infoProps = {
       title,
+      subheading,
+      subheadingPosition,
+      headingAlign,
       description,
       ctaButton,
       imageUrl,
@@ -43,6 +49,9 @@ export const PromoSection: PuckComponent<PromoSectionProps> = ({
         return (
           <CompactVariant
             title={title}
+            subheading={subheading}
+            subheadingPosition={subheadingPosition}
+            headingAlign={headingAlign}
             description={description}
             ctaButton={ctaButton}
             imageUrl={imageUrl}
@@ -100,6 +109,26 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
       type: "text",
       label: "Title",
     },
+    subheading: {
+      type: "text",
+      label: "Subheading",
+    },
+    subheadingPosition: {
+      type: "radio",
+      label: "Subheading position",
+      options: [
+        { label: "Above heading", value: "above" },
+        { label: "Below heading", value: "below" },
+      ],
+    },
+    headingAlign: {
+      type: "radio",
+      label: "Heading alignment",
+      options: [
+        { label: "Left", value: "left" },
+        { label: "Center", value: "center" },
+      ],
+    },
     description: {
       type: "textarea",
       label: "Description",
@@ -125,6 +154,8 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
   defaultProps: {
     variant: "compact",
     title: "Featured Promotion",
+    subheadingPosition: "above",
+    headingAlign: "left",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing. Maecenas finibus placerat justo. 100 characters",
     ctaButton: {

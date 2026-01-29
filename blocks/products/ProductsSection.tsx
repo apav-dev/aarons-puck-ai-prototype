@@ -5,6 +5,7 @@ import { Section } from "../../components/Section/index";
 import { PuckComponent } from "@measured/puck";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
+import classnames from "classnames";
 
 const getClassName = getClassNameFactory("ProductsSection", styles);
 
@@ -18,17 +19,35 @@ export type ProductItem = {
 
 export type ProductsSectionProps = {
   heading: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
   products: ProductItem[];
 };
 
 export const ProductsSection: PuckComponent<ProductsSectionProps> = ({
   heading,
+  subheading,
+  subheadingPosition = "above",
+  headingAlign = "left",
   products,
   puck,
 }) => {
+  const headingBlockClass =
+    headingAlign === "center" ? getClassName("headingBlock--center") : "";
   return (
     <Section className={getClassName()}>
-      <h2 className={getClassName("heading")}>{heading}</h2>
+      <div
+        className={classnames(getClassName("headingBlock"), headingBlockClass)}
+      >
+        {subheading && subheadingPosition === "above" && (
+          <p className={getClassName("subheading")}>{subheading}</p>
+        )}
+        <h2 className={getClassName("heading")}>{heading}</h2>
+        {subheading && subheadingPosition === "below" && (
+          <p className={getClassName("subheading")}>{subheading}</p>
+        )}
+      </div>
       <div className={getClassName("grid")}>
         {products.map((product, index) => (
           <div key={index} className={getClassName("card")}>
@@ -68,6 +87,26 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
       type: "text",
       label: "Heading",
     },
+    subheading: {
+      type: "text",
+      label: "Subheading",
+    },
+    subheadingPosition: {
+      type: "radio",
+      label: "Subheading position",
+      options: [
+        { label: "Above heading", value: "above" },
+        { label: "Below heading", value: "below" },
+      ],
+    },
+    headingAlign: {
+      type: "radio",
+      label: "Heading alignment",
+      options: [
+        { label: "Left", value: "left" },
+        { label: "Center", value: "center" },
+      ],
+    },
     products: {
       type: "array",
       label: "Products",
@@ -102,6 +141,8 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
   },
   defaultProps: {
     heading: "Featured Products at Business Geomodifier",
+    subheadingPosition: "above",
+    headingAlign: "left",
     products: [
       {
         title: "Product Title",

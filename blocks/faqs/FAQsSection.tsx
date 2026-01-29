@@ -17,6 +17,9 @@ export type FAQVariant = "classic" | "grid" | "sidebar" | "elevated";
 
 export type FAQsSectionProps = {
   title: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
   faqs: FAQItem[];
   variant: FAQVariant;
 };
@@ -84,13 +87,46 @@ const AnswerContent = ({
   );
 };
 
+// Shared heading block for FAQ variants
+const FAQHeadingBlock = ({
+  title,
+  subheading,
+  subheadingPosition,
+  headingAlign,
+}: {
+  title: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
+}) => {
+  const blockClass =
+    headingAlign === "center" ? getClassName("headingBlock--center") : "";
+  return (
+    <div className={classnames(getClassName("headingBlock"), blockClass)}>
+      {subheading && subheadingPosition === "above" && (
+        <p className={getClassName("subheading")}>{subheading}</p>
+      )}
+      <h2 className={getClassName("title")}>{title}</h2>
+      {subheading && subheadingPosition === "below" && (
+        <p className={getClassName("subheading")}>{subheading}</p>
+      )}
+    </div>
+  );
+};
+
 // Classic variant - Accordion style with expandable items
 const ClassicVariant = ({
   title,
+  subheading,
+  subheadingPosition,
+  headingAlign,
   faqs,
   isEditing,
 }: {
   title: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
   faqs: FAQItem[];
   isEditing: boolean;
 }) => {
@@ -105,7 +141,12 @@ const ClassicVariant = ({
 
   return (
     <div className={getClassName("classic")}>
-      <h2 className={getClassName("title")}>{title}</h2>
+      <FAQHeadingBlock
+        title={title}
+        subheading={subheading}
+        subheadingPosition={subheadingPosition}
+        headingAlign={headingAlign}
+      />
       <div className={getClassName("classicList")}>
         {faqs.map((faq, index) => {
           const isExpanded = isEditing || expandedIndex === index;
@@ -153,17 +194,28 @@ const ClassicVariant = ({
 // Grid variant - Multi-column grid layout
 const GridVariant = ({
   title,
+  subheading,
+  subheadingPosition,
+  headingAlign,
   faqs,
   isEditing,
 }: {
   title: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
   faqs: FAQItem[];
   isEditing: boolean;
 }) => {
   return (
     <div className={getClassName("grid")}>
       <div className={getClassName("gridHeader")}>
-        <h2 className={getClassName("title")}>{title}</h2>
+        <FAQHeadingBlock
+          title={title}
+          subheading={subheading}
+          subheadingPosition={subheadingPosition}
+          headingAlign={headingAlign}
+        />
       </div>
       <div className={getClassName("gridList")}>
         {faqs.map((faq, index) => (
@@ -182,10 +234,16 @@ const GridVariant = ({
 // Sidebar variant - Title on left, FAQs on right
 const SidebarVariant = ({
   title,
+  subheading,
+  subheadingPosition,
+  headingAlign,
   faqs,
   isEditing,
 }: {
   title: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
   faqs: FAQItem[];
   isEditing: boolean;
 }) => {
@@ -195,13 +253,28 @@ const SidebarVariant = ({
         <span className={getClassName("sidebarLabel")}>
           Frequently asked questions
         </span>
-        <h2 className={getClassName("sidebarTitle")}>{title}</h2>
+        <div
+          className={classnames(
+            getClassName("headingBlock"),
+            headingAlign === "center" && getClassName("headingBlock--center"),
+          )}
+        >
+          {subheading && subheadingPosition === "above" && (
+            <p className={getClassName("subheading")}>{subheading}</p>
+          )}
+          <h2 className={getClassName("sidebarTitle")}>{title}</h2>
+          {subheading && subheadingPosition === "below" && (
+            <p className={getClassName("subheading")}>{subheading}</p>
+          )}
+        </div>
       </div>
       <div className={getClassName("sidebarContent")}>
         <ul className={getClassName("sidebarList")}>
           {faqs.map((faq, index) => (
             <li key={index} className={getClassName("sidebarItem")}>
-              <h4 className={getClassName("sidebarQuestion")}>{faq.question}</h4>
+              <h4 className={getClassName("sidebarQuestion")}>
+                {faq.question}
+              </h4>
               <p className={getClassName("sidebarAnswer")}>
                 <AnswerContent answer={faq.answer} isEditing={isEditing} />
               </p>
@@ -216,23 +289,36 @@ const SidebarVariant = ({
 // Elevated variant - Centered card with shadow
 const ElevatedVariant = ({
   title,
+  subheading,
+  subheadingPosition,
+  headingAlign,
   faqs,
   isEditing,
 }: {
   title: string;
+  subheading?: string;
+  subheadingPosition?: "above" | "below";
+  headingAlign?: "left" | "center";
   faqs: FAQItem[];
   isEditing: boolean;
 }) => {
   return (
     <div className={getClassName("elevated")}>
       <div className={getClassName("elevatedHeader")}>
-        <h2 className={getClassName("title")}>{title}</h2>
+        <FAQHeadingBlock
+          title={title}
+          subheading={subheading}
+          subheadingPosition={subheadingPosition}
+          headingAlign={headingAlign}
+        />
       </div>
       <div className={getClassName("elevatedCard")}>
         <div className={getClassName("elevatedGrid")}>
           {faqs.map((faq, index) => (
             <div key={index} className={getClassName("elevatedItem")}>
-              <h4 className={getClassName("elevatedQuestion")}>{faq.question}</h4>
+              <h4 className={getClassName("elevatedQuestion")}>
+                {faq.question}
+              </h4>
               <p className={getClassName("elevatedAnswer")}>
                 <AnswerContent answer={faq.answer} isEditing={isEditing} />
               </p>
@@ -247,24 +333,41 @@ const ElevatedVariant = ({
 
 export const FAQsSection: PuckComponent<FAQsSectionProps> = ({
   title,
+  subheading,
+  subheadingPosition = "above",
+  headingAlign = "left",
   faqs,
   variant,
   puck,
 }) => {
+  const headingProps = {
+    title,
+    subheading,
+    subheadingPosition,
+    headingAlign,
+  };
   const renderVariant = () => {
     switch (variant) {
       case "grid":
         return (
-          <GridVariant title={title} faqs={faqs} isEditing={puck.isEditing} />
+          <GridVariant
+            {...headingProps}
+            faqs={faqs}
+            isEditing={puck.isEditing}
+          />
         );
       case "sidebar":
         return (
-          <SidebarVariant title={title} faqs={faqs} isEditing={puck.isEditing} />
+          <SidebarVariant
+            {...headingProps}
+            faqs={faqs}
+            isEditing={puck.isEditing}
+          />
         );
       case "elevated":
         return (
           <ElevatedVariant
-            title={title}
+            {...headingProps}
             faqs={faqs}
             isEditing={puck.isEditing}
           />
@@ -273,7 +376,7 @@ export const FAQsSection: PuckComponent<FAQsSectionProps> = ({
       default:
         return (
           <ClassicVariant
-            title={title}
+            {...headingProps}
             faqs={faqs}
             isEditing={puck.isEditing}
           />
@@ -282,7 +385,9 @@ export const FAQsSection: PuckComponent<FAQsSectionProps> = ({
   };
 
   return (
-    <Section className={getClassName({ [variant]: true })}>{renderVariant()}</Section>
+    <Section className={getClassName({ [variant]: true })}>
+      {renderVariant()}
+    </Section>
   );
 };
 
@@ -301,6 +406,26 @@ export const FAQsSectionConfig: ComponentConfig<FAQsSectionProps> = {
     title: {
       type: "text",
       label: "Title",
+    },
+    subheading: {
+      type: "text",
+      label: "Subheading",
+    },
+    subheadingPosition: {
+      type: "radio",
+      label: "Subheading position",
+      options: [
+        { label: "Above heading", value: "above" },
+        { label: "Below heading", value: "below" },
+      ],
+    },
+    headingAlign: {
+      type: "radio",
+      label: "Heading alignment",
+      options: [
+        { label: "Left", value: "left" },
+        { label: "Center", value: "center" },
+      ],
     },
     faqs: {
       type: "array",
@@ -331,6 +456,8 @@ export const FAQsSectionConfig: ComponentConfig<FAQsSectionProps> = {
   defaultProps: {
     variant: "classic",
     title: "Frequently Asked Questions",
+    subheadingPosition: "above",
+    headingAlign: "left",
     faqs: [
       {
         question: "What are some random questions to ask?",

@@ -5,6 +5,7 @@ import { Section } from "../../components/Section/index";
 import { PuckComponent } from "@measured/puck";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../lib/get-class-name-factory";
+import classnames from "classnames";
 import { InsightsSectionProps } from "./types";
 import { ClassicVariant } from "./variants/ClassicVariant";
 import { EditorialVariant } from "./variants/EditorialVariant";
@@ -20,6 +21,9 @@ export type {
 
 export const InsightsSection: PuckComponent<InsightsSectionProps> = ({
   heading,
+  subheading,
+  subheadingPosition = "above",
+  headingAlign = "left",
   insights,
   variant,
   seeAllButton,
@@ -29,6 +33,8 @@ export const InsightsSection: PuckComponent<InsightsSectionProps> = ({
   showReadMore,
   puck,
 }) => {
+  const headingBlockClass =
+    headingAlign === "center" ? getClassName("headingBlock--center") : "";
   const renderVariant = () => {
     const commonProps = {
       insights,
@@ -52,7 +58,17 @@ export const InsightsSection: PuckComponent<InsightsSectionProps> = ({
 
   return (
     <Section className={getClassName({ [variant]: true })}>
-      <h2 className={getClassName("heading")}>{heading}</h2>
+      <div
+        className={classnames(getClassName("headingBlock"), headingBlockClass)}
+      >
+        {subheading && subheadingPosition === "above" && (
+          <p className={getClassName("subheading")}>{subheading}</p>
+        )}
+        <h2 className={getClassName("heading")}>{heading}</h2>
+        {subheading && subheadingPosition === "below" && (
+          <p className={getClassName("subheading")}>{subheading}</p>
+        )}
+      </div>
       {renderVariant()}
       {seeAllButton.label && seeAllButton.href && (
         <div className={getClassName("seeAllWrapper")}>
@@ -87,6 +103,26 @@ export const InsightsSectionConfig: ComponentConfig<InsightsSectionProps> = {
         instructions:
           "The main heading for the insights section. For brick-and-mortar location landing pages, use SEO-friendly titles like 'Insights & Resources' or 'Helpful Articles from [Business Name]' or 'Local Insights for [Location]'.",
       },
+    },
+    subheading: {
+      type: "text",
+      label: "Subheading",
+    },
+    subheadingPosition: {
+      type: "radio",
+      label: "Subheading position",
+      options: [
+        { label: "Above heading", value: "above" },
+        { label: "Below heading", value: "below" },
+      ],
+    },
+    headingAlign: {
+      type: "radio",
+      label: "Heading alignment",
+      options: [
+        { label: "Left", value: "left" },
+        { label: "Center", value: "center" },
+      ],
     },
     // Visibility options
     showCategory: {
@@ -210,6 +246,8 @@ export const InsightsSectionConfig: ComponentConfig<InsightsSectionProps> = {
   defaultProps: {
     variant: "classic",
     heading: "Insights",
+    subheadingPosition: "above",
+    headingAlign: "left",
     showCategory: true,
     showDate: true,
     showDescription: true,

@@ -18,7 +18,7 @@ import { NavHeader, NavHeaderProps } from "./blocks/nav-header";
 
 // Page Sections Props Type
 type PageSectionsProps = {
-  Header: HeaderProps;
+  Header: NavHeaderProps;
   Hero: HeroProps;
   CoreInfoSection: CoreInfoSectionProps;
   PromoSection: PromoSectionProps;

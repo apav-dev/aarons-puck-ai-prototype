@@ -16,6 +16,9 @@ export type { TeamSectionProps } from "./types";
 export const TeamSection: PuckComponent<TeamSectionProps> = ({
   title,
   subtitle,
+  subheading,
+  subheadingPosition = "above",
+  headingAlign = "left",
   teamMembers,
   variant,
   showDescription,
@@ -31,6 +34,9 @@ export const TeamSection: PuckComponent<TeamSectionProps> = ({
     const commonProps = {
       title,
       subtitle,
+      subheading,
+      subheadingPosition,
+      headingAlign,
       teamMembers,
       showDescription,
       showSocialLinks,
@@ -101,6 +107,26 @@ export const TeamSectionConfig: ComponentConfig<TeamSectionProps> = {
         instructions:
           "Optional subtitle or description text that appears below the main title. Use to provide additional context about the team or location.",
       },
+    },
+    subheading: {
+      type: "text",
+      label: "Subheading",
+    },
+    subheadingPosition: {
+      type: "radio",
+      label: "Subheading position",
+      options: [
+        { label: "Above heading", value: "above" },
+        { label: "Below heading", value: "below" },
+      ],
+    },
+    headingAlign: {
+      type: "radio",
+      label: "Heading alignment",
+      options: [
+        { label: "Left", value: "left" },
+        { label: "Center", value: "center" },
+      ],
     },
     // Visibility options
     showDescription: {
@@ -264,6 +290,8 @@ export const TeamSectionConfig: ComponentConfig<TeamSectionProps> = {
     title: "Meet Our Team",
     subtitle:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+    subheadingPosition: "above",
+    headingAlign: "left",
     showDescription: false,
     showPhone: true,
     showEmail: true,
