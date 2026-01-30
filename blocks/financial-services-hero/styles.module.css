@@ -1,0 +1,501 @@
+.FinancialServicesHero {
+  --accent-color: #0f172a;
+  --text-color: #0f172a;
+  --muted-color: #475569;
+  --panel-bg: #ffffff;
+  --panel-border: #e2e8f0;
+  --star-color: #16a34a;
+  background-color: var(--panel-bg);
+  color: var(--text-color);
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+
+.FinancialServicesHero--theme-dark {
+  --text-color: #f8fafc;
+  --muted-color: #cbd5f5;
+  --panel-bg: #0b1220;
+  --panel-border: rgba(148, 163, 184, 0.25);
+}
+
+.FinancialServicesHero--accent-navy {
+  --accent-color: #0f172a;
+  --star-color: #0ea5e9;
+}
+
+.FinancialServicesHero--accent-emerald {
+  --accent-color: #15803d;
+  --star-color: #16a34a;
+}
+
+.FinancialServicesHero--accent-slate {
+  --accent-color: #475569;
+  --star-color: #64748b;
+}
+
+.FinancialServicesHero--accent-gold {
+  --accent-color: #b45309;
+  --star-color: #f59e0b;
+}
+
+.FinancialServicesHero-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+@media (min-width: 1024px) {
+  .FinancialServicesHero-inner {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 48px;
+  }
+}
+
+.FinancialServicesHero-media {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #e5e7eb;
+}
+
+.FinancialServicesHero-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.FinancialServicesHero-contentGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .FinancialServicesHero-contentGroup {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(200px, 280px);
+    align-items: start;
+  }
+}
+
+.FinancialServicesHero-contentMain {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.FinancialServicesHero-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.FinancialServicesHero-identityTopRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted-color);
+}
+
+.FinancialServicesHero-businessLabel {
+  font-weight: 600;
+}
+
+.FinancialServicesHero-credentials {
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+.FinancialServicesHero-advisorName {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.FinancialServicesHero-roleLine {
+  margin: 0;
+  font-size: 15px;
+  color: var(--muted-color);
+}
+
+.FinancialServicesHero-licenseRow {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--muted-color);
+}
+
+.FinancialServicesHero-licenseLabel {
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+.FinancialServicesHero-licenseValue {
+  font-weight: 500;
+}
+
+.FinancialServicesHero-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.FinancialServicesHero-ratingValue {
+  font-size: 14px;
+  color: var(--muted-color);
+}
+
+.FinancialServicesHero-stars {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.FinancialServicesHero-star {
+  width: 16px;
+  height: 16px;
+  color: var(--star-color);
+  flex-shrink: 0;
+}
+
+.FinancialServicesHero-star.empty {
+  color: #e2e8f0;
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.FinancialServicesHero-reviewCount {
+  font-size: 14px;
+  color: var(--muted-color);
+}
+
+.FinancialServicesHero-address {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+.FinancialServicesHero-addressLine {
+  line-height: 1.4;
+}
+
+.FinancialServicesHero-directionsLink {
+  margin-top: 6px;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.FinancialServicesHero-directionsArrow {
+  font-size: 16px;
+}
+
+.FinancialServicesHero-actions {
+  display: flex;
+  align-items: center;
+}
+
+.FinancialServicesHero-ctaButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: 6px;
+  background-color: var(--accent-color);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.FinancialServicesHero-ctaButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(15, 23, 42, 0.15);
+}
+
+.FinancialServicesHero-contactColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-left: 1px solid var(--panel-border);
+  padding-left: 24px;
+}
+
+@media (max-width: 1023px) {
+  .FinancialServicesHero-contactColumn {
+    border-left: none;
+    padding-left: 0;
+  }
+}
+
+.FinancialServicesHero-contactRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.FinancialServicesHero-contactIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(21, 128, 61, 0.08);
+  color: var(--accent-color);
+}
+
+.FinancialServicesHero-contactIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.FinancialServicesHero-contactText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.FinancialServicesHero-contactLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted-color);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.FinancialServicesHero-contactValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.FinancialServicesHero--layout-right .FinancialServicesHero-media {
+  order: 2;
+}
+
+.FinancialServicesHero--layout-right .FinancialServicesHero-contentGroup {
+  order: 1;
+}
+
+/* Advisor Card */
+.FinancialServicesHero--advisorCard .FinancialServicesHero-contentGroup {
+  background: transparent;
+}
+
+/* Institutional Split */
+.FinancialServicesHero--institutionalSplit .FinancialServicesHero-contentGroup {
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  padding: 24px;
+  background: rgba(148, 163, 184, 0.05);
+}
+
+.FinancialServicesHero--institutionalSplit .FinancialServicesHero-contactColumn {
+  border-left: none;
+  padding-left: 0;
+  border-top: 1px solid var(--panel-border);
+  padding-top: 16px;
+}
+
+@media (min-width: 1024px) {
+  .FinancialServicesHero--institutionalSplit .FinancialServicesHero-contactColumn {
+    border-top: none;
+    border-left: 1px solid var(--panel-border);
+    padding-top: 0;
+    padding-left: 24px;
+  }
+}
+
+/* ==========================================================================
+   Classic variant - Professional about layout (screenshot)
+   ========================================================================== */
+
+.FinancialServicesHero-classicRoot {
+  padding: 72px 0;
+}
+
+.FinancialServicesHero-classicContent {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+}
+
+.FinancialServicesHero-classicContent--single {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 900px) {
+  .FinancialServicesHero-classicContent {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+}
+
+.FinancialServicesHero-classicHeading {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  letter-spacing: -0.02em;
+}
+
+.FinancialServicesHero-classicBody {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.FinancialServicesHero-classicParagraph {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.7;
+  color: inherit;
+}
+
+.FinancialServicesHero-classicSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.FinancialServicesHero-classicSidebarSection {
+  padding-top: 12px;
+}
+
+.FinancialServicesHero-classicSidebarSection + .FinancialServicesHero-classicSidebarSection {
+  border-top: 1px solid var(--financial-services-divider);
+}
+
+.FinancialServicesHero-classicSidebarTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+}
+
+.FinancialServicesHero-classicSidebarPlaceholder {
+  margin: 0;
+  font-size: 14px;
+  color: currentColor;
+  opacity: 0.6;
+}
+
+.FinancialServicesHero-classicBulletList {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.FinancialServicesHero-classicBulletItem {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.FinancialServicesHero-classicBulletItem::marker {
+  color: var(--financial-services-accent);
+}
+
+.FinancialServicesHero-classicBadgeList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.FinancialServicesHero-classicBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background-color: var(--financial-services-accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.FinancialServicesHero-classicAwards {
+  margin-top: 56px;
+}
+
+.FinancialServicesHero-classicAwardsHeading {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 24px 0;
+}
+
+.FinancialServicesHero-classicAwardsList {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.FinancialServicesHero-classicAwardItem {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .FinancialServicesHero-classicAwardItem {
+    grid-template-columns: 160px 1fr;
+  }
+}
+
+.FinancialServicesHero-classicAwardLogo {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.FinancialServicesHero-classicAwardLogo img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: grayscale(1);
+}
+
+.FinancialServicesHero-classicAwardTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+}
+
+.FinancialServicesHero-classicAwardDescription {
+  margin: 0 0 6px 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.FinancialServicesHero-classicAwardMeta {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: currentColor;
+  opacity: 0.6;
+}
+

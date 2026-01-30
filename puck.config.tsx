@@ -1,5 +1,9 @@
 import type { Config } from "@puckeditor/core";
 import { Hero, HeroProps } from "./blocks/hero";
+import {
+  FinancialServicesHero,
+  FinancialServicesHeroProps,
+} from "./blocks/financial-services-hero";
 import { CoreInfoSection, CoreInfoSectionProps } from "./blocks/core-info";
 import { PromoSection, PromoSectionProps } from "./blocks/promo";
 import { ProductsSection, ProductsSectionProps } from "./blocks/products";
@@ -7,6 +11,11 @@ import { FAQsSection, FAQsSectionProps } from "./blocks/faqs";
 import { InsightsSection, InsightsSectionProps } from "./blocks/insights";
 import { TeamSection, TeamSectionProps } from "./blocks/team";
 import { PhotoGridSection, PhotoGridSectionProps } from "./blocks/photo-grid";
+import { AboutColumnsSection, AboutColumnsSectionProps } from "./blocks/about-columns";
+import {
+  ProfessionalAboutSection,
+  ProfessionalAboutSectionProps,
+} from "./blocks/professional-about";
 import { Heading, HeadingProps } from "./blocks/atoms/heading";
 import { Text, TextProps } from "./blocks/atoms/text";
 import { Button, ButtonProps } from "./blocks/atoms/button";
@@ -20,6 +29,7 @@ import { NavHeader, NavHeaderProps } from "./blocks/nav-header";
 type PageSectionsProps = {
   Header: NavHeaderProps;
   Hero: HeroProps;
+  FinancialServicesHero: FinancialServicesHeroProps;
   CoreInfoSection: CoreInfoSectionProps;
   PromoSection: PromoSectionProps;
   ProductsSection: ProductsSectionProps;
@@ -27,6 +37,8 @@ type PageSectionsProps = {
   InsightsSection: InsightsSectionProps;
   TeamSection: TeamSectionProps;
   PhotoGridSection: PhotoGridSectionProps;
+  AboutColumnsSection: AboutColumnsSectionProps;
+  ProfessionalAboutSection: ProfessionalAboutSectionProps;
 };
 
 // Atoms Props Type
@@ -49,6 +61,7 @@ const fullPagesConfig: Config<PageSectionsProps> = {
   components: {
     Header: NavHeader,
     Hero: Hero,
+    FinancialServicesHero: FinancialServicesHero,
     CoreInfoSection: CoreInfoSection,
     PromoSection: PromoSection,
     ProductsSection: ProductsSection,
@@ -56,6 +69,8 @@ const fullPagesConfig: Config<PageSectionsProps> = {
     InsightsSection: InsightsSection,
     TeamSection: TeamSection,
     PhotoGridSection: PhotoGridSection,
+    AboutColumnsSection: AboutColumnsSection,
+    ProfessionalAboutSection: ProfessionalAboutSection,
   },
 };
 

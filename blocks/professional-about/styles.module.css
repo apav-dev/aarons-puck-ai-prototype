@@ -1,0 +1,175 @@
+/* ==========================================================================
+   Professional About Section - Base Styles
+   ========================================================================== */
+
+.ProfessionalAboutSection {
+  padding: 72px 0;
+}
+
+.ProfessionalAboutSection-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+}
+
+.ProfessionalAboutSection-content--single {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 900px) {
+  .ProfessionalAboutSection-content {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+}
+
+.ProfessionalAboutSection-heading {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  letter-spacing: -0.02em;
+}
+
+.ProfessionalAboutSection-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ProfessionalAboutSection-paragraph {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.7;
+  color: inherit;
+}
+
+.ProfessionalAboutSection-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ProfessionalAboutSection-sidebarSection {
+  padding-top: 12px;
+}
+
+.ProfessionalAboutSection-sidebarSection + .ProfessionalAboutSection-sidebarSection {
+  border-top: 1px solid var(--professional-about-divider);
+}
+
+.ProfessionalAboutSection-sidebarTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+}
+
+.ProfessionalAboutSection-sidebarPlaceholder {
+  margin: 0;
+  font-size: 14px;
+  color: currentColor;
+  opacity: 0.6;
+}
+
+.ProfessionalAboutSection-bulletList {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ProfessionalAboutSection-bulletItem {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.ProfessionalAboutSection-bulletItem::marker {
+  color: var(--professional-about-accent);
+}
+
+.ProfessionalAboutSection-badgeList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ProfessionalAboutSection-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background-color: var(--professional-about-accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   Awards Section
+   ========================================================================== */
+
+.ProfessionalAboutSection-awards {
+  margin-top: 56px;
+}
+
+.ProfessionalAboutSection-awardsHeading {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 24px 0;
+}
+
+.ProfessionalAboutSection-awardsList {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.ProfessionalAboutSection-awardItem {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .ProfessionalAboutSection-awardItem {
+    grid-template-columns: 160px 1fr;
+  }
+}
+
+.ProfessionalAboutSection-awardLogo {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.ProfessionalAboutSection-awardLogo img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: grayscale(1);
+}
+
+.ProfessionalAboutSection-awardTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+}
+
+.ProfessionalAboutSection-awardDescription {
+  margin: 0 0 6px 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ProfessionalAboutSection-awardMeta {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: currentColor;
+  opacity: 0.6;
+}
