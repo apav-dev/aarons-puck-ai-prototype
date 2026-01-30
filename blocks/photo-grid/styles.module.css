@@ -1,5 +1,5 @@
 .PhotoGridSection {
-  background-color: white;
+  background-color: var(--page-color-tertiary, #ffffff);
   padding: 64px 0;
 }
 
@@ -23,7 +23,7 @@
 .PhotoGridSection-subheading {
   font-size: 16px;
   font-weight: 400;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   margin: 0 0 8px 0;
   line-height: 1.4;
 }
@@ -31,7 +31,7 @@
 .PhotoGridSection-heading {
   font-size: 28px;
   font-weight: 700;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   margin: 0 0 8px 0;
   line-height: 1.2;
 }
@@ -102,7 +102,7 @@
 .PhotoGridSection-label {
   font-size: 16px;
   font-weight: 400;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   text-align: center;
   margin: 0;
   line-height: 1.4;
@@ -124,13 +124,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #722F37;
+  color: var(--page-color-primary, #722F37);
   transition: color 0.2s ease, opacity 0.2s ease;
   flex-shrink: 0;
 }
 
 .PhotoGridSection-carouselArrow:disabled {
-  color: #9CA3AF;
+  color: var(--page-color-quaternary, #9CA3AF);
   cursor: default;
 }
 
@@ -165,17 +165,17 @@
   height: 4px;
   border: none;
   border-radius: 2px;
-  background-color: #D1D5DB;
+  background-color: var(--page-color-quaternary, #D1D5DB);
   cursor: pointer;
   padding: 0;
   transition: background-color 0.2s ease;
 }
 
 .PhotoGridSection-carouselIndicator[data-active="true"] {
-  background-color: #722F37;
+  background-color: var(--page-color-primary, #722F37);
 }
 
 .PhotoGridSection-carouselIndicator:hover:not([data-active="true"]) {
-  background-color: #9CA3AF;
+  background-color: var(--page-color-quaternary, #9CA3AF);
 }
 

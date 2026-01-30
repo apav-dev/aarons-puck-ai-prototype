@@ -26,7 +26,7 @@
 .FAQsSection-subheading {
   font-size: 16px;
   font-weight: 400;
-  color: #1f2937;
+  color: var(--page-color-secondary, #1f2937);
   margin: 0 0 8px 0;
   line-height: 1.4;
 }
@@ -34,7 +34,7 @@
 .FAQsSection-title {
   font-size: 32px;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--page-color-secondary, #1f2937);
   margin: 0;
   line-height: 1.2;
 }
@@ -72,11 +72,11 @@
 }
 
 .FAQsSection-classicItem {
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--page-color-quaternary, #e5e7eb);
 }
 
 .FAQsSection-classicItem:first-child {
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--page-color-quaternary, #e5e7eb);
 }
 
 .FAQsSection-classicQuestion {
@@ -91,12 +91,12 @@
   text-align: left;
   font-size: 16px;
   font-weight: 400;
-  color: #1f2937;
+  color: var(--page-color-secondary, #1f2937);
   transition: color 0.2s ease;
 }
 
 .FAQsSection-classicQuestion:hover:not(:disabled) {
-  color: #4b5563;
+  color: var(--page-color-secondary, #4b5563);
 }
 
 .FAQsSection-classicQuestion:disabled {
@@ -112,7 +112,7 @@
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  color: #1f2937;
+  color: var(--page-color-secondary, #1f2937);
 }
 
 .FAQsSection-chevron--expanded {
@@ -123,7 +123,7 @@
   padding-bottom: 20px;
   font-size: 16px;
   font-weight: 400;
-  color: #4b5563;
+  color: var(--page-color-secondary, #4b5563);
   line-height: 1.6;
 }
 
@@ -168,14 +168,14 @@
 .FAQsSection-gridQuestion {
   font-size: 18px;
   font-weight: 500;
-  color: #374151;
+  color: var(--page-color-secondary, #374151);
   margin: 0;
   line-height: 1.4;
 }
 
 .FAQsSection-gridAnswer {
   font-size: 15px;
-  color: #6b7280;
+  color: var(--page-color-secondary, #6b7280);
   margin: 0;
   line-height: 1.6;
 }
@@ -212,7 +212,7 @@
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #4f46e5;
+  color: var(--page-color-primary, #4f46e5);
   margin-bottom: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -221,7 +221,7 @@
 .FAQsSection-sidebarTitle {
   font-size: 28px;
   font-weight: 800;
-  color: #1f2937;
+  color: var(--page-color-secondary, #1f2937);
   margin: 0;
   line-height: 1.2;
 }
@@ -244,24 +244,24 @@
 
 .FAQsSection-sidebarItem {
   padding: 20px 0;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--page-color-quaternary, #e5e7eb);
 }
 
 .FAQsSection-sidebarItem:last-child {
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--page-color-quaternary, #e5e7eb);
 }
 
 .FAQsSection-sidebarQuestion {
   font-size: 16px;
   font-weight: 600;
-  color: #374151;
+  color: var(--page-color-secondary, #374151);
   margin: 0 0 12px 0;
   line-height: 1.4;
 }
 
 .FAQsSection-sidebarAnswer {
   font-size: 15px;
-  color: #4b5563;
+  color: var(--page-color-secondary, #4b5563);
   margin: 0;
   line-height: 1.6;
 }
@@ -282,9 +282,9 @@
 
 .FAQsSection-elevatedCard {
   position: relative;
-  background: white;
+  background: var(--page-color-tertiary, #ffffff);
   border-radius: 8px;
-  box-shadow: 0 7px 20px 7px #f1f1f1;
+  box-shadow: 0 7px 20px 7px rgba(0, 0, 0, 0.06);
   max-width: 1024px;
   margin: 0 auto;
   width: 100%;
@@ -314,14 +314,14 @@
 .FAQsSection-elevatedQuestion {
   font-size: 18px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--page-color-secondary, #1f2937);
   margin: 0;
   line-height: 1.4;
 }
 
 .FAQsSection-elevatedAnswer {
   font-size: 15px;
-  color: #6b7280;
+  color: var(--page-color-secondary, #6b7280);
   margin: 0;
   line-height: 1.6;
 }
@@ -333,7 +333,7 @@
   left: 50%;
   width: 1px;
   height: 100%;
-  background-color: #e5e7eb;
+  background-color: var(--page-color-quaternary, #e5e7eb);
 }
 
 @media (min-width: 768px) {

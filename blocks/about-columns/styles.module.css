@@ -112,7 +112,7 @@
    ========================================================================== */
 
 .AboutColumnsSection.classic {
-  background-color: #0d4a4a;
+  background-color: var(--page-color-secondary, #0d4a4a);
   color: #ffffff;
   padding: 80px 0;
 }
@@ -142,7 +142,7 @@
    ========================================================================== */
 
 .AboutColumnsSection.cards {
-  background-color: #ffffff;
+  background-color: var(--page-color-tertiary, #ffffff);
 }
 
 .AboutColumnsSection-card {
@@ -150,8 +150,8 @@
   flex-direction: column;
   gap: 16px;
   padding: 32px;
-  background-color: #ffffff;
-  border: 1px solid #e5e5e5;
+  background-color: var(--page-color-tertiary, #ffffff);
+  border: 1px solid var(--page-color-quaternary, #e5e5e5);
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.2s, transform 0.2s;
@@ -163,23 +163,23 @@
 }
 
 .AboutColumnsSection.cards .AboutColumnsSection-tagline {
-  color: #666;
+  color: var(--page-color-secondary, #666666);
 }
 
 .AboutColumnsSection.cards .AboutColumnsSection-subheading {
-  color: #666;
+  color: var(--page-color-secondary, #666666);
 }
 
 .AboutColumnsSection.cards .AboutColumnsSection-heading {
-  color: #000;
+  color: var(--page-color-secondary, #000000);
 }
 
 .AboutColumnsSection.cards .AboutColumnsSection-columnTitle {
-  color: #000;
+  color: var(--page-color-secondary, #000000);
 }
 
 .AboutColumnsSection.cards .AboutColumnsSection-columnParagraph {
-  color: #333;
+  color: var(--page-color-secondary, #333333);
 }
 
 /* ==========================================================================
@@ -187,7 +187,7 @@
    ========================================================================== */
 
 .AboutColumnsSection.stacked {
-  background-color: #ffffff;
+  background-color: var(--page-color-tertiary, #ffffff);
 }
 
 .AboutColumnsSection-stackedContainer {
@@ -220,29 +220,29 @@
 .AboutColumnsSection-divider {
   width: 100%;
   height: 1px;
-  background-color: #e5e5e5;
+  background-color: var(--page-color-quaternary, #e5e5e5);
   margin: 0;
   grid-column: 1 / -1;
 }
 
 .AboutColumnsSection.stacked .AboutColumnsSection-tagline {
-  color: #666;
+  color: var(--page-color-secondary, #666666);
 }
 
 .AboutColumnsSection.stacked .AboutColumnsSection-subheading {
-  color: #666;
+  color: var(--page-color-secondary, #666666);
 }
 
 .AboutColumnsSection.stacked .AboutColumnsSection-heading {
-  color: #000;
+  color: var(--page-color-secondary, #000000);
 }
 
 .AboutColumnsSection.stacked .AboutColumnsSection-columnTitle {
-  color: #000;
+  color: var(--page-color-secondary, #000000);
 }
 
 .AboutColumnsSection.stacked .AboutColumnsSection-columnParagraph {
-  color: #333;
+  color: var(--page-color-secondary, #333333);
 }
 
 /* ==========================================================================
@@ -250,7 +250,7 @@
    ========================================================================== */
 
 .AboutColumnsSection.bordered {
-  background-color: #ffffff;
+  background-color: var(--page-color-tertiary, #ffffff);
 }
 
 .AboutColumnsSection-borderedColumn {
@@ -258,7 +258,7 @@
   flex-direction: column;
   gap: 16px;
   padding-left: 24px;
-  border-left: 4px solid #0d4a4a;
+  border-left: 4px solid var(--page-color-primary, #0d4a4a);
 }
 
 @media (min-width: 768px) {
@@ -269,21 +269,21 @@
 }
 
 .AboutColumnsSection.bordered .AboutColumnsSection-tagline {
-  color: #666;
+  color: var(--page-color-secondary, #666666);
 }
 
 .AboutColumnsSection.bordered .AboutColumnsSection-subheading {
-  color: #666;
+  color: var(--page-color-secondary, #666666);
 }
 
 .AboutColumnsSection.bordered .AboutColumnsSection-heading {
-  color: #000;
+  color: var(--page-color-secondary, #000000);
 }
 
 .AboutColumnsSection.bordered .AboutColumnsSection-columnTitle {
-  color: #000;
+  color: var(--page-color-secondary, #000000);
 }
 
 .AboutColumnsSection.bordered .AboutColumnsSection-columnParagraph {
-  color: #333;
+  color: var(--page-color-secondary, #333333);
 }

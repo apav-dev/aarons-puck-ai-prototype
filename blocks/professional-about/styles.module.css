@@ -3,6 +3,8 @@
    ========================================================================== */
 
 .ProfessionalAboutSection {
+  --professional-about-accent: var(--page-color-primary, #0f172a);
+  --professional-about-divider: var(--page-color-quaternary, #e5e7eb);
   padding: 72px 0;
 }
 

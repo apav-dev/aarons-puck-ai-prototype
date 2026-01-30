@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import React from "react";
-import { ComponentConfig } from "@measured/puck";
-import { PuckComponent } from "@measured/puck";
+import { ComponentConfig } from "@puckeditor/core";
+import { PuckComponent } from "@puckeditor/core";
 import classnames from "classnames";
 import { Section } from "../../components/Section/index";
 import getClassNameFactory from "../../lib/get-class-name-factory";

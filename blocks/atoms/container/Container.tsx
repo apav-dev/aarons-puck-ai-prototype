@@ -1,5 +1,5 @@
 import React, { CSSProperties } from "react";
-import { ComponentConfig, PuckComponent, Slot } from "@measured/puck";
+import { ComponentConfig, PuckComponent, Slot } from "@puckeditor/core";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../../lib/get-class-name-factory";
 
@@ -52,8 +52,8 @@ export const Container: PuckComponent<ContainerProps> = ({
 
   const containerStyle: CSSProperties = {
     display: "flex",
-    flexDirection: direction,
-    flexWrap: wrap,
+    flexDirection: direction as CSSProperties["flexDirection"],
+    flexWrap: wrap as CSSProperties["flexWrap"],
     justifyContent,
     alignItems,
     ...(gap && { gap }),

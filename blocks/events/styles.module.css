@@ -1,5 +1,5 @@
 .EventsSection {
-  background-color: white;
+  background-color: var(--page-color-tertiary, #ffffff);
   padding: 64px 0;
 }
 
@@ -12,7 +12,7 @@
 .EventsSection-title {
   font-size: 32px;
   font-weight: 700;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   margin: 0;
   text-align: center;
   line-height: 1.2;
@@ -33,7 +33,7 @@
 .EventsSection-eventCard {
   display: flex;
   flex-direction: column;
-  background-color: white;
+  background-color: var(--page-color-tertiary, #ffffff);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -77,7 +77,7 @@
 .EventsSection-eventTitle {
   font-size: 24px;
   font-weight: 700;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   margin: 0;
   line-height: 1.2;
 }
@@ -91,7 +91,7 @@
 .EventsSection-eventDateTime {
   font-size: 16px;
   font-weight: 400;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -99,13 +99,13 @@
 }
 
 .EventsSection-separator {
-  color: #666;
+  color: var(--page-color-secondary, #666666);
 }
 
 .EventsSection-eventDescription {
   font-size: 16px;
   font-weight: 400;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   margin: 0;
   line-height: 1.6;
   flex: 1;
@@ -117,7 +117,7 @@
   gap: 8px;
   font-size: 16px;
   font-weight: 500;
-  color: #000;
+  color: var(--page-color-primary, #000000);
   text-decoration: none;
   cursor: pointer;
   transition: opacity 0.2s ease;

@@ -1,4 +1,5 @@
 import type { Config } from "@puckeditor/core";
+import { CSSProperties, ReactNode, useEffect } from "react";
 import { Hero, HeroProps } from "./blocks/hero";
 import {
   FinancialServicesHero,
@@ -24,6 +25,8 @@ import { Spacer, SpacerProps } from "./blocks/atoms/spacer";
 import { Flex, FlexProps } from "./blocks/atoms/flex";
 import { Grid, GridProps } from "./blocks/atoms/grid";
 import { NavHeader, NavHeaderProps } from "./blocks/nav-header";
+import { getGoogleFontsUrl } from "./lib/google-fonts";
+import { DEFAULT_THEME, mergeTheme, PageTheme } from "./lib/theme";
 
 // Page Sections Props Type
 type PageSectionsProps = {
@@ -56,8 +59,74 @@ type AtomsProps = {
 // Combined Props Type
 type Props = PageSectionsProps & AtomsProps;
 
+type RootProps = {
+  title?: string;
+  theme?: PageTheme;
+};
+
+const ensureFontLink = (fontFamily?: string) => {
+  if (!fontFamily || typeof document === "undefined") return;
+
+  const fontId = fontFamily.toLowerCase().replace(/\s+/g, "-");
+  const linkId = `page-theme-font-${fontId}`;
+
+  if (document.getElementById(linkId)) return;
+
+  const link = document.createElement("link");
+  link.id = linkId;
+  link.rel = "stylesheet";
+  link.href = getGoogleFontsUrl(fontFamily);
+  document.head.appendChild(link);
+};
+
+const ThemeRoot = ({
+  children,
+  theme,
+}: {
+  children: ReactNode;
+  theme?: PageTheme;
+}) => {
+  const mergedTheme = mergeTheme(theme);
+
+  useEffect(() => {
+    ensureFontLink(mergedTheme.fonts.heading);
+    ensureFontLink(mergedTheme.fonts.body);
+  }, [mergedTheme.fonts.heading, mergedTheme.fonts.body]);
+
+  const styleVars = {
+    "--page-color-primary": mergedTheme.colors.primary,
+    "--page-color-secondary": mergedTheme.colors.secondary,
+    "--page-color-tertiary": mergedTheme.colors.tertiary,
+    "--page-color-quaternary": mergedTheme.colors.quaternary,
+    "--page-font-heading": `"${mergedTheme.fonts.heading}", sans-serif`,
+    "--page-font-body": `"${mergedTheme.fonts.body}", sans-serif`,
+  } as CSSProperties;
+
+  return (
+    <div className="PageThemeRoot" style={styleVars}>
+      {children}
+    </div>
+  );
+};
+
+const rootConfig = {
+  fields: {
+    title: {
+      type: "text" as const,
+      label: "Title",
+    },
+  },
+  defaultProps: {
+    title: "",
+    theme: DEFAULT_THEME,
+  },
+  render: ({ children, theme }: RootProps & { children: ReactNode }) => {
+    return <ThemeRoot theme={theme}>{children}</ThemeRoot>;
+  },
+};
+
 // Full Pages Config: Only Page Sections
-const fullPagesConfig: Config<PageSectionsProps> = {
+const fullPagesConfig: Config<PageSectionsProps, RootProps> = {
   components: {
     Header: NavHeader,
     Hero: Hero,
@@ -72,10 +141,11 @@ const fullPagesConfig: Config<PageSectionsProps> = {
     AboutColumnsSection: AboutColumnsSection,
     ProfessionalAboutSection: ProfessionalAboutSection,
   },
+  root: rootConfig,
 };
 
 // Atoms Config: Only Atomic Components
-const atomsConfig: Config<AtomsProps> = {
+const atomsConfig: Config<AtomsProps, RootProps> = {
   components: {
     Flex: Flex,
     Grid: Grid,
@@ -86,6 +156,7 @@ const atomsConfig: Config<AtomsProps> = {
     Image: Image,
     Spacer: Spacer,
   },
+  root: rootConfig,
 };
 
 // Get the current mode from environment variable
@@ -101,7 +172,7 @@ const getMode = () => {
 
 // Export the appropriate config based on mode
 // Image mode uses atomsConfig since it builds with atomic components
-const getConfig = (): Config<PageSectionsProps | AtomsProps> => {
+const getConfig = (): Config<PageSectionsProps | AtomsProps, RootProps> => {
   const mode = getMode();
   return mode === "atoms" || mode === "image" ? atomsConfig : fullPagesConfig;
 };

@@ -1,5 +1,5 @@
 .HeroSection {
-  background-color: white;
+  background-color: var(--page-color-tertiary, #ffffff);
   padding-top: 64px;
   padding-bottom: 64px;
 }
@@ -73,14 +73,14 @@
 .HeroSection-label {
   font-size: 14px;
   font-weight: 400;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   margin: 0;
 }
 
 .HeroSection-title {
   font-size: 32px;
   font-weight: 700;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   margin: 0;
   line-height: 1.2;
 }
@@ -94,7 +94,7 @@
 .HeroSection-status {
   font-size: 14px;
   font-weight: 400;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   margin: 0;
 }
 
@@ -108,7 +108,7 @@
 .HeroSection-ratingValue {
   font-size: 14px;
   font-weight: 400;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
 }
 
 .HeroSection-stars {
@@ -120,7 +120,7 @@
 .HeroSection-star {
   width: 16px;
   height: 16px;
-  color: #dc2626;
+  color: var(--page-color-primary, #dc2626);
   flex-shrink: 0;
 }
 
@@ -133,7 +133,7 @@
 .HeroSection-reviewCount {
   font-size: 14px;
   font-weight: 400;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
 }
 
 .HeroSection-actions {
@@ -147,7 +147,7 @@
   align-items: center;
   justify-content: center;
   padding: 12px 24px;
-  background-color: #dc2626;
+  background-color: var(--page-color-primary, #dc2626);
   color: white;
   border: none;
   border-radius: 6px;
@@ -159,7 +159,7 @@
 }
 
 .HeroSection-primaryButton:hover {
-  background-color: #b91c1c;
+  filter: brightness(0.9);
 }
 
 .HeroSection-secondaryButton {
@@ -167,9 +167,9 @@
   align-items: center;
   justify-content: center;
   padding: 12px 24px;
-  background-color: white;
-  color: #dc2626;
-  border: 1px solid #dc2626;
+  background-color: var(--page-color-tertiary, #ffffff);
+  color: var(--page-color-primary, #dc2626);
+  border: 1px solid var(--page-color-primary, #dc2626);
   border-radius: 6px;
   font-size: 16px;
   font-weight: 500;
@@ -179,7 +179,7 @@
 }
 
 .HeroSection-secondaryButton:hover {
-  background-color: #fef2f2;
+  background-color: var(--page-color-quaternary, #fef2f2);
 }
 
 .HeroSection-imageWrapper {
@@ -245,7 +245,7 @@
 .HeroSection-spotlightCard {
   position: relative;
   z-index: 1;
-  background-color: white;
+  background-color: var(--page-color-tertiary, #ffffff);
   border-radius: 12px;
   padding: 32px;
   margin: 32px;
@@ -290,12 +290,12 @@
 .HeroSection--spotlight .HeroSection-status,
 .HeroSection--spotlight .HeroSection-ratingValue,
 .HeroSection--spotlight .HeroSection-reviewCount {
-  color: #000;
+  color: var(--page-color-secondary, #000000);
 }
 
 /* Spotlight variant: star color */
 .HeroSection--spotlight .HeroSection-star:not(.empty) {
-  color: #dc2626;
+  color: var(--page-color-primary, #dc2626);
 }
 
 /* Immersive Variant Styles — bg in Section outer (full-bleed), content in inner */

@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .ProductsSection {
-  background-color: white;
+  background-color: var(--page-color-tertiary, #ffffff);
   padding: 64px 0;
 }
 
@@ -35,7 +35,7 @@
 .ProductsSection-subheading {
   font-size: 16px;
   font-weight: 400;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   margin: 0 0 8px 0;
   line-height: 1.4;
 }
@@ -43,7 +43,7 @@
 .ProductsSection-heading {
   font-size: 28px;
   font-weight: 700;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   margin: 0;
   line-height: 1.2;
 }
@@ -61,14 +61,14 @@
 .ProductsSection-sectionCTA {
   font-size: 14px;
   font-weight: 500;
-  color: #4f46e5;
+  color: var(--page-color-primary, #4f46e5);
   text-decoration: none;
   white-space: nowrap;
   transition: color 0.2s;
 }
 
 .ProductsSection-sectionCTA:hover {
-  color: #4338ca;
+  opacity: 0.8;
 }
 
 .ProductsSection-sectionCTAMobile {
@@ -119,17 +119,17 @@
 }
 
 .ProductsSection-ratingStar--filled {
-  color: #fbbf24;
+  color: var(--page-color-primary, #fbbf24);
 }
 
 .ProductsSection-ratingStar--empty {
-  color: #e5e7eb;
+  color: var(--page-color-quaternary, #e5e7eb);
 }
 
 .ProductsSection-ratingReviewCount {
   font-size: 14px;
   font-weight: 400;
-  color: #6b7280;
+  color: var(--page-color-secondary, #6b7280);
   margin: 0;
   line-height: 1.4;
 }
@@ -180,7 +180,7 @@
   width: 100%;
   overflow: hidden;
   border-radius: 8px;
-  background-color: #f3f4f6;
+  background-color: var(--page-color-quaternary, #f3f4f6);
 }
 
 .ProductsSection-simpleImage {
@@ -220,7 +220,7 @@
 .ProductsSection-simpleTitle {
   font-size: 14px;
   font-weight: 400;
-  color: #374151;
+  color: var(--page-color-secondary, #374151);
   margin: 0;
   line-height: 1.4;
 }
@@ -228,7 +228,7 @@
 .ProductsSection-simpleCategory {
   font-size: 14px;
   font-weight: 400;
-  color: #6b7280;
+  color: var(--page-color-secondary, #6b7280);
   margin: 4px 0 0 0;
   line-height: 1.4;
 }
@@ -236,7 +236,7 @@
 .ProductsSection-simpleDescription {
   font-size: 14px;
   font-weight: 400;
-  color: #6b7280;
+  color: var(--page-color-secondary, #6b7280);
   margin: 4px 0 0 0;
   line-height: 1.5;
 }
@@ -248,7 +248,7 @@
 .ProductsSection-simplePrice {
   font-size: 18px;
   font-weight: 500;
-  color: #111827;
+  color: var(--page-color-secondary, #111827);
   margin: 4px 0 0 0;
   line-height: 1.4;
 }
@@ -298,19 +298,19 @@
 }
 
 .ProductsSection-cardsCard {
-  background-color: white;
+  background-color: var(--page-color-tertiary, #ffffff);
   border-radius: 8px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--page-color-quaternary, #e5e7eb);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .ProductsSection-cardsImageWrapper {
   width: 100%;
   overflow: hidden;
-  background-color: #f3f4f6;
+  background-color: var(--page-color-quaternary, #f3f4f6);
 }
 
 .ProductsSection-cardsImage {
@@ -360,7 +360,7 @@
 .ProductsSection-cardsTitle {
   font-size: 14px;
   font-weight: 500;
-  color: #111827;
+  color: var(--page-color-secondary, #111827);
   margin: 0;
   line-height: 1.4;
   position: relative;
@@ -380,7 +380,7 @@
 .ProductsSection-cardsDescription {
   font-size: 14px;
   font-weight: 400;
-  color: #6b7280;
+  color: var(--page-color-secondary, #6b7280);
   margin: 0;
   line-height: 1.5;
   flex: 1;
@@ -397,7 +397,7 @@
 .ProductsSection-cardsCategory {
   font-size: 14px;
   font-weight: 400;
-  color: #6b7280;
+  color: var(--page-color-secondary, #6b7280);
   font-style: italic;
   margin: 0;
   line-height: 1.4;
@@ -406,7 +406,7 @@
 .ProductsSection-cardsPrice {
   font-size: 16px;
   font-weight: 500;
-  color: #111827;
+  color: var(--page-color-secondary, #111827);
   margin: 0;
   line-height: 1.4;
 }
@@ -421,9 +421,9 @@
   align-items: center;
   justify-content: center;
   padding: 10px 20px;
-  background-color: white;
-  color: #dc2626;
-  border: 1px solid #dc2626;
+  background-color: var(--page-color-tertiary, #ffffff);
+  color: var(--page-color-primary, #dc2626);
+  border: 1px solid var(--page-color-primary, #dc2626);
   border-radius: 6px;
   font-size: 16px;
   font-weight: 500;
@@ -435,7 +435,7 @@
 }
 
 .ProductsSection-cardsCTA:hover {
-  background-color: #fef2f2;
+  background-color: var(--page-color-quaternary, #fef2f2);
 }
 
 .ProductsSection-cardsContent--center .ProductsSection-cardsCTA {
@@ -461,7 +461,7 @@
 .ProductsSection-gridGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  border-left: 1px solid #e5e7eb;
+  border-left: 1px solid var(--page-color-quaternary, #e5e7eb);
 }
 
 @media (min-width: 768px) {
@@ -477,8 +477,8 @@
 }
 
 .ProductsSection-gridItem {
-  border-right: 1px solid #e5e7eb;
-  border-bottom: 1px solid #e5e7eb;
+  border-right: 1px solid var(--page-color-quaternary, #e5e7eb);
+  border-bottom: 1px solid var(--page-color-quaternary, #e5e7eb);
   padding: 16px;
   position: relative;
   transition: opacity 0.2s;
@@ -498,7 +498,7 @@
   width: 100%;
   aspect-ratio: 1 / 1;
   border-radius: 8px;
-  background-color: #f3f4f6;
+  background-color: var(--page-color-quaternary, #f3f4f6);
   object-fit: cover;
   display: block;
 }
@@ -512,7 +512,7 @@
 .ProductsSection-gridCategory {
   font-size: 14px;
   font-weight: 400;
-  color: #6b7280;
+  color: var(--page-color-secondary, #6b7280);
   margin: 4px 0 0 0;
   line-height: 1.4;
 }
@@ -520,7 +520,7 @@
 .ProductsSection-gridDescription {
   font-size: 14px;
   font-weight: 400;
-  color: #6b7280;
+  color: var(--page-color-secondary, #6b7280);
   margin: 8px 0 0 0;
   line-height: 1.5;
 }
@@ -528,7 +528,7 @@
 .ProductsSection-gridTitle {
   font-size: 14px;
   font-weight: 500;
-  color: #111827;
+  color: var(--page-color-secondary, #111827);
   margin: 0;
   line-height: 1.4;
   position: relative;
@@ -556,7 +556,7 @@
 .ProductsSection-gridPrice {
   font-size: 16px;
   font-weight: 500;
-  color: #111827;
+  color: var(--page-color-secondary, #111827);
   margin: 16px 0 0 0;
   line-height: 1.4;
 }
@@ -642,7 +642,7 @@
 .ProductsSection-overlayTitle {
   font-size: 14px;
   font-weight: 500;
-  color: #111827;
+  color: var(--page-color-secondary, #111827);
   margin: 0;
   line-height: 1.4;
 }
@@ -650,7 +650,7 @@
 .ProductsSection-overlayCategory {
   font-size: 14px;
   font-weight: 400;
-  color: #6b7280;
+  color: var(--page-color-secondary, #6b7280);
   margin: 4px 0 0 0;
   line-height: 1.4;
 }
@@ -658,7 +658,7 @@
 .ProductsSection-overlayDescription {
   font-size: 14px;
   font-weight: 400;
-  color: #6b7280;
+  color: var(--page-color-secondary, #6b7280);
   margin: 4px 0 0 0;
   line-height: 1.5;
 }
@@ -677,8 +677,8 @@
   justify-content: center;
   width: 100%;
   padding: 8px 32px;
-  background-color: #f3f4f6;
-  color: #111827;
+  background-color: var(--page-color-quaternary, #f3f4f6);
+  color: var(--page-color-secondary, #111827);
   border: 1px solid transparent;
   border-radius: 6px;
   font-size: 14px;
@@ -689,7 +689,7 @@
 }
 
 .ProductsSection-overlayCTA:hover {
-  background-color: #e5e7eb;
+  background-color: var(--page-color-quaternary, #e5e7eb);
 }
 
 .ProductsSection-overlayCTASrOnly {

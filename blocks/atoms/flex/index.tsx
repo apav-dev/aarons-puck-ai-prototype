@@ -1,5 +1,5 @@
 import React from "react";
-import { ComponentConfig, Slot } from "@measured/puck";
+import { ComponentConfig, Slot } from "@puckeditor/core";
 import styles from "./styles.module.css";
 import { Section } from "../section";
 import { WithLayout, withLayout } from "../layout";

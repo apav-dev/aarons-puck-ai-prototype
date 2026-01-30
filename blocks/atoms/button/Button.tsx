@@ -1,5 +1,5 @@
 import React, { CSSProperties } from "react";
-import { ComponentConfig, PuckComponent } from "@measured/puck";
+import { ComponentConfig, PuckComponent } from "@puckeditor/core";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../../lib/get-class-name-factory";
 import classnames from "classnames";
@@ -43,6 +43,10 @@ export const Button: PuckComponent<ButtonProps> = ({
   icon,
   iconPosition = "left",
 }) => {
+  const themePrimary = "var(--page-color-primary, #000000)";
+  const themeSecondary = "var(--page-color-secondary, #000000)";
+  const themeQuaternary = "var(--page-color-quaternary, #f5f5f5)";
+
   const getSizeStyles = () => {
     switch (size) {
       case "small":
@@ -72,29 +76,29 @@ export const Button: PuckComponent<ButtonProps> = ({
     switch (variant) {
       case "primary":
         return {
-          backgroundColor: backgroundColor || "#000000",
+          backgroundColor: backgroundColor || themePrimary,
           color: textColor || "#ffffff",
-          borderColor: borderColor || backgroundColor || "#000000",
+          borderColor: borderColor || backgroundColor || themePrimary,
           borderWidth: "1px",
         };
       case "secondary":
         return {
-          backgroundColor: backgroundColor || "#f5f5f5",
-          color: textColor || "#000000",
-          borderColor: borderColor || backgroundColor || "#f5f5f5",
+          backgroundColor: backgroundColor || themeQuaternary,
+          color: textColor || themeSecondary,
+          borderColor: borderColor || backgroundColor || themeQuaternary,
           borderWidth: "1px",
         };
       case "outline":
         return {
           backgroundColor: "transparent",
-          color: textColor || borderColor || "#000000",
-          borderColor: borderColor || "#000000",
+          color: textColor || borderColor || themePrimary,
+          borderColor: borderColor || themePrimary,
           borderWidth: "1px",
         };
       case "ghost":
         return {
           backgroundColor: "transparent",
-          color: textColor || "#000000",
+          color: textColor || themeSecondary,
           borderColor: "transparent",
           borderWidth: "0",
         };
@@ -313,6 +317,8 @@ export const ButtonConfig: ComponentConfig<ButtonProps> = {
     },
   },
   defaultProps: {
+    label: "",
+    href: "",
     variant: "primary",
     size: "medium",
     borderRadius: "4px",

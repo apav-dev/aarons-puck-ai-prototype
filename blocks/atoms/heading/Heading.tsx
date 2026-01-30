@@ -1,5 +1,5 @@
 import React, { useEffect, CSSProperties } from "react";
-import { ComponentConfig, PuckComponent } from "@measured/puck";
+import { ComponentConfig, PuckComponent } from "@puckeditor/core";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../../lib/get-class-name-factory";
 import { getGoogleFontsUrl } from "../../../lib/google-fonts";
@@ -234,6 +234,7 @@ export const HeadingConfig: ComponentConfig<HeadingProps> = {
     },
   },
   defaultProps: {
+    text: "",
     level: "h2",
     fontWeight: "700",
     textAlign: "left",

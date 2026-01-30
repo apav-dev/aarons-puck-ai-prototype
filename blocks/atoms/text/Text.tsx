@@ -1,5 +1,5 @@
 import React, { useEffect, CSSProperties, JSX } from "react";
-import { ComponentConfig, PuckComponent } from "@measured/puck";
+import { ComponentConfig, PuckComponent } from "@puckeditor/core";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../../lib/get-class-name-factory";
 import { getGoogleFontsUrl } from "../../../lib/google-fonts";
@@ -40,7 +40,7 @@ export const Text: PuckComponent<TextProps> = ({
     fontWeight,
     fontFamily: fontFamily ? `"${fontFamily}", sans-serif` : undefined,
     color,
-    textAlign,
+    textAlign: textAlign as CSSProperties["textAlign"],
     lineHeight,
     letterSpacing,
     marginTop,

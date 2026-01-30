@@ -1,6 +1,6 @@
 .HeaderSection {
-  background-color: white;
-  border-bottom: 1px solid #e5e7eb;
+  background-color: var(--page-color-tertiary, #ffffff);
+  border-bottom: 1px solid var(--page-color-quaternary, #e5e7eb);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -22,7 +22,7 @@
   justify-content: flex-end;
   padding: 10px 24px;
   gap: 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--page-color-quaternary, #e5e7eb);
 }
 
 @media (min-width: 1024px) {
@@ -33,14 +33,14 @@
 
 .HeaderSection-secondaryLink {
   font-size: 14px;
-  color: #374151;
+  color: var(--page-color-secondary, #374151);
   text-decoration: none;
   white-space: nowrap;
   transition: color 0.2s;
 }
 
 .HeaderSection-secondaryLink:hover {
-  color: #dc2626;
+  color: var(--page-color-primary, #dc2626);
 }
 
 /* Bottom row: logo, primary nav, CTAs */
@@ -76,7 +76,7 @@
   min-width: 40px;
   border-radius: 50%;
   object-fit: cover;
-  background-color: #f3f4f6;
+  background-color: var(--page-color-quaternary, #f3f4f6);
 }
 
 @media (min-width: 1024px) {
@@ -89,7 +89,7 @@
 .HeaderSection-logoText {
   font-size: 18px;
   font-weight: 700;
-  color: #dc2626;
+  color: var(--page-color-primary, #dc2626);
 }
 
 /* Primary nav: visible on desktop when not collapsed */
@@ -124,7 +124,7 @@
 .HeaderSection-primaryLink {
   font-size: 15px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--page-color-secondary, #1f2937);
   text-decoration: none;
   white-space: nowrap;
   transition: color 0.2s;
@@ -132,7 +132,7 @@
 }
 
 .HeaderSection-primaryLink:hover {
-  color: #dc2626;
+  color: var(--page-color-primary, #dc2626);
 }
 
 /* CTAs – always visible on desktop, in flyout on mobile */
@@ -154,7 +154,7 @@
   align-items: center;
   justify-content: center;
   padding: 10px 20px;
-  background-color: #dc2626;
+  background-color: var(--page-color-primary, #dc2626);
   color: white;
   border: none;
   border-radius: 6px;
@@ -167,7 +167,7 @@
 }
 
 .HeaderSection-primaryCta:hover {
-  background-color: #b91c1c;
+  filter: brightness(0.9);
 }
 
 .HeaderSection-secondaryCta {
@@ -175,9 +175,9 @@
   align-items: center;
   justify-content: center;
   padding: 10px 20px;
-  background-color: white;
-  color: #dc2626;
-  border: 1px solid #dc2626;
+  background-color: var(--page-color-tertiary, #ffffff);
+  color: var(--page-color-primary, #dc2626);
+  border: 1px solid var(--page-color-primary, #dc2626);
   border-radius: 6px;
   font-size: 15px;
   font-weight: 600;
@@ -188,7 +188,7 @@
 }
 
 .HeaderSection-secondaryCta:hover {
-  background-color: #fef2f2;
+  background-color: var(--page-color-quaternary, #fef2f2);
 }
 
 /* Hamburger: visible on mobile; on desktop only when primary nav collapsed */
@@ -200,14 +200,14 @@
   height: 44px;
   border: none;
   background: transparent;
-  color: #1f2937;
+  color: var(--page-color-secondary, #1f2937);
   cursor: pointer;
   border-radius: 8px;
   transition: background-color 0.2s;
 }
 
 .HeaderSection-hamburger:hover {
-  background-color: #f3f4f6;
+  background-color: var(--page-color-quaternary, #f3f4f6);
 }
 
 @media (min-width: 1024px) {
@@ -244,7 +244,7 @@
   bottom: 0;
   width: 100%;
   max-width: 400px;
-  background: white;
+  background: var(--page-color-tertiary, #ffffff);
   z-index: 201;
   box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -263,7 +263,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--page-color-quaternary, #e5e7eb);
   flex-shrink: 0;
 }
 
@@ -275,14 +275,14 @@
   height: 44px;
   border: none;
   background: transparent;
-  color: #1f2937;
+  color: var(--page-color-secondary, #1f2937);
   cursor: pointer;
   border-radius: 8px;
   transition: background-color 0.2s;
 }
 
 .HeaderSection-flyoutClose:hover {
-  background-color: #f3f4f6;
+  background-color: var(--page-color-quaternary, #f3f4f6);
 }
 
 .HeaderSection-flyoutBody {
@@ -306,13 +306,13 @@
   padding: 12px 0;
   font-size: 16px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--page-color-secondary, #1f2937);
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .HeaderSection-flyoutPrimaryLink:hover {
-  color: #dc2626;
+  color: var(--page-color-primary, #dc2626);
 }
 
 .HeaderSection-flyoutSecondary {
@@ -325,13 +325,13 @@
   padding: 10px 0;
   font-size: 15px;
   font-weight: 400;
-  color: #374151;
+  color: var(--page-color-secondary, #374151);
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .HeaderSection-flyoutSecondaryLink:hover {
-  color: #dc2626;
+  color: var(--page-color-primary, #dc2626);
 }
 
 .HeaderSection-flyoutCtas {
@@ -340,7 +340,7 @@
   gap: 12px;
   margin-top: auto;
   padding-top: 24px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--page-color-quaternary, #e5e7eb);
 }
 
 .HeaderSection-flyoutPrimaryCta {
@@ -349,7 +349,7 @@
   justify-content: center;
   width: 100%;
   padding: 14px 20px;
-  background-color: #dc2626;
+  background-color: var(--page-color-primary, #dc2626);
   color: white;
   border: none;
   border-radius: 6px;
@@ -361,7 +361,7 @@
 }
 
 .HeaderSection-flyoutPrimaryCta:hover {
-  background-color: #b91c1c;
+  filter: brightness(0.9);
 }
 
 .HeaderSection-flyoutSecondaryCta {
@@ -370,9 +370,9 @@
   justify-content: center;
   width: 100%;
   padding: 14px 20px;
-  background-color: white;
-  color: #dc2626;
-  border: 1px solid #dc2626;
+  background-color: var(--page-color-tertiary, #ffffff);
+  color: var(--page-color-primary, #dc2626);
+  border: 1px solid var(--page-color-primary, #dc2626);
   border-radius: 6px;
   font-size: 16px;
   font-weight: 600;
@@ -382,10 +382,10 @@
 }
 
 .HeaderSection-flyoutSecondaryCta:hover {
-  background-color: #fef2f2;
+  background-color: var(--page-color-quaternary, #fef2f2);
 }
 
 .HeaderSection-chevron {
   flex-shrink: 0;
-  color: #991b1b;
+  color: var(--page-color-primary, #991b1b);
 }

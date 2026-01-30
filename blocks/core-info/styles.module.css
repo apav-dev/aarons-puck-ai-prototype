@@ -1,5 +1,5 @@
 .CoreInfoSection {
-  background-color: white;
+  background-color: var(--page-color-tertiary, #ffffff);
   padding: 64px 0;
 }
 
@@ -18,7 +18,7 @@
 .CoreInfoSection-sectionTitle {
   font-size: 28px;
   font-weight: 700;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   margin: 0;
   line-height: 1.2;
 }
@@ -26,7 +26,7 @@
 .CoreInfoSection-subheading {
   font-size: 16px;
   font-weight: 400;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   margin: 0 0 8px 0;
   line-height: 1.4;
 }
@@ -61,7 +61,7 @@
 .CoreInfoSection-heading {
   font-size: 24px;
   font-weight: 700;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   margin: 0;
   line-height: 1.2;
 }
@@ -69,7 +69,7 @@
 .CoreInfoSection-address {
   font-size: 16px;
   font-weight: 400;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   line-height: 1.5;
   white-space: pre-line;
 }
@@ -77,14 +77,14 @@
 .CoreInfoSection-link {
   font-size: 16px;
   font-weight: 400;
-  color: #dc2626;
+  color: var(--page-color-primary, #dc2626);
   text-decoration: underline;
   cursor: pointer;
   display: inline-block;
 }
 
 .CoreInfoSection-link:hover {
-  color: #b91c1c;
+  opacity: 0.8;
 }
 
 .CoreInfoSection-contactItem {
@@ -93,14 +93,14 @@
   gap: 8px;
   font-size: 16px;
   font-weight: 400;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
 }
 
 .CoreInfoSection-icon {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
 }
 
 .CoreInfoSection-hoursList {
@@ -117,7 +117,7 @@
   gap: 8px;
   font-size: 16px;
   font-weight: 400;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
 }
 
 .CoreInfoSection-day {
@@ -128,7 +128,7 @@
 .CoreInfoSection-specialNote {
   font-size: 16px;
   font-weight: 400;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   margin-top: 8px;
 }
 
@@ -144,7 +144,7 @@
 .CoreInfoSection-serviceItem {
   font-size: 16px;
   font-weight: 400;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   padding-left: 20px;
   position: relative;
 }
@@ -153,7 +153,7 @@
   content: "•";
   position: absolute;
   left: 0;
-  color: #000;
+  color: var(--page-color-secondary, #000000);
   font-weight: 700;
 }
 

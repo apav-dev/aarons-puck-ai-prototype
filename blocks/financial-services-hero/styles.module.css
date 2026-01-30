@@ -1,10 +1,10 @@
 .FinancialServicesHero {
-  --accent-color: #0f172a;
-  --text-color: #0f172a;
-  --muted-color: #475569;
-  --panel-bg: #ffffff;
-  --panel-border: #e2e8f0;
-  --star-color: #16a34a;
+  --accent-color: var(--page-color-primary, #0f172a);
+  --text-color: var(--page-color-secondary, #0f172a);
+  --muted-color: var(--page-color-secondary, #475569);
+  --panel-bg: var(--page-color-tertiary, #ffffff);
+  --panel-border: var(--page-color-quaternary, #e2e8f0);
+  --star-color: var(--page-color-primary, #16a34a);
   background-color: var(--panel-bg);
   color: var(--text-color);
   padding-top: 64px;
@@ -57,7 +57,7 @@
   max-width: 420px;
   border-radius: 16px;
   overflow: hidden;
-  background: #e5e7eb;
+  background: var(--page-color-quaternary, #e5e7eb);
 }
 
 .FinancialServicesHero-image {
@@ -170,7 +170,7 @@
 }
 
 .FinancialServicesHero-star.empty {
-  color: #e2e8f0;
+  color: var(--page-color-quaternary, #e2e8f0);
   fill: none;
   stroke-width: 1.5;
 }

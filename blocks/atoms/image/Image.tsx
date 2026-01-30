@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { CSSProperties } from "react";
-import { ComponentConfig, PuckComponent } from "@measured/puck";
+import { ComponentConfig, PuckComponent } from "@puckeditor/core";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../../lib/get-class-name-factory";
 import classnames from "classnames";
@@ -39,7 +39,7 @@ export const Image: PuckComponent<ImageProps> = ({
   const imageStyle: CSSProperties = {
     width: width || "100%",
     height: height || (aspectRatio ? "auto" : undefined),
-    objectFit,
+    objectFit: objectFit as CSSProperties["objectFit"],
     borderRadius,
     borderWidth: borderWidth ? `${borderWidth}` : undefined,
     borderStyle: borderWidth ? "solid" : undefined,
@@ -182,6 +182,8 @@ export const ImageConfig: ComponentConfig<ImageProps> = {
     },
   },
   defaultProps: {
+    src: "",
+    alt: "",
     objectFit: "cover",
     opacity: 1,
     hoverEffect: "none",

@@ -1,5 +1,5 @@
 import React from "react";
-import { ComponentConfig, Slot } from "@measured/puck";
+import { ComponentConfig, Slot } from "@puckeditor/core";
 import styles from "./styles.module.css";
 import getClassNameFactory from "../../../lib/get-class-name-factory";
 import { Section } from "../section";
