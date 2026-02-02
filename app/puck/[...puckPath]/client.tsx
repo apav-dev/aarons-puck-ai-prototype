@@ -17,8 +17,9 @@ export function Client({ path, data }: { path: string; data: Partial<Data> }) {
       data={data}
       plugins={[aiPlugin, headingAnalyzer, themePlugin]}
       onPublish={async (data) => {
-        await fetch("/puck/api", {
+        await fetch("/api/pages/publish", {
           method: "post",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ data, path }),
         });
       }}

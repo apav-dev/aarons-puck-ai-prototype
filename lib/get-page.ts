@@ -1,11 +1,27 @@
 import { Data } from "@puckeditor/core";
-import fs from "fs";
+import { getConvexClient, queryRef } from "./convex";
 
-// Replace with call to your database
-export const getPage = (path: string) => {
-  const allData: Record<string, Data> | null = fs.existsSync("database.json")
-    ? JSON.parse(fs.readFileSync("database.json", "utf-8"))
-    : null;
+type PageRecord = {
+  draftData?: Data;
+  publishedData?: Data;
+};
 
-  return allData ? allData[path] : null;
+export const getPage = async (
+  path: string,
+  mode: "draft" | "published" = "published"
+) => {
+  const client = getConvexClient();
+  const record = (await client.query(queryRef("pages:getByPath"), {
+    path,
+  })) as PageRecord | null;
+
+  if (!record) {
+    return null;
+  }
+
+  if (mode === "draft") {
+    return record.draftData ?? record.publishedData ?? null;
+  }
+
+  return record.publishedData ?? record.draftData ?? null;
 };

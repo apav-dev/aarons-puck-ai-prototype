@@ -1,0 +1,10 @@
+{
+  "name": "Galaxy Grill Downtown",
+  "address": {
+    "region": "CA",
+    "city": "San Francisco",
+    "line1": "123 Market St",
+    "postalCode": "94103"
+  },
+  "phone": "415-555-0100"
+}

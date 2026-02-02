@@ -1,4 +1,4 @@
-import type { Config } from "@puckeditor/core";
+import type { ComponentConfig, Config } from "@puckeditor/core";
 import { CSSProperties, ReactNode, useEffect } from "react";
 import { Hero, HeroProps } from "./blocks/hero";
 import {
@@ -27,6 +27,7 @@ import { Grid, GridProps } from "./blocks/atoms/grid";
 import { NavHeader, NavHeaderProps } from "./blocks/nav-header";
 import { getGoogleFontsUrl } from "./lib/google-fonts";
 import { DEFAULT_THEME, mergeTheme, PageTheme } from "./lib/theme";
+import { resolveTokensInValue } from "./lib/template-tokens";
 
 // Page Sections Props Type
 type PageSectionsProps = {
@@ -125,9 +126,53 @@ const rootConfig = {
   },
 };
 
+const withTokenResolution = (
+  component: ComponentConfig<any>
+): ComponentConfig<any> => {
+  const originalResolveData = component.resolveData;
+
+  return {
+    ...component,
+    resolveData: async (data, params) => {
+      const base = originalResolveData
+        ? await originalResolveData(data, params)
+        : data;
+      const props = base?.props ?? data.props;
+      const location = params?.metadata?.location as
+        | Record<string, unknown>
+        | undefined;
+
+      if (!location) {
+        return base;
+      }
+
+      const resolvedProps = resolveTokensInValue(props, location);
+      if (resolvedProps === props) {
+        return base;
+      }
+
+      return {
+        ...base,
+        props: resolvedProps,
+      };
+    },
+  };
+};
+
+const applyTokenResolution = <T extends Record<string, ComponentConfig<any>>>(
+  components: T
+): T => {
+  return Object.fromEntries(
+    Object.entries(components).map(([key, component]) => [
+      key,
+      withTokenResolution(component),
+    ])
+  ) as T;
+};
+
 // Full Pages Config: Only Page Sections
 const fullPagesConfig: Config<PageSectionsProps, RootProps> = {
-  components: {
+  components: applyTokenResolution({
     Header: NavHeader,
     Hero: Hero,
     FinancialServicesHero: FinancialServicesHero,
@@ -140,13 +185,13 @@ const fullPagesConfig: Config<PageSectionsProps, RootProps> = {
     PhotoGridSection: PhotoGridSection,
     AboutColumnsSection: AboutColumnsSection,
     ProfessionalAboutSection: ProfessionalAboutSection,
-  },
+  }),
   root: rootConfig,
 };
 
 // Atoms Config: Only Atomic Components
 const atomsConfig: Config<AtomsProps, RootProps> = {
-  components: {
+  components: applyTokenResolution({
     Flex: Flex,
     Grid: Grid,
     // Card: Card,
@@ -155,7 +200,7 @@ const atomsConfig: Config<AtomsProps, RootProps> = {
     Button: Button,
     Image: Image,
     Spacer: Spacer,
-  },
+  }),
   root: rootConfig,
 };
 
