@@ -7,7 +7,7 @@
  * All routes produced by this page are statically rendered using incremental
  * static site generation. After the first visit, the page will be cached as
  * a static file. Subsequent visits will receive the cache. Publishing a page
- * will invalidate the cache as the page is written in /api/puck/route.ts
+ * will invalidate the cache via /api/pages/publish.
  */
 
 import { Client } from "./client";

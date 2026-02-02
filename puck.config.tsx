@@ -17,6 +17,7 @@ import {
   ProfessionalAboutSection,
   ProfessionalAboutSectionProps,
 } from "./blocks/professional-about";
+import { Directory, DirectorySectionProps } from "./blocks/directory";
 import { Heading, HeadingProps } from "./blocks/atoms/heading";
 import { Text, TextProps } from "./blocks/atoms/text";
 import { Button, ButtonProps } from "./blocks/atoms/button";
@@ -43,6 +44,7 @@ type PageSectionsProps = {
   PhotoGridSection: PhotoGridSectionProps;
   AboutColumnsSection: AboutColumnsSectionProps;
   ProfessionalAboutSection: ProfessionalAboutSectionProps;
+  Directory: DirectorySectionProps;
 };
 
 // Atoms Props Type
@@ -171,9 +173,10 @@ const applyTokenResolution = <T extends Record<string, ComponentConfig<any>>>(
 };
 
 // Full Pages Config: Only Page Sections
-const fullPagesConfig: Config<PageSectionsProps, RootProps> = {
+export const fullPagesConfig: Config<PageSectionsProps, RootProps> = {
   components: applyTokenResolution({
     Header: NavHeader,
+    Directory: Directory,
     Hero: Hero,
     FinancialServicesHero: FinancialServicesHero,
     CoreInfoSection: CoreInfoSection,
@@ -189,8 +192,21 @@ const fullPagesConfig: Config<PageSectionsProps, RootProps> = {
   root: rootConfig,
 };
 
+type CityPageSectionsProps = {
+  Header: NavHeaderProps;
+  Directory: DirectorySectionProps;
+};
+
+export const cityPagesConfig: Config<CityPageSectionsProps, RootProps> = {
+  components: applyTokenResolution({
+    Header: NavHeader,
+    Directory: Directory,
+  }),
+  root: rootConfig,
+};
+
 // Atoms Config: Only Atomic Components
-const atomsConfig: Config<AtomsProps, RootProps> = {
+export const atomsConfig: Config<AtomsProps, RootProps> = {
   components: applyTokenResolution({
     Flex: Flex,
     Grid: Grid,

@@ -82,6 +82,19 @@ export const seedSampleLocations = mutation({
       });
     }
 
+    const cityPageGroup = await ctx.db
+      .query("pageGroups")
+      .withIndex("by_slug", (q) => q.eq("slug", "city"))
+      .unique();
+
+    if (!cityPageGroup) {
+      await ctx.db.insert("pageGroups", {
+        slug: "city",
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+
     for (const location of sampleLocations) {
       await ctx.db.insert("locations", {
         pageGroupSlug: slug,

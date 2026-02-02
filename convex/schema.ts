@@ -28,7 +28,8 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_page_group_slug", ["pageGroupSlug"])
-    .index("by_slug", ["slug.region", "slug.city", "slug.line1"]),
+    .index("by_slug", ["slug.region", "slug.city", "slug.line1"])
+    .index("by_city", ["slug.region", "slug.city"]),
   pages: defineTable({
     path: v.string(),
     draftData: v.optional(v.any()),

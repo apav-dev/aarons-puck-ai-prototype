@@ -1,0 +1,83 @@
+.DirectorySection {
+  padding: 72px 24px 96px;
+  background-color: var(--page-color-tertiary, #ffffff);
+  color: var(--page-color-secondary, #0f172a);
+  font-family: var(--page-font-body, "Inter", sans-serif);
+}
+
+.DirectorySection-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.DirectorySection-title {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--page-color-secondary, #0f172a);
+  font-family: var(--page-font-heading, "Inter", sans-serif);
+}
+
+.DirectorySection-description {
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+  color: var(--page-color-secondary, #1f2937);
+  max-width: 720px;
+}
+
+.DirectorySection-empty {
+  padding: 32px;
+  border: 1px dashed var(--page-color-quaternary, #e5e7eb);
+  border-radius: 16px;
+  text-align: center;
+  font-size: 15px;
+  color: var(--page-color-secondary, #475569);
+  background: color-mix(
+    in srgb,
+    var(--page-color-quaternary, #f3f4f6) 60%,
+    transparent
+  );
+}
+
+.DirectorySection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.DirectorySection-card {
+  border: 1px solid var(--page-color-quaternary, #e5e7eb);
+  border-radius: 16px;
+  padding: 24px;
+  background: var(--page-color-tertiary, #ffffff);
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.05);
+}
+
+.DirectorySection-cardTitle {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 12px;
+  color: var(--page-color-secondary, #0f172a);
+  font-family: var(--page-font-heading, "Inter", sans-serif);
+}
+
+.DirectorySection-cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 15px;
+  color: var(--page-color-secondary, #334155);
+}
+
+@media (min-width: 768px) {
+  .DirectorySection {
+    padding: 96px 32px 120px;
+  }
+
+  .DirectorySection-title {
+    font-size: 40px;
+  }
+}
