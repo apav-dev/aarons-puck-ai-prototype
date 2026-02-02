@@ -154,8 +154,7 @@
   transition: transform 0.2s, color 0.2s;
 }
 
-.NavHeaderSection-primaryFlyout[data-headlessui-state="open"]
-  .NavHeaderSection-primaryLinkIcon {
+.NavHeaderSection-primaryFlyout[data-headlessui-state="open"] .NavHeaderSection-primaryLinkIcon {
   transform: rotate(180deg);
   color: var(--page-color-primary, #dc2626);
 }

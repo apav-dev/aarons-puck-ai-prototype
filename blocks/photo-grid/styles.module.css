@@ -178,4 +178,3 @@
 .PhotoGridSection-carouselIndicator:hover:not([data-active="true"]) {
   background-color: var(--page-color-quaternary, #9CA3AF);
 }
-

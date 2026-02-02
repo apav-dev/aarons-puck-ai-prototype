@@ -54,7 +54,7 @@
   padding-top: 12px;
 }
 
-.ProfessionalAboutSection-sidebarSection + .ProfessionalAboutSection-sidebarSection {
+.ProfessionalAboutSection-sidebarSection+.ProfessionalAboutSection-sidebarSection {
   border-top: 1px solid var(--professional-about-divider);
 }
 
