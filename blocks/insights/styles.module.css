@@ -499,9 +499,7 @@
 
 .InsightsSection-immersiveReadMore:hover {
   opacity: 0.8;
-}
-
-.InsightsSection-immersiveArrow {
+}.InsightsSection-immersiveArrow {
   width: 14px;
   height: 14px;
   flex-shrink: 0;

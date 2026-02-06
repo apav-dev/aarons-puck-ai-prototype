@@ -8,9 +8,13 @@
  * @module
  */
 
+import type * as articles from "../articles.js";
 import type * as locations from "../locations.js";
 import type * as pageGroups from "../pageGroups.js";
 import type * as pages from "../pages.js";
+import type * as products from "../products.js";
+import type * as promotions from "../promotions.js";
+import type * as relationships from "../relationships.js";
 import type * as seed from "../seed.js";
 
 import type {
@@ -20,9 +24,13 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  articles: typeof articles;
   locations: typeof locations;
   pageGroups: typeof pageGroups;
   pages: typeof pages;
+  products: typeof products;
+  promotions: typeof promotions;
+  relationships: typeof relationships;
   seed: typeof seed;
 }>;
 
