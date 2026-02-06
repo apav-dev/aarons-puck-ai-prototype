@@ -10,6 +10,7 @@ import "@puckeditor/plugin-ai/styles.css";
 import "@puckeditor/plugin-heading-analyzer/dist/index.css";
 import { cityPagesConfig, fullPagesConfig } from "../../puck.config";
 import themePlugin from "../../theme-plugin/ThemePlugin";
+import { ConvexFieldProvider } from "../../lib/fields/ConvexFieldContext";
 
 type Location = {
   _id: string;
@@ -203,180 +204,186 @@ export function Client({
   };
 
   return (
-    <Puck
-      key={`${pageType}-${puckKey}`}
-      config={pageType === "city" ? cityPagesConfig : fullPagesConfig}
-      data={resolvedData}
-      metadata={
-        pageType === "city"
-          ? { city: selectedCity, locations: cityLocations }
-          : { location: selectedLocation }
-      }
-      plugins={[aiPlugin, headingAnalyzer, themePlugin]}
-      overrides={{
-        headerActions: ({ children }) => {
-          return (
-            <>
-              <label
-                htmlFor="page-type-select"
-                style={{
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  color: "var(--puck-color-grey-03)",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                Page type
-              </label>
-              <select
-                id="page-type-select"
-                value={pageType}
-                onChange={(event) =>
-                  switchPageType(event.target.value as PageType)
-                }
-                style={{
-                  padding: "8px 12px",
-                  fontSize: "14px",
-                  border: "1px solid var(--puck-color-grey-09)",
-                  borderRadius: "4px",
-                  backgroundColor: "var(--puck-color-white)",
-                  color: "var(--puck-color-grey-03)",
-                  cursor: "pointer",
-                  minWidth: "160px",
-                  fontFamily: "inherit",
-                }}
-              >
-                <option value="location">Location page</option>
-                <option value="city">City directory</option>
-              </select>
-              {pageType === "location" ? (
-                <>
-                  <label
-                    htmlFor="location-select"
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: 500,
-                      color: "var(--puck-color-grey-03)",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    Preview location
-                  </label>
-                  <select
-                    id="location-select"
-                    value={selectedLocationId ?? ""}
-                    onChange={(event) => setSelectedLocationId(event.target.value)}
-                    disabled={locations.length === 0}
-                    style={{
-                      padding: "8px 12px",
-                      fontSize: "14px",
-                      border: "1px solid var(--puck-color-grey-09)",
-                      borderRadius: "4px",
-                      backgroundColor: "var(--puck-color-white)",
-                      color: "var(--puck-color-grey-03)",
-                      cursor: "pointer",
-                      minWidth: "220px",
-                      fontFamily: "inherit",
-                    }}
-                  >
-                    {locations.length === 0 ? (
-                      <option value="">No locations</option>
-                    ) : (
-                      locations.map((location) => (
-                        <option key={location._id} value={location._id}>
-                          {location.name} — {location.address.line1},{" "}
-                          {location.address.city}
-                        </option>
-                      ))
-                    )}
-                  </select>
-                </>
-              ) : (
-                <>
-                  <label
-                    htmlFor="city-select"
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: 500,
-                      color: "var(--puck-color-grey-03)",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    Preview city
-                  </label>
-                  <select
-                    id="city-select"
-                    value={selectedCityKey}
-                    onChange={(event) => setSelectedCityKey(event.target.value)}
-                    disabled={cities.length === 0}
-                    style={{
-                      padding: "8px 12px",
-                      fontSize: "14px",
-                      border: "1px solid var(--puck-color-grey-09)",
-                      borderRadius: "4px",
-                      backgroundColor: "var(--puck-color-white)",
-                      color: "var(--puck-color-grey-03)",
-                      cursor: "pointer",
-                      minWidth: "200px",
-                      fontFamily: "inherit",
-                    }}
-                  >
-                    {cities.length === 0 ? (
-                      <option value="">No cities</option>
-                    ) : (
-                      cities.map((city) => (
-                        <option key={getCityKey(city)} value={getCityKey(city)}>
-                          {city.city}, {city.region}
-                        </option>
-                      ))
-                    )}
-                  </select>
-                </>
-              )}
-              {previewPath && (
-                <Button href={previewPath} newTab={true} variant="secondary">
-                  Open Preview
-                </Button>
-              )}
-              <Button
-                variant="secondary"
-                onClick={clearLocalChanges}
-                disabled={!hasLocalChanges}
-              >
-                Clear Local Changes
-              </Button>
-              {children}
-            </>
-          );
-        },
-      }}
-      onChange={(nextData) => {
-        const storageKey = getDraftStorageKey(pageType);
-        sessionDrafts.current[pageType] = nextData;
-        writeStorageJson(storageKey, nextData);
-        const nextTheme = nextData?.root?.props?.theme;
-        if (nextTheme) {
-          sessionTheme.current = nextTheme;
-          writeStorageJson(themeStorageKey, nextTheme);
-        }
-        setHasLocalChanges(true);
-      }}
-      onPublish={async (nextData) => {
-        const endpoint =
+    <ConvexFieldProvider
+      location={pageType === "location" ? selectedLocation ?? null : null}
+    >
+      <Puck
+        key={`${pageType}-${puckKey}`}
+        config={pageType === "city" ? cityPagesConfig : fullPagesConfig}
+        data={resolvedData}
+        metadata={
           pageType === "city"
-            ? "/api/page-groups/city/publish"
-            : "/api/page-groups/location/publish";
-        await fetch(endpoint, {
-          method: "post",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ data: nextData }),
-        });
-        const storageKey = getDraftStorageKey(pageType);
-        removeStorageKey(storageKey);
-        sessionDrafts.current[pageType] = nextData;
-        setLocalData(nextData);
-        setHasLocalChanges(Boolean(readStorageJson(themeStorageKey)));
-      }}
-    />
+            ? { city: selectedCity, locations: cityLocations }
+            : { location: selectedLocation }
+        }
+        plugins={[aiPlugin, headingAnalyzer, themePlugin]}
+        overrides={{
+          headerActions: ({ children }) => {
+            return (
+              <>
+                <label
+                  htmlFor="page-type-select"
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: 500,
+                    color: "var(--puck-color-grey-03)",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Page type
+                </label>
+                <select
+                  id="page-type-select"
+                  value={pageType}
+                  onChange={(event) =>
+                    switchPageType(event.target.value as PageType)
+                  }
+                  style={{
+                    padding: "8px 12px",
+                    fontSize: "14px",
+                    border: "1px solid var(--puck-color-grey-09)",
+                    borderRadius: "4px",
+                    backgroundColor: "var(--puck-color-white)",
+                    color: "var(--puck-color-grey-03)",
+                    cursor: "pointer",
+                    minWidth: "160px",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  <option value="location">Location page</option>
+                  <option value="city">City directory</option>
+                </select>
+                {pageType === "location" ? (
+                  <>
+                    <label
+                      htmlFor="location-select"
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        color: "var(--puck-color-grey-03)",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      Preview location
+                    </label>
+                    <select
+                      id="location-select"
+                      value={selectedLocationId ?? ""}
+                      onChange={(event) =>
+                        setSelectedLocationId(event.target.value)
+                      }
+                      disabled={locations.length === 0}
+                      style={{
+                        padding: "8px 12px",
+                        fontSize: "14px",
+                        border: "1px solid var(--puck-color-grey-09)",
+                        borderRadius: "4px",
+                        backgroundColor: "var(--puck-color-white)",
+                        color: "var(--puck-color-grey-03)",
+                        cursor: "pointer",
+                        minWidth: "220px",
+                        fontFamily: "inherit",
+                      }}
+                    >
+                      {locations.length === 0 ? (
+                        <option value="">No locations</option>
+                      ) : (
+                        locations.map((location) => (
+                          <option key={location._id} value={location._id}>
+                            {location.name} — {location.address.line1},{" "}
+                            {location.address.city}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </>
+                ) : (
+                  <>
+                    <label
+                      htmlFor="city-select"
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        color: "var(--puck-color-grey-03)",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      Preview city
+                    </label>
+                    <select
+                      id="city-select"
+                      value={selectedCityKey}
+                      onChange={(event) => setSelectedCityKey(event.target.value)}
+                      disabled={cities.length === 0}
+                      style={{
+                        padding: "8px 12px",
+                        fontSize: "14px",
+                        border: "1px solid var(--puck-color-grey-09)",
+                        borderRadius: "4px",
+                        backgroundColor: "var(--puck-color-white)",
+                        color: "var(--puck-color-grey-03)",
+                        cursor: "pointer",
+                        minWidth: "200px",
+                        fontFamily: "inherit",
+                      }}
+                    >
+                      {cities.length === 0 ? (
+                        <option value="">No cities</option>
+                      ) : (
+                        cities.map((city) => (
+                          <option key={getCityKey(city)} value={getCityKey(city)}>
+                            {city.city}, {city.region}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </>
+                )}
+                {previewPath && (
+                  <Button href={previewPath} newTab={true} variant="secondary">
+                    Open Preview
+                  </Button>
+                )}
+                <Button
+                  variant="secondary"
+                  onClick={clearLocalChanges}
+                  disabled={!hasLocalChanges}
+                >
+                  Clear Local Changes
+                </Button>
+                {children}
+              </>
+            );
+          },
+        }}
+        onChange={(nextData) => {
+          const storageKey = getDraftStorageKey(pageType);
+          sessionDrafts.current[pageType] = nextData;
+          writeStorageJson(storageKey, nextData);
+          const nextTheme = nextData?.root?.props?.theme;
+          if (nextTheme) {
+            sessionTheme.current = nextTheme;
+            writeStorageJson(themeStorageKey, nextTheme);
+          }
+          setHasLocalChanges(true);
+        }}
+        onPublish={async (nextData) => {
+          const endpoint =
+            pageType === "city"
+              ? "/api/page-groups/city/publish"
+              : "/api/page-groups/location/publish";
+          await fetch(endpoint, {
+            method: "post",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ data: nextData }),
+          });
+          const storageKey = getDraftStorageKey(pageType);
+          removeStorageKey(storageKey);
+          sessionDrafts.current[pageType] = nextData;
+          setLocalData(nextData);
+          setHasLocalChanges(Boolean(readStorageJson(themeStorageKey)));
+        }}
+      />
+    </ConvexFieldProvider>
   );
 }

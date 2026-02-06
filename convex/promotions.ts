@@ -17,6 +17,14 @@ export const getById = query({
   },
 });
 
+export const getByIds = query({
+  args: { ids: v.array(v.id("promotions")) },
+  handler: async (ctx, { ids }) => {
+    const records = await Promise.all(ids.map((id) => ctx.db.get(id)));
+    return records.filter(Boolean);
+  },
+});
+
 // ── Mutations ────────────────────────────────────────────────────────
 
 export const create = mutation({

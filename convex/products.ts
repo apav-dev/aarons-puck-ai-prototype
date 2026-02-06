@@ -17,6 +17,14 @@ export const getById = query({
   },
 });
 
+export const getByIds = query({
+  args: { ids: v.array(v.id("products")) },
+  handler: async (ctx, { ids }) => {
+    const records = await Promise.all(ids.map((id) => ctx.db.get(id)));
+    return records.filter(Boolean);
+  },
+});
+
 export const listByCategory = query({
   args: { category: v.string() },
   handler: async (ctx, { category }) => {

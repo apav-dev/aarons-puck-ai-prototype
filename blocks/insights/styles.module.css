@@ -495,9 +495,7 @@
   cursor: pointer;
   transition: opacity 0.2s;
   margin-top: 4px;
-}
-
-.InsightsSection-immersiveReadMore:hover {
+}.InsightsSection-immersiveReadMore:hover {
   opacity: 0.8;
 }.InsightsSection-immersiveArrow {
   width: 14px;

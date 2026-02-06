@@ -11,6 +11,10 @@ import { SimpleVariant } from "./variants/SimpleVariant";
 import { CardsVariant } from "./variants/CardsVariant";
 import { GridVariant } from "./variants/GridVariant";
 import { OverlayVariant } from "./variants/OverlayVariant";
+import ConvexMultiSelect from "../../lib/fields/ConvexMultiSelect";
+import { ConvexOption } from "../../lib/fields/ConvexSingleSelect";
+import { getConvexClient, queryRef } from "../../lib/convex";
+import { ConvexMultiValue } from "../../lib/fields/convex-field-helpers";
 
 const getClassName = getClassNameFactory("ProductsSection", styles);
 
@@ -144,6 +148,28 @@ export const ProductsSection: PuckComponent<ProductsSectionProps> = ({
 
 export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
   fields: {
+    convexProducts: {
+      type: "custom",
+      label: "Product Source",
+      entityLabel: "Products",
+      listQueryName: "products:list",
+      currentForLocationQueryName: "relationships:productsForLocation",
+      linkMutationName: "relationships:linkLocationProduct",
+      unlinkMutationName: "relationships:unlinkLocationProduct",
+      locationIdArg: "locationId",
+      itemIdArg: "productId",
+      mapItemToOption: (item: Record<string, unknown>): ConvexOption => ({
+        id: String(item._id),
+        label: String(item.name ?? "Untitled product"),
+        imageUrl: item.image ? String(item.image) : undefined,
+        raw: item,
+      }),
+      render: (params: {
+        field: unknown;
+        value: ConvexMultiValue | undefined;
+        onChange: (value: ConvexMultiValue) => void;
+      }) => <ConvexMultiSelect {...params} />,
+    },
     variant: {
       type: "radio",
       label: "Variant",
@@ -316,6 +342,7 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
     },
   },
   defaultProps: {
+    convexProducts: { mode: "all" },
     variant: "cards",
     heading: "Featured Products at Business Geomodifier",
     subheadingPosition: "above",
@@ -370,6 +397,68 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
         colorSwatches: [],
       },
     ],
+  },
+  resolveData: async ({ props }, { changed, metadata }) => {
+    const source = props.convexProducts;
+    if (!source) {
+      return { props, readOnly: { products: false } };
+    }
+    if (changed && !changed.convexProducts) {
+      return { props };
+    }
+
+    const client = getConvexClient();
+    let records: Record<string, unknown>[] = [];
+
+    if (source.mode === "all" && source.selectedIds?.length) {
+      records = (await client.query(queryRef("products:getByIds"), {
+        ids: source.selectedIds,
+      })) as Record<string, unknown>[];
+    }
+
+    if (source.mode === "perLocation") {
+      const locationId = metadata?.location?._id;
+      if (locationId) {
+        const products = (await client.query(
+          queryRef("relationships:productsForLocation"),
+          { locationId }
+        )) as Record<string, unknown>[];
+        const order = source.perLocationSelectedIds?.[locationId] ?? [];
+        const ordered = [
+          ...order
+            .map((id) => products.find((product) => String(product._id) === id))
+            .filter(Boolean),
+          ...products.filter(
+            (product) => !order.includes(String(product._id))
+          ),
+        ];
+        records = ordered as Record<string, unknown>[];
+      }
+    }
+
+    if (!records.length) {
+      return { props, readOnly: { products: false } };
+    }
+
+    const products = records.map((product) => ({
+      title: String(product.name ?? "Product"),
+      category: String(product.category ?? ""),
+      description: String(product.description ?? ""),
+      imageUrl: String(product.image ?? ""),
+      link: "#",
+      price:
+        product.price === null || product.price === undefined
+          ? undefined
+          : `$${String(product.price)}`,
+    }));
+
+    return {
+      props: {
+        ...props,
+        products,
+      },
+      readOnly: { products: true },
+    };
   },
   resolveFields: (data) => {
     const { variant } = data.props;

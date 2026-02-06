@@ -5,6 +5,7 @@ import { Client } from "../../../[...puckPath]/client";
 import { getConvexClient, queryRef } from "../../../../lib/convex";
 
 type Location = {
+  _id: string;
   name: string;
   address: {
     region: string;

@@ -9,6 +9,11 @@ import { CompactVariant } from "./variants/CompactVariant";
 import { ClassicVariant } from "./variants/ClassicVariant";
 import { ImmersiveVariant } from "./variants/ImmersiveVariant";
 import { SpotlightVariant } from "./variants/SpotlightVariant";
+import ConvexSingleSelect, {
+  ConvexOption,
+} from "../../lib/fields/ConvexSingleSelect";
+import { getConvexClient, queryRef } from "../../lib/convex";
+import { ConvexSingleValue } from "../../lib/fields/convex-field-helpers";
 
 const getClassName = getClassNameFactory("PromoSection", styles);
 
@@ -95,6 +100,28 @@ export const PromoSection: PuckComponent<PromoSectionProps> = ({
 
 export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
   fields: {
+    convexPromotion: {
+      type: "custom",
+      label: "Promotion Source",
+      entityLabel: "Promotion",
+      listQueryName: "promotions:list",
+      currentForLocationQueryName: "relationships:promotionsForLocation",
+      linkMutationName: "relationships:linkLocationPromotion",
+      unlinkMutationName: "relationships:unlinkLocationPromotion",
+      locationIdArg: "locationId",
+      itemIdArg: "promotionId",
+      mapItemToOption: (item: Record<string, unknown>): ConvexOption => ({
+        id: String(item._id),
+        label: String(item.name ?? "Untitled promotion"),
+        imageUrl: item.image ? String(item.image) : undefined,
+        raw: item,
+      }),
+      render: (params: {
+        field: unknown;
+        value: ConvexSingleValue | undefined;
+        onChange: (value: ConvexSingleValue) => void;
+      }) => <ConvexSingleSelect {...params} />,
+    },
     variant: {
       type: "radio",
       label: "Variant",
@@ -152,6 +179,7 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
     },
   },
   defaultProps: {
+    convexPromotion: { mode: "all" },
     variant: "compact",
     title: "Featured Promotion",
     subheadingPosition: "above",
@@ -164,6 +192,55 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
     },
     imageUrl:
       "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop",
+  },
+  resolveData: async ({ props }, { changed, metadata }) => {
+    const source = props.convexPromotion;
+    if (!source) {
+      return {
+        props,
+        readOnly: { title: false, description: false, imageUrl: false },
+      };
+    }
+    if (changed && !changed.convexPromotion) {
+      return { props };
+    }
+
+    const client = getConvexClient();
+    let promotion: Record<string, unknown> | null = null;
+
+    if (source.mode === "all" && source.selectedId) {
+      promotion = (await client.query(queryRef("promotions:getById"), {
+        id: source.selectedId,
+      })) as Record<string, unknown> | null;
+    }
+
+    if (source.mode === "perLocation") {
+      const locationId = metadata?.location?._id;
+      if (locationId) {
+        const promotions = (await client.query(
+          queryRef("relationships:promotionsForLocation"),
+          { locationId }
+        )) as Record<string, unknown>[];
+        promotion = promotions[0] ?? null;
+      }
+    }
+
+    if (!promotion) {
+      return {
+        props,
+        readOnly: { title: false, description: false, imageUrl: false },
+      };
+    }
+
+    return {
+      props: {
+        ...props,
+        title: String(promotion.name ?? props.title),
+        description: String(promotion.description ?? props.description ?? ""),
+        imageUrl: String(promotion.image ?? props.imageUrl ?? ""),
+      },
+      readOnly: { title: true, description: true, imageUrl: true },
+    };
   },
   render: PromoSection,
 };
