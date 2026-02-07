@@ -25,7 +25,7 @@ export type ProductsSectionProps = {
   subheading?: string;
   subheadingPosition?: "above" | "below";
   headingAlign?: "left" | "center";
-  convexProducts?: import("../../lib/fields/convex-field-helpers").ConvexMultiValue;
+  contentSource?: import("../../lib/fields/content-mode-types").ContentSourceValue;
   products: ProductItem[];
   variant: ProductVariant;
   // Visibility options

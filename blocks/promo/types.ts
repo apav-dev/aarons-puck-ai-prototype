@@ -7,7 +7,7 @@ export type PromoButton = {
 
 export type PromoSectionProps = {
   variant: PromoVariant;
-  convexPromotion?: import("../../lib/fields/convex-field-helpers").ConvexSingleValue;
+  contentSource?: import("../../lib/fields/content-mode-types").ContentSourceValue;
   title: string;
   subheading?: string;
   subheadingPosition?: "above" | "below";

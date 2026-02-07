@@ -11,10 +11,12 @@ import { SimpleVariant } from "./variants/SimpleVariant";
 import { CardsVariant } from "./variants/CardsVariant";
 import { GridVariant } from "./variants/GridVariant";
 import { OverlayVariant } from "./variants/OverlayVariant";
-import ConvexMultiSelect from "../../lib/fields/ConvexMultiSelect";
-import { ConvexOption } from "../../lib/fields/ConvexSingleSelect";
+import ContentModeField from "../../lib/fields/ContentModeField";
 import { getConvexClient, queryRef } from "../../lib/convex";
-import { ConvexMultiValue } from "../../lib/fields/convex-field-helpers";
+import {
+  ContentModeFieldConfig,
+  ContentOption,
+} from "../../lib/fields/content-mode-types";
 
 const getClassName = getClassNameFactory("ProductsSection", styles);
 
@@ -148,27 +150,28 @@ export const ProductsSection: PuckComponent<ProductsSectionProps> = ({
 
 export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
   fields: {
-    convexProducts: {
+    contentSource: {
       type: "custom",
-      label: "Product Source",
+      label: "Products",
       entityLabel: "Products",
+      selectionMode: "multiple",
       listQueryName: "products:list",
       currentForLocationQueryName: "relationships:productsForLocation",
       linkMutationName: "relationships:linkLocationProduct",
       unlinkMutationName: "relationships:unlinkLocationProduct",
       locationIdArg: "locationId",
       itemIdArg: "productId",
-      mapItemToOption: (item: Record<string, unknown>): ConvexOption => ({
+      mapItemToOption: (item: Record<string, unknown>): ContentOption => ({
         id: String(item._id),
         label: String(item.name ?? "Untitled product"),
         imageUrl: item.image ? String(item.image) : undefined,
         raw: item,
       }),
       render: (params: {
-        field: unknown;
-        value: ConvexMultiValue | undefined;
-        onChange: (value: ConvexMultiValue) => void;
-      }) => <ConvexMultiSelect {...params} />,
+        field: ContentModeFieldConfig;
+        value: unknown;
+        onChange: (value: unknown) => void;
+      }) => <ContentModeField {...params} />,
     },
     variant: {
       type: "radio",
@@ -289,7 +292,7 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
     },
     products: {
       type: "array",
-      label: "Products",
+      label: "",
       min: 1,
       max: 6,
       getItemSummary: (item) => item.title || "Product",
@@ -342,7 +345,7 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
     },
   },
   defaultProps: {
-    convexProducts: { mode: "all" },
+    contentSource: { source: "static", dynamicMode: "all" },
     variant: "cards",
     heading: "Featured Products at Business Geomodifier",
     subheadingPosition: "above",
@@ -399,24 +402,26 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
     ],
   },
   resolveData: async ({ props }, { changed, metadata }) => {
-    const source = props.convexProducts;
-    if (!source) {
+    const source = props.contentSource;
+    if (!source || source.source === "static") {
       return { props, readOnly: { products: false } };
     }
-    if (changed && !changed.convexProducts) {
+    if (changed && !changed.contentSource) {
       return { props };
     }
 
     const client = getConvexClient();
     let records: Record<string, unknown>[] = [];
 
-    if (source.mode === "all" && source.selectedIds?.length) {
+    const mode = source.dynamicMode ?? "all";
+
+    if (mode === "all" && source.selectedIds?.length) {
       records = (await client.query(queryRef("products:getByIds"), {
         ids: source.selectedIds,
       })) as Record<string, unknown>[];
     }
 
-    if (source.mode === "perLocation") {
+    if (mode === "perLocation") {
       const locationId = metadata?.location?._id;
       if (locationId) {
         const products = (await client.query(
@@ -461,11 +466,15 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
     };
   },
   resolveFields: (data) => {
-    const { variant } = data.props;
+    const { variant, contentSource } = data.props;
     const baseFields = ProductsSectionConfig.fields;
 
     // Filter fields based on variant
     const filteredFields: typeof baseFields = { ...baseFields };
+
+    if (contentSource?.source === "dynamic") {
+      delete filteredFields.products;
+    }
 
     // Color swatches only for simple variant (not shown on grid/cards/overlay)
     if (variant !== "simple") {
