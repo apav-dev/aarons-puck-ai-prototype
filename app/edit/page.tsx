@@ -1,12 +1,15 @@
 import { Metadata } from "next";
 import { Data } from "@puckeditor/core";
 import { Client } from "./client";
-import { getConvexClient, queryRef } from "../../lib/convex";
+import { getSupabaseClient } from "../../lib/supabase";
 
-type PageGroupRecord = { draftData?: Data; publishedData?: Data } | null;
+type PageGroupRow = {
+  draft_data?: Data | null;
+  published_data?: Data | null;
+} | null;
 
 type Location = {
-  _id: string;
+  id: string;
   name: string;
   address: {
     region: string;
@@ -41,31 +44,50 @@ export default async function Page({
   const resolvedSearchParams = await searchParams;
   const pageType =
     resolvedSearchParams?.pageType === "city" ? "city" : "location";
-  const client = getConvexClient();
+  const supabase = getSupabaseClient();
 
-  const pageGroup = (await client.query(queryRef("pageGroups:getBySlug"), {
-    slug: pageType,
-  })) as PageGroupRecord;
+  const { data: pageGroup } = await supabase
+    .from("page_groups")
+    .select("draft_data, published_data")
+    .eq("slug", pageType)
+    .maybeSingle();
 
-  const locations = (await client.query(queryRef("locations:listForGroup"), {
-    pageGroupSlug: "location",
-  })) as Location[] | null;
+  const { data: locationsRows } = await supabase
+    .from("locations")
+    .select("*")
+    .eq("page_group_slug", "location");
 
-  const cities = (await client.query(queryRef("locations:listCities"), {
-    pageGroupSlug: "location",
-  })) as CitySummary[] | null;
+  const locations: Location[] = (locationsRows ?? []).map((row) => ({
+    id: row.id,
+    name: row.name,
+    address: row.address as Location["address"],
+    slug: row.slug as Location["slug"],
+  }));
+
+  const citiesMap = new Map<string, CitySummary>();
+  for (const loc of locations) {
+    const key = `${loc.slug.region}:${loc.slug.city}`;
+    if (!citiesMap.has(key)) {
+      citiesMap.set(key, {
+        region: loc.address.region,
+        city: loc.address.city,
+        slug: { region: loc.slug.region, city: loc.slug.city },
+      });
+    }
+  }
+  const cities = Array.from(citiesMap.values());
 
   const data =
-    pageGroup?.draftData ??
-    pageGroup?.publishedData ??
+    (pageGroup as PageGroupRow)?.draft_data ??
+    (pageGroup as PageGroupRow)?.published_data ??
     ({ content: [], root: { props: {} }, zones: {} } as Data);
 
   return (
     <Client
       pageType={pageType}
       data={data}
-      locations={locations ?? []}
-      cities={cities ?? []}
+      locations={locations}
+      cities={cities}
     />
   );
 }

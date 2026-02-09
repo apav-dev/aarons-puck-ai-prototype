@@ -14,7 +14,8 @@ import { Client } from "./client";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { getPage } from "../../lib/get-page";
-import { getConvexClient, queryRef } from "../../lib/convex";
+import { getSupabaseClient } from "../../lib/supabase";
+import { resolvePerLocationData } from "../../lib/resolve-per-location";
 
 export async function generateMetadata({
   params,
@@ -37,7 +38,6 @@ export default async function Page({
   const { puckPath = [] } = await params;
   const path = `/${puckPath.join("/")}`;
   const data = await getPage(path);
-  const client = getConvexClient();
   let metadata: Record<string, unknown> | undefined;
 
   if (!data) {
@@ -46,17 +46,34 @@ export default async function Page({
 
   if (puckPath.length >= 3) {
     const [regionSlug, citySlug, line1Slug] = puckPath;
-    const location = await client.query(queryRef("locations:getBySlugs"), {
-      regionSlug,
-      citySlug,
-      line1Slug,
-    });
-    if (location) {
-      metadata = { location };
+    const supabase = getSupabaseClient();
+    const { data: locationRow } = await supabase
+      .from("locations")
+      .select("*")
+      .eq("slug->>region", regionSlug)
+      .eq("slug->>city", citySlug)
+      .eq("slug->>line1", line1Slug)
+      .maybeSingle();
+    if (locationRow) {
+      metadata = {
+        location: {
+          id: locationRow.id,
+          name: locationRow.name,
+          address: locationRow.address,
+          slug: locationRow.slug,
+        },
+      };
     }
   }
 
-  return <Client data={data} metadata={metadata} />;
+  // Resolve per-location content overrides server-side.
+  // Puck's <Render> does not call resolveData, so we must resolve here.
+  const resolvedData =
+    metadata?.location && typeof (metadata.location as Record<string, unknown>).id === "string"
+      ? await resolvePerLocationData(data, (metadata.location as Record<string, unknown>).id as string)
+      : data;
+
+  return <Client data={resolvedData} metadata={metadata} />;
 }
 
 // Force Next.js to produce static pages: https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config#dynamic

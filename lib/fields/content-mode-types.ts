@@ -33,13 +33,9 @@ export type ContentModeFieldConfig = CustomField<ContentSourceValue> & {
   label?: string;
   entityLabel: string;
   selectionMode: ContentSelectionMode;
-  listQueryName: string;
-  listArgs?: Record<string, unknown>;
+  entityTable: string;
+  junctionTable: string;
+  entityIdColumn: string;
+  locationIdColumn: string;
   mapItemToOption: (item: Record<string, unknown>) => ContentOption;
-  currentForLocationQueryName: string;
-  linkMutationName: string;
-  unlinkMutationName: string;
-  syncOverridesMutationName: string;
-  locationIdArg: string;
-  itemIdArg: string;
 };

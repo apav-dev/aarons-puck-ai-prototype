@@ -1,34 +1,43 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { getConvexClient, mutationRef, queryRef } from "../../../../../lib/convex";
-
-type CitySummary = {
-  slug: {
-    region: string;
-    city: string;
-  };
-};
+import { getSupabaseClient } from "../../../../../lib/supabase";
 
 export async function POST(request: Request) {
   const { data } = await request.json();
-  const client = getConvexClient();
+  const supabase = getSupabaseClient();
 
-  await client.mutation(mutationRef("pageGroups:publish"), {
-    slug: "city",
-    data,
-  });
+  await supabase.from("page_groups").upsert(
+    {
+      slug: "city",
+      draft_data: data,
+      published_data: data,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "slug" }
+  );
 
-  const cities = (await client.query(queryRef("locations:listCities"), {
-    pageGroupSlug: "location",
-  })) as CitySummary[] | null;
+  const { data: locationRows } = await supabase
+    .from("locations")
+    .select("slug")
+    .eq("page_group_slug", "location");
 
-  for (const city of cities ?? []) {
-    const path = `/${city.slug.region}/${city.slug.city}`;
+  const citiesMap = new Map<string, { region: string; city: string }>();
+  for (const row of locationRows ?? []) {
+    const slug = row.slug as { region: string; city: string };
+    const key = `${slug.region}:${slug.city}`;
+    if (!citiesMap.has(key)) {
+      citiesMap.set(key, slug);
+    }
+  }
+  const cities = Array.from(citiesMap.values());
+
+  for (const city of cities) {
+    const path = `/${city.region}/${city.city}`;
     revalidatePath(path);
   }
 
   return NextResponse.json({
     status: "ok",
-    revalidated: cities?.length ?? 0,
+    revalidated: cities.length,
   });
 }

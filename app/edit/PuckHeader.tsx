@@ -6,7 +6,7 @@ import { Button } from "@puckeditor/core";
 type PageType = "location" | "city";
 
 type Location = {
-  _id: string;
+  id: string;
   name: string;
   address: { region: string; city: string; line1: string };
   slug: { region: string; city: string; line1: string };
@@ -132,7 +132,7 @@ export function PuckHeader({
                 <option value="">No locations</option>
               ) : (
                 locations.map((loc) => (
-                  <option key={loc._id} value={loc._id}>
+                  <option key={loc.id} value={loc.id}>
                     {loc.name}
                   </option>
                 ))

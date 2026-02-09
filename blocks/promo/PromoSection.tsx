@@ -10,7 +10,7 @@ import { ClassicVariant } from "./variants/ClassicVariant";
 import { ImmersiveVariant } from "./variants/ImmersiveVariant";
 import { SpotlightVariant } from "./variants/SpotlightVariant";
 import ContentModeField from "../../lib/fields/ContentModeField";
-import { getConvexClient, queryRef } from "../../lib/convex";
+import { getSupabaseClient } from "../../lib/supabase";
 import {
   ContentModeFieldConfig,
   ContentOption,
@@ -18,6 +18,10 @@ import {
 } from "../../lib/fields/content-mode-types";
 
 const getClassName = getClassNameFactory("PromoSection", styles);
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const isValidUuid = (id: string) => UUID_RE.test(id);
 
 export type { PromoSectionProps } from "./types";
 
@@ -107,15 +111,12 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
       label: "Promotion",
       entityLabel: "Promotion",
       selectionMode: "single",
-      listQueryName: "promotions:list",
-      currentForLocationQueryName: "relationships:promotionsForLocation",
-      linkMutationName: "relationships:linkLocationPromotion",
-      unlinkMutationName: "relationships:unlinkLocationPromotion",
-      syncOverridesMutationName: "relationships:syncLocationPromotionOverrides",
-      locationIdArg: "locationId",
-      itemIdArg: "promotionId",
+      entityTable: "promotions",
+      junctionTable: "location_promotions",
+      entityIdColumn: "promotion_id",
+      locationIdColumn: "location_id",
       mapItemToOption: (item: Record<string, unknown>): ContentOption => ({
-        id: String(item._id),
+        id: String(item.id ?? item._id),
         label: String(item.name ?? "Untitled promotion"),
         imageUrl: item.image ? String(item.image) : undefined,
         raw: item,
@@ -199,7 +200,7 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
     imageUrl:
       "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop",
   },
-  resolveData: async ({ props }, { changed, metadata }) => {
+  resolveData: async ({ props }, { metadata }) => {
     const source = props.contentSource;
     if (!source || source.source === "static") {
       return {
@@ -207,40 +208,34 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
         readOnly: { title: false, description: false, imageUrl: false },
       };
     }
-    const client = getConvexClient();
+    const supabase = getSupabaseClient();
     let promotion: Record<string, unknown> | null = null;
-
     const mode =
       source.dynamicMode === "perLocation" ? "perLocation" : "synced";
 
-    if (mode === "synced" && source.selectedId) {
-      promotion = (await client.query(queryRef("promotions:getById"), {
-        id: source.selectedId,
-      })) as Record<string, unknown> | null;
+    if (mode === "synced" && source.selectedId && isValidUuid(source.selectedId)) {
+      const { data } = await supabase
+        .from("promotions")
+        .select("*")
+        .eq("id", source.selectedId)
+        .maybeSingle();
+      promotion = data as Record<string, unknown> | null;
     }
 
     if (mode === "perLocation") {
-      const locationId = metadata?.location?._id;
+      const locationId = metadata?.location?.id;
       if (locationId) {
-        const override =
-          source.overrides?.find((item) =>
-            item.locationIds.includes(locationId)
-          ) ?? source.overrides?.find((item) => item.isDefault);
-        const targetId =
-          override?.itemIds?.[0] ??
-          source.perLocationSelectedId?.[locationId] ??
-          "";
-        if (targetId) {
-          promotion = (await client.query(queryRef("promotions:getById"), {
-            id: targetId,
-          })) as Record<string, unknown> | null;
-        } else {
-          const promotions = (await client.query(
-            queryRef("relationships:promotionsForLocation"),
-            { locationId }
-          )) as Record<string, unknown>[];
-          promotion = promotions[0] ?? null;
-        }
+        // Always use the junction table as the single source of truth for
+        // per-location promotions. The override.itemIds stored in the page
+        // JSON are editor-UI metadata and can become stale.
+        const { data: linkRows } = await supabase
+          .from("location_promotions")
+          .select("*, promotions(*)")
+          .eq("location_id", locationId);
+        const promotions = ((linkRows ?? []) as { promotions: Record<string, unknown> }[]).map(
+          (row) => row.promotions
+        ).filter(Boolean) as Record<string, unknown>[];
+        promotion = promotions[0] ?? null;
       }
     }
 

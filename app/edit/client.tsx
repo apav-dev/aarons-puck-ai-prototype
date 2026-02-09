@@ -9,10 +9,10 @@ import headingAnalyzer from "@puckeditor/plugin-heading-analyzer";
 import "./puck-layer.css";
 import { cityPagesConfig, fullPagesConfig } from "../../puck.config";
 import themePlugin from "../../theme-plugin/ThemePlugin";
-import { ConvexFieldProvider } from "../../lib/fields/ConvexFieldContext";
+import { FieldProvider } from "../../lib/fields/FieldContext";
 
 type Location = {
-  _id: string;
+  id: string;
   name: string;
   address: {
     region: string;
@@ -110,15 +110,15 @@ export function Client({
   const [hasLocalChanges, setHasLocalChanges] = useState(false);
   const [puckKey, setPuckKey] = useState(0);
   const [selectedLocationId, setSelectedLocationId] = useState<string | undefined>(
-    locations[0]?._id
+    locations[0]?.id
   );
   const [selectedCityKey, setSelectedCityKey] = useState<string>(() =>
     cities[0] ? getCityKey(cities[0]) : ""
   );
 
   useEffect(() => {
-    if (!selectedLocationId && locations[0]?._id) {
-      setSelectedLocationId(locations[0]._id);
+    if (!selectedLocationId && locations[0]?.id) {
+      setSelectedLocationId(locations[0].id);
     }
   }, [locations, selectedLocationId]);
 
@@ -149,7 +149,7 @@ export function Client({
   }, [data, pageType]);
 
   const selectedLocation = useMemo(() => {
-    return locations.find((location) => location._id === selectedLocationId);
+    return locations.find((location) => location.id === selectedLocationId);
   }, [locations, selectedLocationId]);
 
   const selectedCity = useMemo(() => {
@@ -176,8 +176,49 @@ export function Client({
 
   const resolvedData = useMemo(() => {
     const base = localData ?? data;
-    return applyThemeDraft(base, localTheme);
-  }, [data, localData, localTheme]);
+    const themed = applyThemeDraft(base, localTheme);
+
+    // Stamp per-location components with a location-dependent refresh value
+    // so Puck sees a genuine prop change and re-fires resolveData when the
+    // preview location switches (otherwise the data reference stays the same
+    // and Puck may skip resolution).
+    const previewId =
+      pageType === "location" ? selectedLocationId : selectedCityKey;
+    if (!previewId) return themed;
+
+    // Simple numeric hash of the preview ID for a stable refresh value
+    let hash = 0;
+    for (let i = 0; i < previewId.length; i++) {
+      hash = ((hash << 5) - hash + previewId.charCodeAt(i)) | 0;
+    }
+
+    const stampContent = (items: typeof themed.content) =>
+      items?.map((item) => {
+        const cs = (item.props as Record<string, unknown>)
+          ?.contentSource as Record<string, unknown> | undefined;
+        if (cs?.dynamicMode !== "perLocation") return item;
+        return {
+          ...item,
+          props: {
+            ...item.props,
+            contentSource: { ...cs, refresh: hash },
+          },
+        };
+      });
+
+    return {
+      ...themed,
+      content: stampContent(themed.content) ?? themed.content,
+      zones: themed.zones
+        ? Object.fromEntries(
+            Object.entries(themed.zones).map(([k, v]) => [
+              k,
+              stampContent(v) ?? v,
+            ]),
+          )
+        : themed.zones,
+    } as Partial<Data>;
+  }, [data, localData, localTheme, pageType, selectedLocationId, selectedCityKey]);
 
   const switchPageType = (nextType: PageType) => {
     const params = new URLSearchParams(searchParams?.toString());
@@ -203,12 +244,12 @@ export function Client({
   };
 
   return (
-    <ConvexFieldProvider
+    <FieldProvider
       location={pageType === "location" ? selectedLocation ?? null : null}
       allLocations={locations}
     >
       <Puck
-        key={`${pageType}-${puckKey}`}
+        key={`${pageType}-${pageType === "location" ? selectedLocationId : selectedCityKey}-${puckKey}`}
         config={pageType === "city" ? cityPagesConfig : fullPagesConfig}
         data={resolvedData}
         metadata={
@@ -270,6 +311,6 @@ export function Client({
           setHasLocalChanges(Boolean(readStorageJson(themeStorageKey)));
         }}
       />
-    </ConvexFieldProvider>
+    </FieldProvider>
   );
 }

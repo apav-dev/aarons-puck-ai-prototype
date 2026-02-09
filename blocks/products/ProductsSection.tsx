@@ -12,7 +12,7 @@ import { CardsVariant } from "./variants/CardsVariant";
 import { GridVariant } from "./variants/GridVariant";
 import { OverlayVariant } from "./variants/OverlayVariant";
 import ContentModeField from "../../lib/fields/ContentModeField";
-import { getConvexClient, queryRef } from "../../lib/convex";
+import { getSupabaseClient } from "../../lib/supabase";
 import {
   ContentModeFieldConfig,
   ContentOption,
@@ -20,6 +20,10 @@ import {
 } from "../../lib/fields/content-mode-types";
 
 const getClassName = getClassNameFactory("ProductsSection", styles);
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const filterValidUuids = (ids: string[]) => ids.filter((id) => UUID_RE.test(id));
 
 export type { ProductsSectionProps } from "./types";
 export type { ProductItem } from "./types";
@@ -156,15 +160,12 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
       label: "Products",
       entityLabel: "Products",
       selectionMode: "multiple",
-      listQueryName: "products:list",
-      currentForLocationQueryName: "relationships:productsForLocation",
-      linkMutationName: "relationships:linkLocationProduct",
-      unlinkMutationName: "relationships:unlinkLocationProduct",
-      syncOverridesMutationName: "relationships:syncLocationProductOverrides",
-      locationIdArg: "locationId",
-      itemIdArg: "productId",
+      entityTable: "products",
+      junctionTable: "location_products",
+      entityIdColumn: "product_id",
+      locationIdColumn: "location_id",
       mapItemToOption: (item: Record<string, unknown>): ContentOption => ({
-        id: String(item._id),
+        id: String(item.id ?? item._id),
         label: String(item.name ?? "Untitled product"),
         imageUrl: item.image ? String(item.image) : undefined,
         raw: item,
@@ -405,75 +406,40 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
       },
     ],
   },
-  resolveData: async ({ props }, { changed, metadata }) => {
+  resolveData: async ({ props }, { metadata }) => {
     const source = props.contentSource;
     if (!source || source.source === "static") {
       return { props, readOnly: { products: false } };
     }
-    const client = getConvexClient();
+    const supabase = getSupabaseClient();
     let records: Record<string, unknown>[] = [];
-
     const mode =
       source.dynamicMode === "perLocation" ? "perLocation" : "synced";
 
     if (mode === "synced" && source.selectedIds?.length) {
-      records = (await client.query(queryRef("products:getByIds"), {
-        ids: source.selectedIds,
-      })) as Record<string, unknown>[];
+      const validIds = filterValidUuids(source.selectedIds);
+      if (validIds.length > 0) {
+        const { data } = await supabase
+          .from("products")
+          .select("*")
+          .in("id", validIds);
+        records = (data ?? []) as Record<string, unknown>[];
+      }
     }
 
     if (mode === "perLocation") {
-      const locationId = metadata?.location?._id;
+      const locationId = metadata?.location?.id;
       if (locationId) {
-        const override =
-          source.overrides?.find((item) =>
-            item.locationIds.includes(locationId)
-          ) ?? source.overrides?.find((item) => item.isDefault);
-        const order =
-          override?.itemIds ?? source.perLocationSelectedIds?.[locationId] ?? [];
-        if (order.length > 0) {
-          records = (await client.query(queryRef("products:getByIds"), {
-            ids: order,
-          })) as Record<string, unknown>[];
-          const ordered = [
-            ...order
-              .map((id) => records.find((product) => String(product._id) === id))
-              .filter(Boolean),
-            ...records.filter((product) => !order.includes(String(product._id))),
-          ];
-          records = ordered as Record<string, unknown>[];
-          return {
-            props: {
-              ...props,
-              products: records.map((product) => ({
-                title: String(product.name ?? "Product"),
-                category: String(product.category ?? ""),
-                description: String(product.description ?? ""),
-                imageUrl: String(product.image ?? ""),
-                link: "#",
-                price:
-                  product.price === null || product.price === undefined
-                    ? undefined
-                    : `$${String(product.price)}`,
-              })),
-            },
-            readOnly: { products: true },
-          };
-        }
-
-        const products = (await client.query(
-          queryRef("relationships:productsForLocation"),
-          { locationId }
-        )) as Record<string, unknown>[];
-        const ordered = [
-          ...order
-            .map((id) => products.find((product) => String(product._id) === id))
-            .filter(Boolean),
-          ...products.filter(
-            (product) => !order.includes(String(product._id))
-          ),
-        ];
-        records = ordered as Record<string, unknown>[];
+        // Always use the junction table as the single source of truth for
+        // per-location products. The override.itemIds stored in the page JSON
+        // are editor-UI metadata and can become stale.
+        const { data: linkRows } = await supabase
+          .from("location_products")
+          .select("*, products(*)")
+          .eq("location_id", locationId);
+        records = ((linkRows ?? []) as { products: Record<string, unknown> }[])
+          .map((row) => row.products)
+          .filter(Boolean) as Record<string, unknown>[];
       }
     }
 

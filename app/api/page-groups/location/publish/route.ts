@@ -1,30 +1,29 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { getConvexClient, mutationRef, queryRef } from "../../../../../lib/convex";
-
-type Location = {
-  slug: {
-    region: string;
-    city: string;
-    line1: string;
-  };
-};
+import { getSupabaseClient } from "../../../../../lib/supabase";
 
 export async function POST(request: Request) {
   const { data } = await request.json();
-  const client = getConvexClient();
+  const supabase = getSupabaseClient();
 
-  await client.mutation(mutationRef("pageGroups:publish"), {
-    slug: "location",
-    data,
-  });
+  await supabase.from("page_groups").upsert(
+    {
+      slug: "location",
+      draft_data: data,
+      published_data: data,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "slug" }
+  );
 
-  const locations = (await client.query(queryRef("locations:listForGroup"), {
-    pageGroupSlug: "location",
-  })) as Location[] | null;
+  const { data: locations } = await supabase
+    .from("locations")
+    .select("slug")
+    .eq("page_group_slug", "location");
 
   for (const location of locations ?? []) {
-    const path = `/${location.slug.region}/${location.slug.city}/${location.slug.line1}`;
+    const slug = location.slug as { region: string; city: string; line1: string };
+    const path = `/${slug.region}/${slug.city}/${slug.line1}`;
     revalidatePath(path);
   }
 

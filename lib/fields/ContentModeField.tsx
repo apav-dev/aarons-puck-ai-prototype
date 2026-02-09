@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { FieldLabel } from "@puckeditor/core";
-import { useConvexFieldContext } from "./ConvexFieldContext";
+import { useFieldContext } from "./FieldContext";
 import ItemPickerDialog from "./ItemPickerDialog";
 import ConfirmDialog from "./ConfirmDialog";
 import type {
@@ -28,7 +28,7 @@ const getNextValue = (
 };
 
 export const ContentModeField = ({ field, value, onChange }: RenderParams) => {
-  const { location } = useConvexFieldContext();
+  const { location } = useFieldContext();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmState, setConfirmState] = useState<
     | null
@@ -44,7 +44,7 @@ export const ContentModeField = ({ field, value, onChange }: RenderParams) => {
 
   const source = value?.source ?? "static";
   const dynamicMode = value?.dynamicMode ?? "synced";
-  const locationId = location?._id ?? "";
+  const locationId = location?.id ?? "";
   const isDynamic = source === "dynamic";
 
   const overrides = value?.overrides ?? [];

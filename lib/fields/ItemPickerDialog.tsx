@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,8 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useConvexFieldContext } from "./ConvexFieldContext";
-import { mutationRef, queryRef } from "./convex-field-helpers";
+import { useFieldContext } from "./FieldContext";
 import ConfirmDialog from "./ConfirmDialog";
 import type {
   ContentModeFieldConfig,
@@ -37,7 +36,7 @@ type ConfirmState = {
 
 const getNextValue = (
   value: ContentSourceValue | undefined,
-  patch: Partial<ContentSourceValue>
+  patch: Partial<ContentSourceValue>,
 ): ContentSourceValue => {
   return {
     source: value?.source ?? "static",
@@ -56,7 +55,7 @@ const moveItem = (items: string[], from: number, to: number) => {
 
 const createDefaultOverride = (
   itemIds: string[],
-  locationIds: string[]
+  locationIds: string[],
 ): ContentOverride => ({
   id: "default",
   label: "Default",
@@ -72,7 +71,7 @@ export const ItemPickerDialog = ({
   value,
   onChange,
 }: ItemPickerDialogProps) => {
-  const { convexClient, allLocations } = useConvexFieldContext();
+  const { supabaseClient, allLocations } = useFieldContext();
   const [options, setOptions] = useState<ContentOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -87,15 +86,11 @@ export const ItemPickerDialog = ({
   const [regionFilter, setRegionFilter] = useState<string | null>(null);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [confirmState, setConfirmState] = useState<ConfirmState | null>(null);
+  const hasSyncedFromDB = useRef(false);
 
   const allLocationIds = useMemo(
-    () => allLocations.map((location) => location._id),
-    [allLocations]
-  );
-
-  const listArgsKey = useMemo(
-    () => JSON.stringify(field.listArgs ?? {}),
-    [field.listArgs]
+    () => allLocations.map((location) => location.id),
+    [allLocations],
   );
 
   useEffect(() => {
@@ -129,7 +124,7 @@ export const ItemPickerDialog = ({
 
     const legacyItems =
       field.selectionMode === "multiple"
-        ? value?.perLocationSelectedIds?.[allLocationIds[0] ?? ""] ?? []
+        ? (value?.perLocationSelectedIds?.[allLocationIds[0] ?? ""] ?? [])
         : value?.perLocationSelectedId?.[allLocationIds[0] ?? ""]
           ? [value?.perLocationSelectedId?.[allLocationIds[0] ?? ""] ?? ""]
           : [];
@@ -151,56 +146,150 @@ export const ItemPickerDialog = ({
 
   useEffect(() => {
     let active = true;
-    if (!open) return;
+    if (!open) {
+      hasSyncedFromDB.current = false;
+      return;
+    }
     setLoading(true);
     setError(null);
-    convexClient
-      .query(queryRef(field.listQueryName), field.listArgs ?? {})
-      .then((items) => {
+
+    const load = async () => {
+      try {
+        // 1. Fetch all entity options
+        const { data: items, error: err } = await supabaseClient
+          .from(field.entityTable)
+          .select("*");
+
         if (!active) return;
+        if (err) {
+          setError(err.message ?? "Failed to load items.");
+          return;
+        }
+
         const next = Array.isArray(items)
           ? items.map((item) =>
-              field.mapItemToOption(item as Record<string, unknown>)
+              field.mapItemToOption(item as Record<string, unknown>),
             )
           : [];
         setOptions(next);
-      })
-      .catch((err) => {
-        if (!active) return;
-        setError(err instanceof Error ? err.message : "Failed to load items.");
-      })
-      .finally(() => {
-        if (!active) return;
-        setLoading(false);
-      });
+
+        // Prune any stale IDs that don't match fetched options (e.g. old
+        // Convex IDs left over from a migration).
+        const validIds = new Set(next.map((opt) => opt.id));
+        const prune = (ids: string[]) => ids.filter((id) => validIds.has(id));
+
+        setSelectedIds((prev) => {
+          const pruned = prune(prev);
+          return pruned.length === prev.length ? prev : pruned;
+        });
+        setSelectedId((prev) => (validIds.has(prev) ? prev : ""));
+
+        // 2. For per-location mode, sync override itemIds from the junction
+        //    table so the dialog always reflects the actual DB state (the
+        //    overrides baked into the page JSON can become stale).
+        if (!hasSyncedFromDB.current) {
+          hasSyncedFromDB.current = true;
+
+          const { data: junctionRows } = await supabaseClient
+            .from(field.junctionTable)
+            .select("*");
+
+          if (!active) return;
+
+          // Build a map: locationId → [entityIds]
+          const locationToItems = new Map<string, string[]>();
+          for (const row of (junctionRows ?? []) as Record<string, unknown>[]) {
+            const locId = String(row[field.locationIdColumn]);
+            const itemId = String(row[field.entityIdColumn]);
+            if (!locationToItems.has(locId)) {
+              locationToItems.set(locId, []);
+            }
+            locationToItems.get(locId)!.push(itemId);
+          }
+
+          setOverrides((prev) => {
+            let changed = false;
+            const synced = prev.map((override) => {
+              // Pick the first location in this override to look up its items
+              const repLocId = override.locationIds[0];
+              const dbItems = repLocId
+                ? (locationToItems.get(repLocId) ?? []).filter((id) =>
+                    validIds.has(id),
+                  )
+                : [];
+
+              // Use DB items if available, otherwise prune existing items
+              const finalItems =
+                dbItems.length > 0 ? dbItems : prune(override.itemIds);
+
+              if (
+                finalItems.length !== override.itemIds.length ||
+                finalItems.some((id, i) => id !== override.itemIds[i])
+              ) {
+                changed = true;
+                return { ...override, itemIds: finalItems };
+              }
+              return override;
+            });
+            return changed ? synced : prev;
+          });
+        } else {
+          // Not first load — just prune stale IDs
+          setOverrides((prev) => {
+            let changed = false;
+            const pruned = prev.map((override) => {
+              const cleanItems = prune(override.itemIds);
+              if (cleanItems.length !== override.itemIds.length) {
+                changed = true;
+                return { ...override, itemIds: cleanItems };
+              }
+              return override;
+            });
+            return changed ? pruned : prev;
+          });
+        }
+      } catch (e) {
+        if (active) {
+          setError(
+            e instanceof Error ? e.message : "Failed to load items.",
+          );
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    load();
 
     return () => {
       active = false;
     };
-  }, [convexClient, field.listQueryName, listArgsKey, open]);
+  }, [supabaseClient, field, open]);
 
   const activeOverride = useMemo(
-    () => overrides.find((override) => override.id === activeOverrideId) ?? null,
-    [activeOverrideId, overrides]
+    () =>
+      overrides.find((override) => override.id === activeOverrideId) ?? null,
+    [activeOverrideId, overrides],
   );
 
   const customOverrides = useMemo(
     () => overrides.filter((override) => !override.isDefault),
-    [overrides]
+    [overrides],
   );
 
   const claimedLocationIds = useMemo(() => {
     return overrides
       .filter(
-        (override) =>
-          !override.isDefault && override.id !== activeOverrideId
+        (override) => !override.isDefault && override.id !== activeOverrideId,
       )
       .flatMap((override) => override.locationIds);
   }, [activeOverrideId, overrides]);
 
   const regions = useMemo(() => {
     const list = allLocations
-      .map((location) => location.address?.region ?? location.slug?.region ?? "")
+      .map(
+        (location) => location.address?.region ?? location.slug?.region ?? "",
+      )
       .filter(Boolean);
     return Array.from(new Set(list));
   }, [allLocations]);
@@ -221,7 +310,7 @@ export const ItemPickerDialog = ({
     const term = search.trim().toLowerCase();
     if (!term) return options;
     return options.filter((option) =>
-      option.label.toLowerCase().includes(term)
+      option.label.toLowerCase().includes(term),
     );
   }, [options, search]);
 
@@ -234,7 +323,13 @@ export const ItemPickerDialog = ({
           : [];
     }
     return activeOverride?.itemIds ?? [];
-  }, [activeOverride?.itemIds, field.selectionMode, mode, selectedId, selectedIds]);
+  }, [
+    activeOverride?.itemIds,
+    field.selectionMode,
+    mode,
+    selectedId,
+    selectedIds,
+  ]);
 
   const selectedOptions = useMemo(() => {
     if (field.selectionMode === "multiple") {
@@ -264,7 +359,9 @@ export const ItemPickerDialog = ({
   } as const;
 
   const updateOverrides = (nextOverrides: ContentOverride[]) => {
-    const defaultOverride = nextOverrides.find((override) => override.isDefault);
+    const defaultOverride = nextOverrides.find(
+      (override) => override.isDefault,
+    );
     if (!defaultOverride) {
       setOverrides(nextOverrides);
       return;
@@ -277,7 +374,7 @@ export const ItemPickerDialog = ({
       locationIds: allLocationIds.filter((id) => !claimed.includes(id)),
     };
     const updated = nextOverrides.map((override) =>
-      override.isDefault ? nextDefault : override
+      override.isDefault ? nextDefault : override,
     );
     setOverrides(updated);
   };
@@ -304,8 +401,8 @@ export const ItemPickerDialog = ({
                     ? [next[0]]
                     : [],
             }
-          : override
-      )
+          : override,
+      ),
     );
   };
 
@@ -313,7 +410,7 @@ export const ItemPickerDialog = ({
     updateCurrentItems(
       currentItemIds.includes(id)
         ? currentItemIds.filter((item) => item !== id)
-        : [...currentItemIds, id]
+        : [...currentItemIds, id],
     );
   };
 
@@ -338,7 +435,7 @@ export const ItemPickerDialog = ({
               : selectedId
                 ? [selectedId]
                 : [],
-            allLocationIds
+            allLocationIds,
           );
           setOverrides([defaultOverride]);
           setActiveOverrideId(defaultOverride.id);
@@ -415,7 +512,9 @@ export const ItemPickerDialog = ({
         setConfirmState(null);
         const next = overrides.filter((override) => override.id !== id);
         updateOverrides(next);
-        setActiveOverrideId(next.find((override) => override.isDefault)?.id ?? "default");
+        setActiveOverrideId(
+          next.find((override) => override.isDefault)?.id ?? "default",
+        );
       },
     });
   };
@@ -432,18 +531,18 @@ export const ItemPickerDialog = ({
             ? override.locationIds.filter((id) => id !== locationId)
             : [...override.locationIds, locationId],
         };
-      })
+      }),
     );
   };
 
   const toggleAllFilteredLocations = () => {
     if (!activeOverride || activeOverride.isDefault) return;
     const available = filteredLocations.filter(
-      (location) => !claimedLocationIds.includes(location._id)
+      (location) => !claimedLocationIds.includes(location.id),
     );
-    const availableIds = available.map((location) => location._id);
+    const availableIds = available.map((location) => location.id);
     const allIn = availableIds.every((id) =>
-      activeOverride.locationIds.includes(id)
+      activeOverride.locationIds.includes(id),
     );
     updateOverrides(
       overrides.map((override) => {
@@ -452,41 +551,72 @@ export const ItemPickerDialog = ({
           ...override,
           locationIds: allIn
             ? override.locationIds.filter((id) => !availableIds.includes(id))
-            : Array.from(
-                new Set([...override.locationIds, ...availableIds])
-              ),
+            : Array.from(new Set([...override.locationIds, ...availableIds])),
         };
-      })
+      }),
     );
   };
 
   const runSave = async (nextOverrides: ContentOverride[]) => {
-    const itemIdsKey = `${field.itemIdArg}s`;
-    const payloadOverrides = nextOverrides.map((override) => ({
-      locationIds: override.locationIds,
-      [itemIdsKey]: override.itemIds,
-    })) as Record<string, unknown>[];
+    // Only include IDs that exist in the fetched options list. This guards
+    // against stale IDs (e.g. leftover Convex IDs) being sent to Supabase.
+    const validItemIds = new Set(options.map((opt) => opt.id));
+    const cleanedOverrides = nextOverrides.map((override) => ({
+      ...override,
+      itemIds: override.itemIds.filter((id) => validItemIds.has(id)),
+    }));
 
-    await convexClient.mutation(
-      mutationRef(field.syncOverridesMutationName),
-      {
-        overrides: payloadOverrides,
-      }
+    const affectedLocationIds = Array.from(
+      new Set(cleanedOverrides.flatMap((o) => o.locationIds)),
     );
+    if (affectedLocationIds.length === 0) return;
+
+    const { locationIdColumn, entityIdColumn, junctionTable } = field;
+
+    const { error: deleteError } = await supabaseClient
+      .from(junctionTable)
+      .delete()
+      .in(locationIdColumn, affectedLocationIds);
+    if (deleteError) throw deleteError;
+
+    const rows = cleanedOverrides.flatMap((override) =>
+      override.locationIds.flatMap((locId) =>
+        override.itemIds.map((itemId) => ({
+          [locationIdColumn]: locId,
+          [entityIdColumn]: itemId,
+        })),
+      ),
+    );
+    if (rows.length > 0) {
+      const { error: insertError } = await supabaseClient
+        .from(junctionTable)
+        .insert(rows);
+      if (insertError) throw insertError;
+    }
   };
 
   const handleSave = async () => {
     setSaving(true);
     setError(null);
     try {
+      // Filter IDs to only those present in the fetched options so stale
+      // references (e.g. old Convex IDs) never reach the database or get
+      // persisted back into page data.
+      const validItemIds = new Set(options.map((opt) => opt.id));
+      const pruneIds = (ids: string[]) =>
+        ids.filter((id) => validItemIds.has(id));
+
       if (mode === "synced") {
-        const itemIds =
+        const itemIds = pruneIds(
           field.selectionMode === "multiple"
             ? selectedIds
             : selectedId
               ? [selectedId]
-              : [];
-        const syncedOverrides = [createDefaultOverride(itemIds, allLocationIds)];
+              : [],
+        );
+        const syncedOverrides = [
+          createDefaultOverride(itemIds, allLocationIds),
+        ];
         await runSave(syncedOverrides);
         onChange(
           getNextValue(value, {
@@ -495,21 +625,27 @@ export const ItemPickerDialog = ({
             selectedIds:
               field.selectionMode === "multiple" ? itemIds : undefined,
             selectedId:
-              field.selectionMode === "single" ? itemIds[0] ?? undefined : undefined,
+              field.selectionMode === "single"
+                ? (itemIds[0] ?? undefined)
+                : undefined,
             overrides: undefined,
             refresh: Date.now(),
-          })
+          }),
         );
         onOpenChange(false);
         return;
       }
 
-      const ensuredOverrides =
+      const ensuredOverrides = (
         overrides.length > 0
           ? overrides
-          : [createDefaultOverride([], allLocationIds)];
+          : [createDefaultOverride([], allLocationIds)]
+      ).map((override) => ({
+        ...override,
+        itemIds: pruneIds(override.itemIds),
+      }));
       const defaultOverride = ensuredOverrides.find(
-        (override) => override.isDefault
+        (override) => override.isDefault,
       );
       const custom = ensuredOverrides.filter((override) => !override.isDefault);
 
@@ -523,7 +659,7 @@ export const ItemPickerDialog = ({
             selectedIds: undefined,
             selectedId: undefined,
             refresh: Date.now(),
-          })
+          }),
         );
         onOpenChange(false);
       };
@@ -536,10 +672,12 @@ export const ItemPickerDialog = ({
             custom.length === 1 ? "" : "s"
           } affecting ${custom.reduce(
             (sum, override) => sum + override.locationIds.length,
-            0
+            0,
           )} location${
-            custom.reduce((sum, override) => sum + override.locationIds.length, 0) ===
-            1
+            custom.reduce(
+              (sum, override) => sum + override.locationIds.length,
+              0,
+            ) === 1
               ? ""
               : "s"
           }. The remaining ${defaultCount} location${
@@ -550,7 +688,7 @@ export const ItemPickerDialog = ({
               (override) =>
                 `"${override.label}": ${override.itemIds.length} ${field.entityLabel.toLowerCase()} → ${override.locationIds.length} location${
                   override.locationIds.length === 1 ? "" : "s"
-                }`
+                }`,
             ),
             `Default: ${defaultOverride?.itemIds.length ?? 0} ${field.entityLabel.toLowerCase()} → ${defaultCount} location${
               defaultCount === 1 ? "" : "s"
@@ -561,7 +699,7 @@ export const ItemPickerDialog = ({
             setConfirmState(null);
             finalizeSave().catch((err) => {
               setError(
-                err instanceof Error ? err.message : "Failed to save changes."
+                err instanceof Error ? err.message : "Failed to save changes.",
               );
             });
           },
@@ -592,7 +730,9 @@ export const ItemPickerDialog = ({
             style={{
               ...buttonBaseStyles,
               background:
-                mode === "synced" ? "var(--puck-color-blue-06, #2563eb)" : "white",
+                mode === "synced"
+                  ? "var(--puck-color-blue-06, #2563eb)"
+                  : "white",
               color: mode === "synced" ? "white" : "var(--puck-color-grey-02)",
             }}
           >
@@ -608,14 +748,14 @@ export const ItemPickerDialog = ({
                   ? "var(--puck-color-blue-06, #2563eb)"
                   : "white",
               color:
-                mode === "perLocation"
-                  ? "white"
-                  : "var(--puck-color-grey-02)",
+                mode === "perLocation" ? "white" : "var(--puck-color-grey-02)",
             }}
           >
             Per-location
           </button>
-          <span style={{ fontSize: "12px", color: "var(--puck-color-grey-05)" }}>
+          <span
+            style={{ fontSize: "12px", color: "var(--puck-color-grey-05)" }}
+          >
             {mode === "synced"
               ? `Same ${field.entityLabel.toLowerCase()} on all locations`
               : `${customOverrides.length} override${
@@ -629,12 +769,20 @@ export const ItemPickerDialog = ({
             {overrides.map((override) => {
               const isActive = override.id === activeOverrideId;
               return (
-                <button
+                <div
                   key={override.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => {
                     setActiveOverrideId(override.id);
                     setShowLocationPicker(!override.isDefault);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setActiveOverrideId(override.id);
+                      setShowLocationPicker(!override.isDefault);
+                    }
                   }}
                   style={{
                     padding: "4px 10px",
@@ -644,9 +792,7 @@ export const ItemPickerDialog = ({
                         ? "var(--puck-color-blue-06, #2563eb)"
                         : "var(--puck-color-grey-09, #dcdcdc)"
                     }`,
-                    background: isActive
-                      ? "rgba(37, 99, 235, 0.1)"
-                      : "white",
+                    background: isActive ? "rgba(37, 99, 235, 0.1)" : "white",
                     color: isActive
                       ? "var(--puck-color-blue-06, #2563eb)"
                       : "var(--puck-color-grey-02, #292929)",
@@ -687,7 +833,7 @@ export const ItemPickerDialog = ({
                       ×
                     </button>
                   )}
-                </button>
+                </div>
               );
             })}
             <button
@@ -704,119 +850,135 @@ export const ItemPickerDialog = ({
           </div>
         )}
 
-        {mode === "perLocation" && activeOverride && !activeOverride.isDefault && (
-          <div style={{ border: "1px solid var(--puck-color-grey-10)", borderRadius: "8px" }}>
+        {mode === "perLocation" &&
+          activeOverride &&
+          !activeOverride.isDefault && (
             <div
               style={{
-                display: "flex",
-                gap: "6px",
-                padding: "8px 10px",
-                borderBottom: "1px solid var(--puck-color-grey-10)",
-                alignItems: "center",
-                flexWrap: "wrap",
+                border: "1px solid var(--puck-color-grey-10)",
+                borderRadius: "8px",
               }}
             >
-              <input
-                type="text"
-                placeholder="Search locations..."
-                value={locationSearch}
-                onChange={(event) => setLocationSearch(event.target.value)}
+              <div
                 style={{
-                  flex: 1,
-                  minWidth: "120px",
-                  padding: "6px 8px",
-                  borderRadius: "6px",
-                  border: "1px solid var(--puck-color-grey-09)",
+                  display: "flex",
+                  gap: "6px",
+                  padding: "8px 10px",
+                  borderBottom: "1px solid var(--puck-color-grey-10)",
+                  alignItems: "center",
+                  flexWrap: "wrap",
                 }}
-              />
-              {regions.map((region) => (
-                <button
-                  key={region}
-                  type="button"
-                  onClick={() =>
-                    setRegionFilter((prev) => (prev === region ? null : region))
-                  }
-                  style={{
-                    ...buttonBaseStyles,
-                    padding: "4px 8px",
-                    background:
-                      regionFilter === region
-                        ? "var(--puck-color-blue-06, #2563eb)"
-                        : "white",
-                    color:
-                      regionFilter === region
-                        ? "white"
-                        : "var(--puck-color-grey-02)",
-                  }}
-                >
-                  {region}
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={() => setShowLocationPicker((prev) => !prev)}
-                style={{ ...buttonBaseStyles, padding: "4px 8px" }}
               >
-                {showLocationPicker ? "Collapse" : "Expand"}
-              </button>
-            </div>
-            {showLocationPicker && (
-              <>
+                <input
+                  type="text"
+                  placeholder="Search locations..."
+                  value={locationSearch}
+                  onChange={(event) => setLocationSearch(event.target.value)}
+                  style={{
+                    flex: 1,
+                    minWidth: "120px",
+                    padding: "6px 8px",
+                    borderRadius: "6px",
+                    border: "1px solid var(--puck-color-grey-09)",
+                  }}
+                />
+                {regions.map((region) => (
+                  <button
+                    key={region}
+                    type="button"
+                    onClick={() =>
+                      setRegionFilter((prev) =>
+                        prev === region ? null : region,
+                      )
+                    }
+                    style={{
+                      ...buttonBaseStyles,
+                      padding: "4px 8px",
+                      background:
+                        regionFilter === region
+                          ? "var(--puck-color-blue-06, #2563eb)"
+                          : "white",
+                      color:
+                        regionFilter === region
+                          ? "white"
+                          : "var(--puck-color-grey-02)",
+                    }}
+                  >
+                    {region}
+                  </button>
+                ))}
                 <button
                   type="button"
-                  onClick={toggleAllFilteredLocations}
-                  style={{
-                    ...buttonBaseStyles,
-                    width: "100%",
-                    borderTop: "none",
-                    borderRadius: "0",
-                  }}
+                  onClick={() => setShowLocationPicker((prev) => !prev)}
+                  style={{ ...buttonBaseStyles, padding: "4px 8px" }}
                 >
-                  Select all available ({filteredLocations.length})
+                  {showLocationPicker ? "Collapse" : "Expand"}
                 </button>
-                <div style={{ maxHeight: "180px", overflowY: "auto" }}>
-                  {filteredLocations.map((location) => {
-                    const claimed = claimedLocationIds.includes(location._id);
-                    const checked =
-                      activeOverride.locationIds.includes(location._id);
-                    return (
-                      <div
-                        key={location._id}
-                        onClick={() => (!claimed ? toggleLocationInOverride(location._id) : null)}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                          padding: "6px 10px",
-                          cursor: claimed ? "default" : "pointer",
-                          opacity: claimed ? 0.5 : 1,
-                          borderBottom: "1px solid var(--puck-color-grey-11)",
-                        }}
-                      >
-                        <input type="checkbox" readOnly checked={checked} />
-                        <span>{location.name ?? "Unnamed location"}</span>
-                        {claimed && (
-                          <span style={{ fontSize: "11px", color: "#b45309" }}>
-                            in another override
-                          </span>
-                        )}
-                        <span
+              </div>
+              {showLocationPicker && (
+                <>
+                  <button
+                    type="button"
+                    onClick={toggleAllFilteredLocations}
+                    style={{
+                      ...buttonBaseStyles,
+                      width: "100%",
+                      borderTop: "none",
+                      borderRadius: "0",
+                    }}
+                  >
+                    Select all available ({filteredLocations.length})
+                  </button>
+                  <div style={{ maxHeight: "180px", overflowY: "auto" }}>
+                    {filteredLocations.map((location) => {
+                      const claimed = claimedLocationIds.includes(location.id);
+                      const checked = activeOverride.locationIds.includes(
+                        location.id,
+                      );
+                      return (
+                        <div
+                          key={location.id}
+                          onClick={() =>
+                            !claimed
+                              ? toggleLocationInOverride(location.id)
+                              : null
+                          }
                           style={{
-                            marginLeft: "auto",
-                            fontSize: "11px",
-                            color: "var(--puck-color-grey-05)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            padding: "6px 10px",
+                            cursor: claimed ? "default" : "pointer",
+                            opacity: claimed ? 0.5 : 1,
+                            borderBottom: "1px solid var(--puck-color-grey-11)",
                           }}
                         >
-                          {location.address?.city ?? ""}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </>
-            )}
-          </div>
-        )}
+                          <input type="checkbox" readOnly checked={checked} />
+                          <span>{location.name ?? "Unnamed location"}</span>
+                          {claimed && (
+                            <span
+                              style={{ fontSize: "11px", color: "#b45309" }}
+                            >
+                              in another override
+                            </span>
+                          )}
+                          <span
+                            style={{
+                              marginLeft: "auto",
+                              fontSize: "11px",
+                              color: "var(--puck-color-grey-05)",
+                            }}
+                          >
+                            {location.address?.city ?? ""}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <input
@@ -859,7 +1021,9 @@ export const ItemPickerDialog = ({
             >
               Selected order
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "8px" }}
+            >
               {selectedOptions.map((option, index) => (
                 <div
                   key={option.id}
@@ -893,7 +1057,11 @@ export const ItemPickerDialog = ({
                     <button
                       type="button"
                       disabled={index === 0}
-                      onClick={() => updateCurrentItems(moveItem(currentItemIds, index, index - 1))}
+                      onClick={() =>
+                        updateCurrentItems(
+                          moveItem(currentItemIds, index, index - 1),
+                        )
+                      }
                       style={{
                         ...buttonBaseStyles,
                         padding: "4px 6px",
@@ -905,7 +1073,11 @@ export const ItemPickerDialog = ({
                     <button
                       type="button"
                       disabled={index === selectedOptions.length - 1}
-                      onClick={() => updateCurrentItems(moveItem(currentItemIds, index, index + 1))}
+                      onClick={() =>
+                        updateCurrentItems(
+                          moveItem(currentItemIds, index, index + 1),
+                        )
+                      }
                       style={{
                         ...buttonBaseStyles,
                         padding: "4px 6px",
@@ -921,7 +1093,7 @@ export const ItemPickerDialog = ({
                       type="button"
                       onClick={() =>
                         updateCurrentItems(
-                          currentItemIds.filter((id) => id !== option.id)
+                          currentItemIds.filter((id) => id !== option.id),
                         )
                       }
                       style={{
@@ -951,7 +1123,9 @@ export const ItemPickerDialog = ({
             {loading ? "Loading..." : "Available options"}
           </div>
           {error && (
-            <div style={{ fontSize: "13px", color: "var(--puck-color-red-05)" }}>
+            <div
+              style={{ fontSize: "13px", color: "var(--puck-color-red-05)" }}
+            >
               {error}
             </div>
           )}
@@ -1069,7 +1243,9 @@ export const ItemPickerDialog = ({
         </div>
 
         <DialogFooter>
-          <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+          <div
+            style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}
+          >
             <button
               type="button"
               onClick={() => onOpenChange(false)}

@@ -1,15 +1,20 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { getConvexClient, mutationRef } from "../../../../lib/convex";
+import { getSupabaseClient } from "../../../../lib/supabase";
 
 export async function POST(request: Request) {
   const { data, path } = await request.json();
-  const client = getConvexClient();
+  const supabase = getSupabaseClient();
 
-  await client.mutation(mutationRef("pages:publish"), {
-    path,
-    data,
-  });
+  await supabase.from("pages").upsert(
+    {
+      path,
+      draft_data: data,
+      published_data: data,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "path" }
+  );
 
   revalidatePath(path);
 
