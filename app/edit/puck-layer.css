@@ -1,0 +1,13 @@
+/*
+ * Wrap all Puck editor CSS in a named cascade layer ("puck") so that
+ * Tailwind v4 utility classes (in @layer utilities) always take priority.
+ *
+ * Layer order is declared in app/styles.css:
+ *   puck < theme < base < components < utilities
+ *
+ * This means Tailwind utilities override Puck styles when they conflict,
+ * while Puck styles still override browser defaults and Tailwind's base/reset.
+ */
+@import "@puckeditor/core/puck.css" layer(puck);
+@import "@puckeditor/plugin-ai/styles.css" layer(puck);
+@import "@puckeditor/plugin-heading-analyzer/dist/index.css" layer(puck);

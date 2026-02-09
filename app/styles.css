@@ -1,3 +1,11 @@
+/* Declare the full cascade-layer order up front.
+   "puck" sits between Tailwind's base (preflight/reset) and utilities so that:
+     • Puck CSS overrides Tailwind's preflight reset  → Puck editor looks correct
+     • Tailwind utilities override Puck CSS            → our Shadcn components work
+   Order (lowest → highest priority):
+     theme < base < puck < components < utilities                              */
+@layer theme, base, puck, components, utilities;
+
 @import "tailwindcss";
 
 @plugin "tailwindcss-animate";
