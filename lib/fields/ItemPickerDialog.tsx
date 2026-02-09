@@ -315,9 +315,9 @@ export const ItemPickerDialog = ({
   const buttonBaseStyles = {
     padding: "6px 10px",
     borderRadius: "6px",
-    border: "1px solid var(--puck-color-grey-09)",
+    border: "1px solid var(--puck-color-grey-09, #dcdcdc)",
     background: "white",
-    color: "var(--puck-color-grey-02)",
+    color: "var(--puck-color-grey-02, #292929)",
     cursor: "pointer",
   } as const;
 
@@ -335,8 +335,8 @@ export const ItemPickerDialog = ({
             style={{
               ...buttonBaseStyles,
               background:
-                activeMode === "all" ? "var(--puck-color-blue-06)" : "white",
-              color: activeMode === "all" ? "white" : "var(--puck-color-grey-02)",
+                activeMode === "all" ? "var(--puck-color-blue-06, #2563eb)" : "white",
+              color: activeMode === "all" ? "white" : "var(--puck-color-grey-02, #292929)",
             }}
           >
             All pages
@@ -349,12 +349,12 @@ export const ItemPickerDialog = ({
               ...buttonBaseStyles,
               background:
                 activeMode === "perLocation"
-                  ? "var(--puck-color-blue-06)"
+                  ? "var(--puck-color-blue-06, #2563eb)"
                   : "white",
               color:
                 activeMode === "perLocation"
                   ? "white"
-                  : "var(--puck-color-grey-02)",
+                  : "var(--puck-color-grey-02, #292929)",
               cursor: isPerLocationDisabled ? "not-allowed" : "pointer",
               opacity: isPerLocationDisabled ? 0.6 : 1,
             }}

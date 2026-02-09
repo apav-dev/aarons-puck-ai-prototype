@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Data, Puck, Button } from "@puckeditor/core";
+import { Data, Puck } from "@puckeditor/core";
+import { PuckHeader, PuckHeaderActions } from "./PuckHeader";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createAiPlugin } from "@puckeditor/plugin-ai";
 import headingAnalyzer from "@puckeditor/plugin-heading-analyzer";
@@ -216,143 +217,29 @@ export function Client({
         }
         plugins={[aiPlugin, headingAnalyzer, themePlugin]}
         overrides={{
-          headerActions: ({ children }) => {
-            return (
-              <>
-                <label
-                  htmlFor="page-type-select"
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "var(--puck-color-grey-03)",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  Page type
-                </label>
-                <select
-                  id="page-type-select"
-                  value={pageType}
-                  onChange={(event) =>
-                    switchPageType(event.target.value as PageType)
-                  }
-                  style={{
-                    padding: "8px 12px",
-                    fontSize: "14px",
-                    border: "1px solid var(--puck-color-grey-09)",
-                    borderRadius: "4px",
-                    backgroundColor: "var(--puck-color-white)",
-                    color: "var(--puck-color-grey-03)",
-                    cursor: "pointer",
-                    minWidth: "160px",
-                    fontFamily: "inherit",
-                  }}
-                >
-                  <option value="location">Location page</option>
-                  <option value="city">City directory</option>
-                </select>
-                {pageType === "location" ? (
-                  <>
-                    <label
-                      htmlFor="location-select"
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: 500,
-                        color: "var(--puck-color-grey-03)",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      Preview location
-                    </label>
-                    <select
-                      id="location-select"
-                      value={selectedLocationId ?? ""}
-                      onChange={(event) =>
-                        setSelectedLocationId(event.target.value)
-                      }
-                      disabled={locations.length === 0}
-                      style={{
-                        padding: "8px 12px",
-                        fontSize: "14px",
-                        border: "1px solid var(--puck-color-grey-09)",
-                        borderRadius: "4px",
-                        backgroundColor: "var(--puck-color-white)",
-                        color: "var(--puck-color-grey-03)",
-                        cursor: "pointer",
-                        minWidth: "220px",
-                        fontFamily: "inherit",
-                      }}
-                    >
-                      {locations.length === 0 ? (
-                        <option value="">No locations</option>
-                      ) : (
-                        locations.map((location) => (
-                          <option key={location._id} value={location._id}>
-                            {location.name} — {location.address.line1},{" "}
-                            {location.address.city}
-                          </option>
-                        ))
-                      )}
-                    </select>
-                  </>
-                ) : (
-                  <>
-                    <label
-                      htmlFor="city-select"
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: 500,
-                        color: "var(--puck-color-grey-03)",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      Preview city
-                    </label>
-                    <select
-                      id="city-select"
-                      value={selectedCityKey}
-                      onChange={(event) => setSelectedCityKey(event.target.value)}
-                      disabled={cities.length === 0}
-                      style={{
-                        padding: "8px 12px",
-                        fontSize: "14px",
-                        border: "1px solid var(--puck-color-grey-09)",
-                        borderRadius: "4px",
-                        backgroundColor: "var(--puck-color-white)",
-                        color: "var(--puck-color-grey-03)",
-                        cursor: "pointer",
-                        minWidth: "200px",
-                        fontFamily: "inherit",
-                      }}
-                    >
-                      {cities.length === 0 ? (
-                        <option value="">No cities</option>
-                      ) : (
-                        cities.map((city) => (
-                          <option key={getCityKey(city)} value={getCityKey(city)}>
-                            {city.city}, {city.region}
-                          </option>
-                        ))
-                      )}
-                    </select>
-                  </>
-                )}
-                {previewPath && (
-                  <Button href={previewPath} newTab={true} variant="secondary">
-                    Open Preview
-                  </Button>
-                )}
-                <Button
-                  variant="secondary"
-                  onClick={clearLocalChanges}
-                  disabled={!hasLocalChanges}
-                >
-                  Clear Local Changes
-                </Button>
-                {children}
-              </>
-            );
-          },
+          header: ({ children }) => (
+            <PuckHeader
+              puckHeader={children}
+              pageType={pageType}
+              onSwitchPageType={switchPageType}
+              locations={locations}
+              cities={cities}
+              selectedLocationId={selectedLocationId}
+              onSelectLocation={setSelectedLocationId}
+              selectedCityKey={selectedCityKey}
+              onSelectCity={setSelectedCityKey}
+              previewPath={previewPath}
+              hasLocalChanges={hasLocalChanges}
+            />
+          ),
+          headerActions: ({ children }) => (
+            <PuckHeaderActions
+              hasLocalChanges={hasLocalChanges}
+              onClearLocalChanges={clearLocalChanges}
+            >
+              {children}
+            </PuckHeaderActions>
+          ),
         }}
         onChange={(nextData) => {
           const storageKey = getDraftStorageKey(pageType);

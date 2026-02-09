@@ -85,9 +85,9 @@ export const ContentModeField = ({ field, value, onChange }: RenderParams) => {
             style={{
               padding: "6px 10px",
               borderRadius: "6px",
-              border: "1px solid var(--puck-color-grey-09)",
-              background: !isDynamic ? "var(--puck-color-blue-06)" : "white",
-              color: !isDynamic ? "white" : "var(--puck-color-grey-02)",
+              border: "1px solid var(--puck-color-grey-09, #dcdcdc)",
+              background: !isDynamic ? "var(--puck-color-blue-06, #2563eb)" : "white",
+              color: !isDynamic ? "white" : "var(--puck-color-grey-02, #292929)",
               cursor: "pointer",
             }}
           >
@@ -99,9 +99,9 @@ export const ContentModeField = ({ field, value, onChange }: RenderParams) => {
             style={{
               padding: "6px 10px",
               borderRadius: "6px",
-              border: "1px solid var(--puck-color-grey-09)",
-              background: isDynamic ? "var(--puck-color-blue-06)" : "white",
-              color: isDynamic ? "white" : "var(--puck-color-grey-02)",
+              border: "1px solid var(--puck-color-grey-09, #dcdcdc)",
+              background: isDynamic ? "var(--puck-color-blue-06, #2563eb)" : "white",
+              color: isDynamic ? "white" : "var(--puck-color-grey-02, #292929)",
               cursor: "pointer",
             }}
           >
