@@ -1,3 +1,5 @@
+import type { CustomField } from "@puckeditor/core";
+
 export type ContentSelectionMode = "single" | "multiple";
 
 export type ContentOption = {
@@ -7,17 +9,26 @@ export type ContentOption = {
   raw?: Record<string, unknown>;
 };
 
+export type ContentOverride = {
+  id: string;
+  label: string;
+  isDefault: boolean;
+  locationIds: string[];
+  itemIds: string[];
+};
+
 export type ContentSourceValue = {
   source: "static" | "dynamic";
-  dynamicMode?: "all" | "perLocation";
+  dynamicMode?: "synced" | "perLocation";
   selectedIds?: string[];
   selectedId?: string;
+  overrides?: ContentOverride[];
   perLocationSelectedIds?: Record<string, string[]>;
   perLocationSelectedId?: Record<string, string | null>;
   refresh?: number;
 };
 
-export type ContentModeFieldConfig = {
+export type ContentModeFieldConfig = CustomField<ContentSourceValue> & {
   type: "custom";
   label?: string;
   entityLabel: string;
@@ -28,6 +39,7 @@ export type ContentModeFieldConfig = {
   currentForLocationQueryName: string;
   linkMutationName: string;
   unlinkMutationName: string;
+  syncOverridesMutationName: string;
   locationIdArg: string;
   itemIdArg: string;
 };

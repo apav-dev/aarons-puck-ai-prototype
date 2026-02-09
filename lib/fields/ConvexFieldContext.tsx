@@ -21,6 +21,7 @@ export type ConvexFieldLocation = {
 
 type ConvexFieldContextValue = {
   location: ConvexFieldLocation | null;
+  allLocations: ConvexFieldLocation[];
   convexClient: ConvexHttpClient;
 };
 
@@ -28,15 +29,19 @@ const ConvexFieldContext = createContext<ConvexFieldContextValue | null>(null);
 
 export const ConvexFieldProvider = ({
   location,
+  allLocations,
   children,
 }: {
   location: ConvexFieldLocation | null;
+  allLocations: ConvexFieldLocation[];
   children: ReactNode;
 }) => {
   const convexClient = useMemo(() => getConvexBrowserClient(), []);
 
   return (
-    <ConvexFieldContext.Provider value={{ location, convexClient }}>
+    <ConvexFieldContext.Provider
+      value={{ location, allLocations, convexClient }}
+    >
       {children}
     </ConvexFieldContext.Provider>
   );

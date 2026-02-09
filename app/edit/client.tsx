@@ -205,6 +205,7 @@ export function Client({
   return (
     <ConvexFieldProvider
       location={pageType === "location" ? selectedLocation ?? null : null}
+      allLocations={locations}
     >
       <Puck
         key={`${pageType}-${puckKey}`}

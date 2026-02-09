@@ -44,6 +44,51 @@ export const unlinkLocationArticle = mutation({
   },
 });
 
+export const syncLocationArticleOverrides = mutation({
+  args: {
+    overrides: v.array(
+      v.object({
+        locationIds: v.array(v.id("locations")),
+        articleIds: v.array(v.id("articles")),
+      })
+    ),
+  },
+  handler: async (ctx, { overrides }) => {
+    const locationIdSet = new Set<string>();
+    for (const override of overrides) {
+      for (const locationId of override.locationIds) {
+        locationIdSet.add(locationId);
+      }
+    }
+
+    for (const locationId of locationIdSet) {
+      const links = await ctx.db
+        .query("locationArticles")
+        .withIndex("by_location", (q) => q.eq("locationId", locationId))
+        .collect();
+      for (const link of links) {
+        await ctx.db.delete(link._id);
+      }
+    }
+
+    for (const override of overrides) {
+      const seenPairs = new Set<string>();
+      for (const locationId of override.locationIds) {
+        for (const articleId of override.articleIds) {
+          const key = `${locationId}:${articleId}`;
+          if (seenPairs.has(key)) continue;
+          seenPairs.add(key);
+          await ctx.db.insert("locationArticles", {
+            locationId,
+            articleId,
+            createdAt: Date.now(),
+          });
+        }
+      }
+    }
+  },
+});
+
 export const removeLocationArticleById = mutation({
   args: { id: v.id("locationArticles") },
   handler: async (ctx, { id }) => {
@@ -127,6 +172,51 @@ export const unlinkLocationProduct = mutation({
   },
 });
 
+export const syncLocationProductOverrides = mutation({
+  args: {
+    overrides: v.array(
+      v.object({
+        locationIds: v.array(v.id("locations")),
+        productIds: v.array(v.id("products")),
+      })
+    ),
+  },
+  handler: async (ctx, { overrides }) => {
+    const locationIdSet = new Set<string>();
+    for (const override of overrides) {
+      for (const locationId of override.locationIds) {
+        locationIdSet.add(locationId);
+      }
+    }
+
+    for (const locationId of locationIdSet) {
+      const links = await ctx.db
+        .query("locationProducts")
+        .withIndex("by_location", (q) => q.eq("locationId", locationId))
+        .collect();
+      for (const link of links) {
+        await ctx.db.delete(link._id);
+      }
+    }
+
+    for (const override of overrides) {
+      const seenPairs = new Set<string>();
+      for (const locationId of override.locationIds) {
+        for (const productId of override.productIds) {
+          const key = `${locationId}:${productId}`;
+          if (seenPairs.has(key)) continue;
+          seenPairs.add(key);
+          await ctx.db.insert("locationProducts", {
+            locationId,
+            productId,
+            createdAt: Date.now(),
+          });
+        }
+      }
+    }
+  },
+});
+
 export const removeLocationProductById = mutation({
   args: { id: v.id("locationProducts") },
   handler: async (ctx, { id }) => {
@@ -207,6 +297,51 @@ export const unlinkLocationPromotion = mutation({
       )
       .first();
     if (link) await ctx.db.delete(link._id);
+  },
+});
+
+export const syncLocationPromotionOverrides = mutation({
+  args: {
+    overrides: v.array(
+      v.object({
+        locationIds: v.array(v.id("locations")),
+        promotionIds: v.array(v.id("promotions")),
+      })
+    ),
+  },
+  handler: async (ctx, { overrides }) => {
+    const locationIdSet = new Set<string>();
+    for (const override of overrides) {
+      for (const locationId of override.locationIds) {
+        locationIdSet.add(locationId);
+      }
+    }
+
+    for (const locationId of locationIdSet) {
+      const links = await ctx.db
+        .query("locationPromotions")
+        .withIndex("by_location", (q) => q.eq("locationId", locationId))
+        .collect();
+      for (const link of links) {
+        await ctx.db.delete(link._id);
+      }
+    }
+
+    for (const override of overrides) {
+      const seenPairs = new Set<string>();
+      for (const locationId of override.locationIds) {
+        for (const promotionId of override.promotionIds) {
+          const key = `${locationId}:${promotionId}`;
+          if (seenPairs.has(key)) continue;
+          seenPairs.add(key);
+          await ctx.db.insert("locationPromotions", {
+            locationId,
+            promotionId,
+            createdAt: Date.now(),
+          });
+        }
+      }
+    }
   },
 });
 

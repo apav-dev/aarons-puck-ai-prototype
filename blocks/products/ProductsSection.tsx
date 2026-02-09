@@ -16,6 +16,7 @@ import { getConvexClient, queryRef } from "../../lib/convex";
 import {
   ContentModeFieldConfig,
   ContentOption,
+  ContentSourceValue,
 } from "../../lib/fields/content-mode-types";
 
 const getClassName = getClassNameFactory("ProductsSection", styles);
@@ -159,6 +160,7 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
       currentForLocationQueryName: "relationships:productsForLocation",
       linkMutationName: "relationships:linkLocationProduct",
       unlinkMutationName: "relationships:unlinkLocationProduct",
+      syncOverridesMutationName: "relationships:syncLocationProductOverrides",
       locationIdArg: "locationId",
       itemIdArg: "productId",
       mapItemToOption: (item: Record<string, unknown>): ContentOption => ({
@@ -167,12 +169,14 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
         imageUrl: item.image ? String(item.image) : undefined,
         raw: item,
       }),
-      render: (params: {
-        field: ContentModeFieldConfig;
-        value: unknown;
-        onChange: (value: unknown) => void;
-      }) => <ContentModeField {...params} />,
-    },
+      render: (params) => (
+        <ContentModeField
+          field={params.field as unknown as ContentModeFieldConfig}
+          value={params.value as ContentSourceValue}
+          onChange={params.onChange as (value: ContentSourceValue) => void}
+        />
+      ),
+    } as ContentModeFieldConfig,
     variant: {
       type: "radio",
       label: "Variant",
@@ -345,7 +349,7 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
     },
   },
   defaultProps: {
-    contentSource: { source: "static", dynamicMode: "all" },
+    contentSource: { source: "static", dynamicMode: "synced" },
     variant: "cards",
     heading: "Featured Products at Business Geomodifier",
     subheadingPosition: "above",
@@ -406,16 +410,13 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
     if (!source || source.source === "static") {
       return { props, readOnly: { products: false } };
     }
-    if (changed && !changed.contentSource) {
-      return { props };
-    }
-
     const client = getConvexClient();
     let records: Record<string, unknown>[] = [];
 
-    const mode = source.dynamicMode ?? "all";
+    const mode =
+      source.dynamicMode === "perLocation" ? "perLocation" : "synced";
 
-    if (mode === "all" && source.selectedIds?.length) {
+    if (mode === "synced" && source.selectedIds?.length) {
       records = (await client.query(queryRef("products:getByIds"), {
         ids: source.selectedIds,
       })) as Record<string, unknown>[];
@@ -424,11 +425,46 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
     if (mode === "perLocation") {
       const locationId = metadata?.location?._id;
       if (locationId) {
+        const override =
+          source.overrides?.find((item) =>
+            item.locationIds.includes(locationId)
+          ) ?? source.overrides?.find((item) => item.isDefault);
+        const order =
+          override?.itemIds ?? source.perLocationSelectedIds?.[locationId] ?? [];
+        if (order.length > 0) {
+          records = (await client.query(queryRef("products:getByIds"), {
+            ids: order,
+          })) as Record<string, unknown>[];
+          const ordered = [
+            ...order
+              .map((id) => records.find((product) => String(product._id) === id))
+              .filter(Boolean),
+            ...records.filter((product) => !order.includes(String(product._id))),
+          ];
+          records = ordered as Record<string, unknown>[];
+          return {
+            props: {
+              ...props,
+              products: records.map((product) => ({
+                title: String(product.name ?? "Product"),
+                category: String(product.category ?? ""),
+                description: String(product.description ?? ""),
+                imageUrl: String(product.image ?? ""),
+                link: "#",
+                price:
+                  product.price === null || product.price === undefined
+                    ? undefined
+                    : `$${String(product.price)}`,
+              })),
+            },
+            readOnly: { products: true },
+          };
+        }
+
         const products = (await client.query(
           queryRef("relationships:productsForLocation"),
           { locationId }
         )) as Record<string, unknown>[];
-        const order = source.perLocationSelectedIds?.[locationId] ?? [];
         const ordered = [
           ...order
             .map((id) => products.find((product) => String(product._id) === id))

@@ -14,6 +14,7 @@ import { getConvexClient, queryRef } from "../../lib/convex";
 import {
   ContentModeFieldConfig,
   ContentOption,
+  ContentSourceValue,
 } from "../../lib/fields/content-mode-types";
 
 const getClassName = getClassNameFactory("PromoSection", styles);
@@ -110,6 +111,7 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
       currentForLocationQueryName: "relationships:promotionsForLocation",
       linkMutationName: "relationships:linkLocationPromotion",
       unlinkMutationName: "relationships:unlinkLocationPromotion",
+      syncOverridesMutationName: "relationships:syncLocationPromotionOverrides",
       locationIdArg: "locationId",
       itemIdArg: "promotionId",
       mapItemToOption: (item: Record<string, unknown>): ContentOption => ({
@@ -118,12 +120,14 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
         imageUrl: item.image ? String(item.image) : undefined,
         raw: item,
       }),
-      render: (params: {
-        field: ContentModeFieldConfig;
-        value: unknown;
-        onChange: (value: unknown) => void;
-      }) => <ContentModeField {...params} />,
-    },
+      render: (params) => (
+        <ContentModeField
+          field={params.field as unknown as ContentModeFieldConfig}
+          value={params.value as ContentSourceValue}
+          onChange={params.onChange as (value: ContentSourceValue) => void}
+        />
+      ),
+    } as ContentModeFieldConfig,
     variant: {
       type: "radio",
       label: "Variant",
@@ -181,7 +185,7 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
     },
   },
   defaultProps: {
-    contentSource: { source: "static", dynamicMode: "all" },
+    contentSource: { source: "static", dynamicMode: "synced" },
     variant: "compact",
     title: "Featured Promotion",
     subheadingPosition: "above",
@@ -203,16 +207,13 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
         readOnly: { title: false, description: false, imageUrl: false },
       };
     }
-    if (changed && !changed.contentSource) {
-      return { props };
-    }
-
     const client = getConvexClient();
     let promotion: Record<string, unknown> | null = null;
 
-    const mode = source.dynamicMode ?? "all";
+    const mode =
+      source.dynamicMode === "perLocation" ? "perLocation" : "synced";
 
-    if (mode === "all" && source.selectedId) {
+    if (mode === "synced" && source.selectedId) {
       promotion = (await client.query(queryRef("promotions:getById"), {
         id: source.selectedId,
       })) as Record<string, unknown> | null;
@@ -221,11 +222,25 @@ export const PromoSectionConfig: ComponentConfig<PromoSectionProps> = {
     if (mode === "perLocation") {
       const locationId = metadata?.location?._id;
       if (locationId) {
-        const promotions = (await client.query(
-          queryRef("relationships:promotionsForLocation"),
-          { locationId }
-        )) as Record<string, unknown>[];
-        promotion = promotions[0] ?? null;
+        const override =
+          source.overrides?.find((item) =>
+            item.locationIds.includes(locationId)
+          ) ?? source.overrides?.find((item) => item.isDefault);
+        const targetId =
+          override?.itemIds?.[0] ??
+          source.perLocationSelectedId?.[locationId] ??
+          "";
+        if (targetId) {
+          promotion = (await client.query(queryRef("promotions:getById"), {
+            id: targetId,
+          })) as Record<string, unknown> | null;
+        } else {
+          const promotions = (await client.query(
+            queryRef("relationships:promotionsForLocation"),
+            { locationId }
+          )) as Record<string, unknown>[];
+          promotion = promotions[0] ?? null;
+        }
       }
     }
 

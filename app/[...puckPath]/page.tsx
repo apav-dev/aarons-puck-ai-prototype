@@ -14,6 +14,7 @@ import { Client } from "./client";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { getPage } from "../../lib/get-page";
+import { getConvexClient, queryRef } from "../../lib/convex";
 
 export async function generateMetadata({
   params,
@@ -36,12 +37,26 @@ export default async function Page({
   const { puckPath = [] } = await params;
   const path = `/${puckPath.join("/")}`;
   const data = await getPage(path);
+  const client = getConvexClient();
+  let metadata: Record<string, unknown> | undefined;
 
   if (!data) {
     return notFound();
   }
 
-  return <Client data={data} />;
+  if (puckPath.length >= 3) {
+    const [regionSlug, citySlug, line1Slug] = puckPath;
+    const location = await client.query(queryRef("locations:getBySlugs"), {
+      regionSlug,
+      citySlug,
+      line1Slug,
+    });
+    if (location) {
+      metadata = { location };
+    }
+  }
+
+  return <Client data={data} metadata={metadata} />;
 }
 
 // Force Next.js to produce static pages: https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config#dynamic
