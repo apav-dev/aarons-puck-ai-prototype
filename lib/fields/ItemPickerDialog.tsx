@@ -4,10 +4,43 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import { CSS } from "@dnd-kit/utilities";
+import {
+  RefreshCw,
+  SlidersHorizontal,
+  Globe,
+  MapPin,
+  GripVertical,
+  Search,
+  Plus,
+  X,
+  ChevronUp,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useFieldContext } from "./FieldContext";
 import ConfirmDialog from "./ConfirmDialog";
 import type {
@@ -16,6 +49,10 @@ import type {
   ContentOverride,
   ContentSourceValue,
 } from "./content-mode-types";
+
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
 
 type ItemPickerDialogProps = {
   open: boolean;
@@ -34,24 +71,18 @@ type ConfirmState = {
   onConfirm: () => void;
 };
 
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
 const getNextValue = (
   value: ContentSourceValue | undefined,
   patch: Partial<ContentSourceValue>,
-): ContentSourceValue => {
-  return {
-    source: value?.source ?? "static",
-    ...value,
-    ...patch,
-  };
-};
-
-const moveItem = (items: string[], from: number, to: number) => {
-  if (from === to || from < 0 || to < 0 || from >= items.length) return items;
-  const next = [...items];
-  const [removed] = next.splice(from, 1);
-  next.splice(to, 0, removed);
-  return next;
-};
+): ContentSourceValue => ({
+  source: value?.source ?? "static",
+  ...value,
+  ...patch,
+});
 
 const createDefaultOverride = (
   itemIds: string[],
@@ -64,6 +95,82 @@ const createDefaultOverride = (
   itemIds,
 });
 
+/* ------------------------------------------------------------------ */
+/*  Sortable selected-item card                                        */
+/* ------------------------------------------------------------------ */
+
+function SortableSelectedItem({
+  option,
+  onRemove,
+}: {
+  option: ContentOption;
+  onRemove: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: option.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-2 py-2"
+    >
+      <button
+        type="button"
+        className="shrink-0 cursor-grab touch-none text-gray-300 hover:text-gray-500 active:cursor-grabbing"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+
+      {option.imageUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={option.imageUrl}
+          alt={option.label}
+          className="h-9 w-9 shrink-0 rounded object-cover"
+        />
+      )}
+
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-sm font-semibold text-gray-900">
+          {option.label}
+        </div>
+        {option.price != null && (
+          <div className="text-xs text-gray-500">
+            ${option.price.toFixed(2)}
+          </div>
+        )}
+      </div>
+
+      <button
+        type="button"
+        onClick={onRemove}
+        className="shrink-0 rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Main dialog                                                        */
+/* ------------------------------------------------------------------ */
+
 export const ItemPickerDialog = ({
   open,
   onOpenChange,
@@ -72,11 +179,14 @@ export const ItemPickerDialog = ({
   onChange,
 }: ItemPickerDialogProps) => {
   const { supabaseClient, allLocations } = useFieldContext();
+
+  /* ---- state ---- */
   const [options, setOptions] = useState<ContentOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [mode, setMode] = useState<"synced" | "perLocation">("synced");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
@@ -88,14 +198,109 @@ export const ItemPickerDialog = ({
   const [confirmState, setConfirmState] = useState<ConfirmState | null>(null);
   const hasSyncedFromDB = useRef(false);
 
+  /* ---- dnd sensors ---- */
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  /* ---- derived ---- */
   const allLocationIds = useMemo(
-    () => allLocations.map((location) => location.id),
+    () => allLocations.map((l) => l.id),
     [allLocations],
   );
 
+  const activeOverride = useMemo(
+    () => overrides.find((o) => o.id === activeOverrideId) ?? null,
+    [activeOverrideId, overrides],
+  );
+
+  const customOverrides = useMemo(
+    () => overrides.filter((o) => !o.isDefault),
+    [overrides],
+  );
+
+  const claimedLocationIds = useMemo(
+    () =>
+      overrides
+        .filter((o) => !o.isDefault && o.id !== activeOverrideId)
+        .flatMap((o) => o.locationIds),
+    [activeOverrideId, overrides],
+  );
+
+  const regions = useMemo(() => {
+    const list = allLocations
+      .map((l) => l.address?.region ?? l.slug?.region ?? "")
+      .filter(Boolean);
+    return Array.from(new Set(list));
+  }, [allLocations]);
+
+  const filteredLocations = useMemo(() => {
+    const term = locationSearch.trim().toLowerCase();
+    return allLocations.filter((l) => {
+      const name = l.name?.toLowerCase() ?? "";
+      const city = l.address?.city?.toLowerCase() ?? "";
+      const region = l.address?.region ?? l.slug?.region ?? "";
+      const matchesTerm = !term || name.includes(term) || city.includes(term);
+      const matchesRegion = !regionFilter || regionFilter === region;
+      return matchesTerm && matchesRegion;
+    });
+  }, [allLocations, locationSearch, regionFilter]);
+
+  const categories = useMemo(() => {
+    const cats = options
+      .map((o) => o.category)
+      .filter((c): c is string => Boolean(c));
+    return Array.from(new Set(cats));
+  }, [options]);
+
+  const filteredOptions = useMemo(() => {
+    let result = options;
+    const term = search.trim().toLowerCase();
+    if (term) {
+      result = result.filter(
+        (o) =>
+          o.label.toLowerCase().includes(term) ||
+          (o.description?.toLowerCase().includes(term) ?? false),
+      );
+    }
+    if (categoryFilter) {
+      result = result.filter((o) => o.category === categoryFilter);
+    }
+    return result;
+  }, [options, search, categoryFilter]);
+
+  const currentItemIds = useMemo(() => {
+    if (mode === "synced") {
+      return field.selectionMode === "multiple"
+        ? selectedIds
+        : selectedId
+          ? [selectedId]
+          : [];
+    }
+    return activeOverride?.itemIds ?? [];
+  }, [activeOverride?.itemIds, field.selectionMode, mode, selectedId, selectedIds]);
+
+  const selectedOptions = useMemo(() => {
+    if (field.selectionMode === "multiple") {
+      return currentItemIds
+        .map((id) => options.find((o) => o.id === id))
+        .filter(Boolean) as ContentOption[];
+    }
+    if (!currentItemIds[0]) return [];
+    const opt = options.find((o) => o.id === currentItemIds[0]);
+    return opt ? [opt] : [];
+  }, [currentItemIds, field.selectionMode, options]);
+
+  /* ---- effects ---- */
+
+  // Reset local state when dialog opens
   useEffect(() => {
     if (!open) return;
     setSearch("");
+    setCategoryFilter(null);
     setLocationSearch("");
     setRegionFilter(null);
 
@@ -144,6 +349,7 @@ export const ItemPickerDialog = ({
     value?.selectedIds,
   ]);
 
+  // Fetch options from Supabase
   useEffect(() => {
     let active = true;
     if (!open) {
@@ -155,7 +361,6 @@ export const ItemPickerDialog = ({
 
     const load = async () => {
       try {
-        // 1. Fetch all entity options
         const { data: items, error: err } = await supabaseClient
           .from(field.entityTable)
           .select("*");
@@ -173,8 +378,6 @@ export const ItemPickerDialog = ({
           : [];
         setOptions(next);
 
-        // Prune any stale IDs that don't match fetched options (e.g. old
-        // Convex IDs left over from a migration).
         const validIds = new Set(next.map((opt) => opt.id));
         const prune = (ids: string[]) => ids.filter((id) => validIds.has(id));
 
@@ -184,9 +387,6 @@ export const ItemPickerDialog = ({
         });
         setSelectedId((prev) => (validIds.has(prev) ? prev : ""));
 
-        // 2. For per-location mode, sync override itemIds from the junction
-        //    table so the dialog always reflects the actual DB state (the
-        //    overrides baked into the page JSON can become stale).
         if (!hasSyncedFromDB.current) {
           hasSyncedFromDB.current = true;
 
@@ -196,7 +396,6 @@ export const ItemPickerDialog = ({
 
           if (!active) return;
 
-          // Build a map: locationId → [entityIds]
           const locationToItems = new Map<string, string[]>();
           for (const row of (junctionRows ?? []) as Record<string, unknown>[]) {
             const locId = String(row[field.locationIdColumn]);
@@ -210,15 +409,12 @@ export const ItemPickerDialog = ({
           setOverrides((prev) => {
             let changed = false;
             const synced = prev.map((override) => {
-              // Pick the first location in this override to look up its items
               const repLocId = override.locationIds[0];
               const dbItems = repLocId
                 ? (locationToItems.get(repLocId) ?? []).filter((id) =>
                     validIds.has(id),
                   )
                 : [];
-
-              // Use DB items if available, otherwise prune existing items
               const finalItems =
                 dbItems.length > 0 ? dbItems : prune(override.itemIds);
 
@@ -234,7 +430,6 @@ export const ItemPickerDialog = ({
             return changed ? synced : prev;
           });
         } else {
-          // Not first load — just prune stale IDs
           setOverrides((prev) => {
             let changed = false;
             const pruned = prev.map((override) => {
@@ -250,9 +445,7 @@ export const ItemPickerDialog = ({
         }
       } catch (e) {
         if (active) {
-          setError(
-            e instanceof Error ? e.message : "Failed to load items.",
-          );
+          setError(e instanceof Error ? e.message : "Failed to load items.");
         }
       } finally {
         if (active) setLoading(false);
@@ -260,123 +453,29 @@ export const ItemPickerDialog = ({
     };
 
     load();
-
     return () => {
       active = false;
     };
   }, [supabaseClient, field, open]);
 
-  const activeOverride = useMemo(
-    () =>
-      overrides.find((override) => override.id === activeOverrideId) ?? null,
-    [activeOverrideId, overrides],
-  );
-
-  const customOverrides = useMemo(
-    () => overrides.filter((override) => !override.isDefault),
-    [overrides],
-  );
-
-  const claimedLocationIds = useMemo(() => {
-    return overrides
-      .filter(
-        (override) => !override.isDefault && override.id !== activeOverrideId,
-      )
-      .flatMap((override) => override.locationIds);
-  }, [activeOverrideId, overrides]);
-
-  const regions = useMemo(() => {
-    const list = allLocations
-      .map(
-        (location) => location.address?.region ?? location.slug?.region ?? "",
-      )
-      .filter(Boolean);
-    return Array.from(new Set(list));
-  }, [allLocations]);
-
-  const filteredLocations = useMemo(() => {
-    const term = locationSearch.trim().toLowerCase();
-    return allLocations.filter((location) => {
-      const name = location.name?.toLowerCase() ?? "";
-      const city = location.address?.city?.toLowerCase() ?? "";
-      const region = location.address?.region ?? location.slug?.region ?? "";
-      const matchesTerm = !term || name.includes(term) || city.includes(term);
-      const matchesRegion = !regionFilter || regionFilter === region;
-      return matchesTerm && matchesRegion;
-    });
-  }, [allLocations, locationSearch, regionFilter]);
-
-  const filteredOptions = useMemo(() => {
-    const term = search.trim().toLowerCase();
-    if (!term) return options;
-    return options.filter((option) =>
-      option.label.toLowerCase().includes(term),
-    );
-  }, [options, search]);
-
-  const currentItemIds = useMemo(() => {
-    if (mode === "synced") {
-      return field.selectionMode === "multiple"
-        ? selectedIds
-        : selectedId
-          ? [selectedId]
-          : [];
-    }
-    return activeOverride?.itemIds ?? [];
-  }, [
-    activeOverride?.itemIds,
-    field.selectionMode,
-    mode,
-    selectedId,
-    selectedIds,
-  ]);
-
-  const selectedOptions = useMemo(() => {
-    if (field.selectionMode === "multiple") {
-      return currentItemIds
-        .map((id) => options.find((option) => option.id === id))
-        .filter(Boolean) as ContentOption[];
-    }
-    if (!currentItemIds[0]) return [];
-    const option = options.find((opt) => opt.id === currentItemIds[0]);
-    return option ? [option] : [];
-  }, [currentItemIds, field.selectionMode, options]);
-
-  const selectionLabel =
-    field.selectionMode === "multiple"
-      ? `${currentItemIds.length} selected`
-      : currentItemIds[0]
-        ? "1 selected"
-        : "0 selected";
-
-  const buttonBaseStyles = {
-    padding: "6px 10px",
-    borderRadius: "6px",
-    border: "1px solid var(--puck-color-grey-09, #dcdcdc)",
-    background: "white",
-    color: "var(--puck-color-grey-02, #292929)",
-    cursor: "pointer",
-  } as const;
+  /* ---- actions ---- */
 
   const updateOverrides = (nextOverrides: ContentOverride[]) => {
-    const defaultOverride = nextOverrides.find(
-      (override) => override.isDefault,
-    );
+    const defaultOverride = nextOverrides.find((o) => o.isDefault);
     if (!defaultOverride) {
       setOverrides(nextOverrides);
       return;
     }
     const claimed = nextOverrides
-      .filter((override) => !override.isDefault)
-      .flatMap((override) => override.locationIds);
+      .filter((o) => !o.isDefault)
+      .flatMap((o) => o.locationIds);
     const nextDefault = {
       ...defaultOverride,
       locationIds: allLocationIds.filter((id) => !claimed.includes(id)),
     };
-    const updated = nextOverrides.map((override) =>
-      override.isDefault ? nextDefault : override,
+    setOverrides(
+      nextOverrides.map((o) => (o.isDefault ? nextDefault : o)),
     );
-    setOverrides(updated);
   };
 
   const updateCurrentItems = (next: string[]) => {
@@ -390,10 +489,10 @@ export const ItemPickerDialog = ({
     }
     if (!activeOverride) return;
     updateOverrides(
-      overrides.map((override) =>
-        override.id === activeOverride.id
+      overrides.map((o) =>
+        o.id === activeOverride.id
           ? {
-              ...override,
+              ...o,
               itemIds:
                 field.selectionMode === "multiple"
                   ? next
@@ -401,7 +500,7 @@ export const ItemPickerDialog = ({
                     ? [next[0]]
                     : [],
             }
-          : override,
+          : o,
       ),
     );
   };
@@ -418,15 +517,15 @@ export const ItemPickerDialog = ({
     if (nextMode === mode) return;
     if (nextMode === "perLocation") {
       setConfirmState({
-        title: "Enable per-location overrides?",
+        title: "Enable per-location customization?",
         message:
-          "Switching to per-location lets you customize by location. The current selection becomes the default.",
+          "This lets you show different products at different locations. The current selection becomes the default for all locations. You can then add overrides for specific locations.",
         bullets: [
-          "Create overrides to assign specific locations",
-          "Locations without overrides keep the default list",
-          "You can switch back to Synced anytime",
+          "Create overrides to give certain locations a different product list",
+          "Locations without an override keep the default selection",
+          "You can return to synced mode at any time",
         ],
-        confirmLabel: "Enable per-location",
+        confirmLabel: "Enable customization",
         onConfirm: () => {
           setConfirmState(null);
           const defaultOverride = createDefaultOverride(
@@ -452,9 +551,7 @@ export const ItemPickerDialog = ({
         message:
           "This will remove all custom overrides and apply one list to every location.",
         bullets: [
-          `${customOverrides.length} override${
-            customOverrides.length === 1 ? "" : "s"
-          } will be deleted`,
+          `${customOverrides.length} override${customOverrides.length === 1 ? "" : "s"} will be deleted`,
           "Every location will use the default list",
           "This cannot be undone",
         ],
@@ -463,7 +560,7 @@ export const ItemPickerDialog = ({
         onConfirm: () => {
           setConfirmState(null);
           setMode("synced");
-          const fallback = overrides.find((override) => override.isDefault);
+          const fallback = overrides.find((o) => o.isDefault);
           const items = fallback?.itemIds ?? [];
           setSelectedIds(items);
           setSelectedId(items[0] ?? "");
@@ -475,7 +572,7 @@ export const ItemPickerDialog = ({
     }
 
     setMode("synced");
-    const fallback = overrides.find((override) => override.isDefault);
+    const fallback = overrides.find((o) => o.isDefault);
     const items = fallback?.itemIds ?? [];
     setSelectedIds(items);
     setSelectedId(items[0] ?? "");
@@ -485,7 +582,7 @@ export const ItemPickerDialog = ({
 
   const addOverride = () => {
     const id = `override_${Date.now()}`;
-    const defaultOverride = overrides.find((override) => override.isDefault);
+    const defaultOverride = overrides.find((o) => o.isDefault);
     const newOverride: ContentOverride = {
       id,
       label: `Override ${customOverrides.length + 1}`,
@@ -499,21 +596,19 @@ export const ItemPickerDialog = ({
   };
 
   const deleteOverride = (id: string) => {
-    const target = overrides.find((override) => override.id === id);
+    const target = overrides.find((o) => o.id === id);
     if (!target || target.isDefault) return;
     setConfirmState({
       title: "Remove this override?",
-      message: `"${target.label}" covers ${target.locationIds.length} location${
-        target.locationIds.length === 1 ? "" : "s"
-      }. Those locations will revert to the default list.`,
+      message: `"${target.label}" covers ${target.locationIds.length} location${target.locationIds.length === 1 ? "" : "s"}. Those locations will revert to the default list.`,
       confirmLabel: "Remove override",
       confirmDanger: true,
       onConfirm: () => {
         setConfirmState(null);
-        const next = overrides.filter((override) => override.id !== id);
+        const next = overrides.filter((o) => o.id !== id);
         updateOverrides(next);
         setActiveOverrideId(
-          next.find((override) => override.isDefault)?.id ?? "default",
+          next.find((o) => o.isDefault)?.id ?? "default",
         );
       },
     });
@@ -522,14 +617,14 @@ export const ItemPickerDialog = ({
   const toggleLocationInOverride = (locationId: string) => {
     if (!activeOverride || activeOverride.isDefault) return;
     updateOverrides(
-      overrides.map((override) => {
-        if (override.id !== activeOverride.id) return override;
-        const has = override.locationIds.includes(locationId);
+      overrides.map((o) => {
+        if (o.id !== activeOverride.id) return o;
+        const has = o.locationIds.includes(locationId);
         return {
-          ...override,
+          ...o,
           locationIds: has
-            ? override.locationIds.filter((id) => id !== locationId)
-            : [...override.locationIds, locationId],
+            ? o.locationIds.filter((id) => id !== locationId)
+            : [...o.locationIds, locationId],
         };
       }),
     );
@@ -538,32 +633,41 @@ export const ItemPickerDialog = ({
   const toggleAllFilteredLocations = () => {
     if (!activeOverride || activeOverride.isDefault) return;
     const available = filteredLocations.filter(
-      (location) => !claimedLocationIds.includes(location.id),
+      (l) => !claimedLocationIds.includes(l.id),
     );
-    const availableIds = available.map((location) => location.id);
+    const availableIds = available.map((l) => l.id);
     const allIn = availableIds.every((id) =>
       activeOverride.locationIds.includes(id),
     );
     updateOverrides(
-      overrides.map((override) => {
-        if (override.id !== activeOverride.id) return override;
+      overrides.map((o) => {
+        if (o.id !== activeOverride.id) return o;
         return {
-          ...override,
+          ...o,
           locationIds: allIn
-            ? override.locationIds.filter((id) => !availableIds.includes(id))
-            : Array.from(new Set([...override.locationIds, ...availableIds])),
+            ? o.locationIds.filter((id) => !availableIds.includes(id))
+            : Array.from(new Set([...o.locationIds, ...availableIds])),
         };
       }),
     );
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = currentItemIds.indexOf(String(active.id));
+    const newIndex = currentItemIds.indexOf(String(over.id));
+    if (oldIndex === -1 || newIndex === -1) return;
+    updateCurrentItems(arrayMove(currentItemIds, oldIndex, newIndex));
+  };
+
+  /* ---- save ---- */
+
   const runSave = async (nextOverrides: ContentOverride[]) => {
-    // Only include IDs that exist in the fetched options list. This guards
-    // against stale IDs (e.g. leftover Convex IDs) being sent to Supabase.
     const validItemIds = new Set(options.map((opt) => opt.id));
-    const cleanedOverrides = nextOverrides.map((override) => ({
-      ...override,
-      itemIds: override.itemIds.filter((id) => validItemIds.has(id)),
+    const cleanedOverrides = nextOverrides.map((o) => ({
+      ...o,
+      itemIds: o.itemIds.filter((id) => validItemIds.has(id)),
     }));
 
     const affectedLocationIds = Array.from(
@@ -579,9 +683,9 @@ export const ItemPickerDialog = ({
       .in(locationIdColumn, affectedLocationIds);
     if (deleteError) throw deleteError;
 
-    const rows = cleanedOverrides.flatMap((override) =>
-      override.locationIds.flatMap((locId) =>
-        override.itemIds.map((itemId) => ({
+    const rows = cleanedOverrides.flatMap((o) =>
+      o.locationIds.flatMap((locId) =>
+        o.itemIds.map((itemId) => ({
           [locationIdColumn]: locId,
           [entityIdColumn]: itemId,
         })),
@@ -599,9 +703,6 @@ export const ItemPickerDialog = ({
     setSaving(true);
     setError(null);
     try {
-      // Filter IDs to only those present in the fetched options so stale
-      // references (e.g. old Convex IDs) never reach the database or get
-      // persisted back into page data.
       const validItemIds = new Set(options.map((opt) => opt.id));
       const pruneIds = (ids: string[]) =>
         ids.filter((id) => validItemIds.has(id));
@@ -640,14 +741,12 @@ export const ItemPickerDialog = ({
         overrides.length > 0
           ? overrides
           : [createDefaultOverride([], allLocationIds)]
-      ).map((override) => ({
-        ...override,
-        itemIds: pruneIds(override.itemIds),
+      ).map((o) => ({
+        ...o,
+        itemIds: pruneIds(o.itemIds),
       }));
-      const defaultOverride = ensuredOverrides.find(
-        (override) => override.isDefault,
-      );
-      const custom = ensuredOverrides.filter((override) => !override.isDefault);
+      const defaultOverride = ensuredOverrides.find((o) => o.isDefault);
+      const custom = ensuredOverrides.filter((o) => !o.isDefault);
 
       const finalizeSave = async () => {
         await runSave(ensuredOverrides);
@@ -668,31 +767,13 @@ export const ItemPickerDialog = ({
         const defaultCount = defaultOverride?.locationIds.length ?? 0;
         setConfirmState({
           title: "Save all changes?",
-          message: `You have ${custom.length} override${
-            custom.length === 1 ? "" : "s"
-          } affecting ${custom.reduce(
-            (sum, override) => sum + override.locationIds.length,
-            0,
-          )} location${
-            custom.reduce(
-              (sum, override) => sum + override.locationIds.length,
-              0,
-            ) === 1
-              ? ""
-              : "s"
-          }. The remaining ${defaultCount} location${
-            defaultCount === 1 ? "" : "s"
-          } will use the default list.`,
+          message: `You have ${custom.length} override${custom.length === 1 ? "" : "s"} affecting ${custom.reduce((sum, o) => sum + o.locationIds.length, 0)} location${custom.reduce((sum, o) => sum + o.locationIds.length, 0) === 1 ? "" : "s"}. The remaining ${defaultCount} location${defaultCount === 1 ? "" : "s"} will use the default list.`,
           bullets: [
             ...custom.map(
-              (override) =>
-                `"${override.label}": ${override.itemIds.length} ${field.entityLabel.toLowerCase()} → ${override.locationIds.length} location${
-                  override.locationIds.length === 1 ? "" : "s"
-                }`,
+              (o) =>
+                `"${o.label}": ${o.itemIds.length} ${field.entityLabel.toLowerCase()} → ${o.locationIds.length} location${o.locationIds.length === 1 ? "" : "s"}`,
             ),
-            `Default: ${defaultOverride?.itemIds.length ?? 0} ${field.entityLabel.toLowerCase()} → ${defaultCount} location${
-              defaultCount === 1 ? "" : "s"
-            }`,
+            `Default: ${defaultOverride?.itemIds.length ?? 0} ${field.entityLabel.toLowerCase()} → ${defaultCount} location${defaultCount === 1 ? "" : "s"}`,
           ],
           confirmLabel: "Save changes",
           onConfirm: () => {
@@ -716,193 +797,170 @@ export const ItemPickerDialog = ({
     }
   };
 
+  /* ---- footer status text ---- */
+  const footerStatus = useMemo(() => {
+    if (mode === "synced") {
+      return `${currentItemIds.length} ${field.entityLabel.toLowerCase()} → all ${allLocations.length} locations`;
+    }
+    if (activeOverride) {
+      return `${activeOverride.itemIds.length} ${field.entityLabel.toLowerCase()} → ${activeOverride.locationIds.length} locations`;
+    }
+    return "";
+  }, [mode, currentItemIds.length, field.entityLabel, allLocations.length, activeOverride]);
+
+  /* ================================================================ */
+  /*  RENDER                                                          */
+  /* ================================================================ */
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent style={{ width: "min(1000px, calc(100vw - 48px))" }}>
-        <DialogHeader>
-          <DialogTitle>Choose {field.entityLabel}</DialogTitle>
-        </DialogHeader>
+      <DialogContent
+        className="flex flex-col gap-0 p-0"
+        style={{ width: "min(1040px, calc(100vw - 48px))", maxHeight: "calc(100vh - 48px)" }}
+      >
+        {/* -------- Header -------- */}
+        <div className="flex items-center gap-3 border-b border-gray-200 px-6 py-4">
+          <DialogTitle className="text-lg font-semibold text-gray-900">
+            Choose {field.entityLabel}
+          </DialogTitle>
+          {field.label && (
+            <span className="text-sm text-gray-400">{field.label}</span>
+          )}
+        </div>
 
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+        {/* -------- Mode toggle -------- */}
+        <div className="flex items-center gap-3 border-b border-gray-200 px-6 py-3">
           <button
             type="button"
             onClick={() => updateMode("synced")}
-            style={{
-              ...buttonBaseStyles,
-              background:
-                mode === "synced"
-                  ? "var(--puck-color-blue-06, #2563eb)"
-                  : "white",
-              color: mode === "synced" ? "white" : "var(--puck-color-grey-02)",
-            }}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
+              mode === "synced"
+                ? "border-indigo-500 bg-white text-indigo-700 shadow-sm"
+                : "border-gray-200 bg-gray-100 text-gray-600 hover:bg-gray-200",
+            )}
           >
+            <RefreshCw className="h-3.5 w-3.5" />
             Synced
           </button>
           <button
             type="button"
             onClick={() => updateMode("perLocation")}
-            style={{
-              ...buttonBaseStyles,
-              background:
-                mode === "perLocation"
-                  ? "var(--puck-color-blue-06, #2563eb)"
-                  : "white",
-              color:
-                mode === "perLocation" ? "white" : "var(--puck-color-grey-02)",
-            }}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
+              mode === "perLocation"
+                ? "border-indigo-500 bg-white text-indigo-700 shadow-sm"
+                : "border-gray-200 bg-gray-100 text-gray-600 hover:bg-gray-200",
+            )}
           >
+            <SlidersHorizontal className="h-3.5 w-3.5" />
             Per-location
           </button>
-          <span
-            style={{ fontSize: "12px", color: "var(--puck-color-grey-05)" }}
-          >
+          <span className="text-sm text-gray-400">
             {mode === "synced"
-              ? `Same ${field.entityLabel.toLowerCase()} on all locations`
-              : `${customOverrides.length} override${
-                  customOverrides.length === 1 ? "" : "s"
-                } active`}
+              ? `Same ${field.entityLabel.toLowerCase()} on all ${allLocations.length} locations`
+              : `${customOverrides.length} override${customOverrides.length === 1 ? "" : "s"} active`}
           </span>
         </div>
 
+        {/* -------- Override tabs (per-location) -------- */}
         {mode === "perLocation" && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+          <div className="flex items-center gap-2 border-b border-gray-200 px-6 py-3">
             {overrides.map((override) => {
               const isActive = override.id === activeOverrideId;
               return (
-                <div
+                <button
                   key={override.id}
-                  role="button"
-                  tabIndex={0}
+                  type="button"
                   onClick={() => {
                     setActiveOverrideId(override.id);
                     setShowLocationPicker(!override.isDefault);
                   }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setActiveOverrideId(override.id);
-                      setShowLocationPicker(!override.isDefault);
-                    }
-                  }}
-                  style={{
-                    padding: "4px 10px",
-                    borderRadius: "6px",
-                    border: `1px solid ${
-                      isActive
-                        ? "var(--puck-color-blue-06, #2563eb)"
-                        : "var(--puck-color-grey-09, #dcdcdc)"
-                    }`,
-                    background: isActive ? "rgba(37, 99, 235, 0.1)" : "white",
-                    color: isActive
-                      ? "var(--puck-color-blue-06, #2563eb)"
-                      : "var(--puck-color-grey-02, #292929)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    cursor: "pointer",
-                  }}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
+                    isActive
+                      ? "border-indigo-500 bg-indigo-50 text-indigo-700"
+                      : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50",
+                  )}
                 >
-                  <span>{override.isDefault ? "🌐" : "📍"}</span>
-                  <span>{override.label}</span>
+                  {override.isDefault ? (
+                    <Globe className="h-3.5 w-3.5" />
+                  ) : (
+                    <MapPin className="h-3.5 w-3.5" />
+                  )}
+                  {override.label}
                   <span
-                    style={{
-                      fontSize: "11px",
-                      padding: "2px 6px",
-                      borderRadius: "999px",
-                      background: isActive
-                        ? "rgba(37, 99, 235, 0.15)"
-                        : "var(--puck-color-grey-11)",
-                    }}
+                    className={cn(
+                      "ml-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold",
+                      isActive
+                        ? "bg-indigo-500 text-white"
+                        : "bg-gray-200 text-gray-600",
+                    )}
                   >
                     {override.locationIds.length}
                   </span>
                   {!override.isDefault && (
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => {
+                        e.stopPropagation();
                         deleteOverride(override.id);
                       }}
-                      style={{
-                        ...buttonBaseStyles,
-                        padding: "0 6px",
-                        border: "none",
-                        background: "transparent",
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.stopPropagation();
+                          deleteOverride(override.id);
+                        }
                       }}
+                      className="ml-0.5 rounded p-0.5 text-gray-400 hover:bg-indigo-100 hover:text-indigo-600"
                     >
-                      ×
-                    </button>
+                      <X className="h-3 w-3" />
+                    </span>
                   )}
-                </div>
+                </button>
               );
             })}
             <button
               type="button"
               onClick={addOverride}
-              style={{
-                ...buttonBaseStyles,
-                borderStyle: "dashed",
-                color: "var(--puck-color-blue-06, #2563eb)",
-              }}
+              className="inline-flex items-center gap-1 rounded-full border border-dashed border-gray-300 px-3 py-1.5 text-sm font-medium text-indigo-600 hover:border-indigo-400 hover:bg-indigo-50"
             >
-              + Override
+              <Plus className="h-3.5 w-3.5" />
+              Override
             </button>
           </div>
         )}
 
+        {/* -------- Location picker (per-location, non-default override) -------- */}
         {mode === "perLocation" &&
           activeOverride &&
           !activeOverride.isDefault && (
-            <div
-              style={{
-                border: "1px solid var(--puck-color-grey-10)",
-                borderRadius: "8px",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  gap: "6px",
-                  padding: "8px 10px",
-                  borderBottom: "1px solid var(--puck-color-grey-10)",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                }}
-              >
-                <input
-                  type="text"
-                  placeholder="Search locations..."
-                  value={locationSearch}
-                  onChange={(event) => setLocationSearch(event.target.value)}
-                  style={{
-                    flex: 1,
-                    minWidth: "120px",
-                    padding: "6px 8px",
-                    borderRadius: "6px",
-                    border: "1px solid var(--puck-color-grey-09)",
-                  }}
-                />
+            <div className="border-b border-gray-200">
+              {/* Search & filters row */}
+              <div className="flex flex-wrap items-center gap-2 px-6 py-3">
+                <div className="relative flex-1">
+                  <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <Input
+                    placeholder="Search locations..."
+                    value={locationSearch}
+                    onChange={(e) => setLocationSearch(e.target.value)}
+                    className="h-8 pl-8 text-sm"
+                  />
+                </div>
                 {regions.map((region) => (
                   <button
                     key={region}
                     type="button"
                     onClick={() =>
-                      setRegionFilter((prev) =>
-                        prev === region ? null : region,
-                      )
+                      setRegionFilter((prev) => (prev === region ? null : region))
                     }
-                    style={{
-                      ...buttonBaseStyles,
-                      padding: "4px 8px",
-                      background:
-                        regionFilter === region
-                          ? "var(--puck-color-blue-06, #2563eb)"
-                          : "white",
-                      color:
-                        regionFilter === region
-                          ? "white"
-                          : "var(--puck-color-grey-02)",
-                    }}
+                    className={cn(
+                      "rounded-md border px-2.5 py-1 text-xs font-medium transition-colors",
+                      regionFilter === region
+                        ? "border-indigo-500 bg-indigo-50 text-indigo-700"
+                        : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50",
+                    )}
                   >
                     {region}
                   </button>
@@ -910,367 +968,338 @@ export const ItemPickerDialog = ({
                 <button
                   type="button"
                   onClick={() => setShowLocationPicker((prev) => !prev)}
-                  style={{ ...buttonBaseStyles, padding: "4px 8px" }}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-gray-700"
                 >
                   {showLocationPicker ? "Collapse" : "Expand"}
+                  <ChevronUp
+                    className={cn(
+                      "h-3.5 w-3.5 transition-transform",
+                      !showLocationPicker && "rotate-180",
+                    )}
+                  />
                 </button>
               </div>
+
+              {/* Location list */}
               {showLocationPicker && (
-                <>
-                  <button
-                    type="button"
-                    onClick={toggleAllFilteredLocations}
-                    style={{
-                      ...buttonBaseStyles,
-                      width: "100%",
-                      borderTop: "none",
-                      borderRadius: "0",
-                    }}
-                  >
-                    Select all available ({filteredLocations.length})
-                  </button>
-                  <div style={{ maxHeight: "180px", overflowY: "auto" }}>
-                    {filteredLocations.map((location) => {
-                      const claimed = claimedLocationIds.includes(location.id);
-                      const checked = activeOverride.locationIds.includes(
-                        location.id,
-                      );
-                      return (
-                        <div
-                          key={location.id}
-                          onClick={() =>
-                            !claimed
-                              ? toggleLocationInOverride(location.id)
-                              : null
-                          }
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px",
-                            padding: "6px 10px",
-                            cursor: claimed ? "default" : "pointer",
-                            opacity: claimed ? 0.5 : 1,
-                            borderBottom: "1px solid var(--puck-color-grey-11)",
-                          }}
-                        >
-                          <input type="checkbox" readOnly checked={checked} />
-                          <span>{location.name ?? "Unnamed location"}</span>
-                          {claimed && (
-                            <span
-                              style={{ fontSize: "11px", color: "#b45309" }}
-                            >
-                              in another override
-                            </span>
-                          )}
-                          <span
-                            style={{
-                              marginLeft: "auto",
-                              fontSize: "11px",
-                              color: "var(--puck-color-grey-05)",
-                            }}
-                          >
-                            {location.address?.city ?? ""}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <input
-            type="text"
-            placeholder={`Search ${field.entityLabel.toLowerCase()}`}
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            style={{
-              flex: 1,
-              padding: "8px 10px",
-              borderRadius: "6px",
-              border: "1px solid var(--puck-color-grey-09)",
-              backgroundColor: "white",
-              color: "var(--puck-color-grey-02)",
-            }}
-          />
-          <span
-            style={{
-              padding: "4px 8px",
-              borderRadius: "999px",
-              background: "var(--puck-color-grey-11)",
-              fontSize: "12px",
-              color: "var(--puck-color-grey-02)",
-            }}
-          >
-            {selectionLabel}
-          </span>
-        </div>
-
-        {field.selectionMode === "multiple" && selectedOptions.length > 0 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <div
-              style={{
-                fontSize: "12px",
-                fontWeight: 600,
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                color: "var(--puck-color-grey-05)",
-              }}
-            >
-              Selected order
-            </div>
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "8px" }}
-            >
-              {selectedOptions.map((option, index) => (
-                <div
-                  key={option.id}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    padding: "8px 10px",
-                    borderRadius: "6px",
-                    border: "1px solid var(--puck-color-grey-10)",
-                    background: "var(--puck-color-grey-12)",
-                  }}
-                >
-                  {option.imageUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={option.imageUrl}
-                      alt={option.label}
-                      style={{
-                        width: "32px",
-                        height: "32px",
-                        borderRadius: "4px",
-                        objectFit: "cover",
-                      }}
+                <div className="max-h-[200px] overflow-y-auto border-t border-gray-100 px-6">
+                  {/* Select all */}
+                  <label className="flex cursor-pointer items-center gap-3 border-b border-gray-100 py-2.5">
+                    <Checkbox
+                      checked={
+                        filteredLocations
+                          .filter((l) => !claimedLocationIds.includes(l.id))
+                          .every((l) => activeOverride.locationIds.includes(l.id)) &&
+                        filteredLocations.filter(
+                          (l) => !claimedLocationIds.includes(l.id),
+                        ).length > 0
+                      }
+                      onCheckedChange={() => toggleAllFilteredLocations()}
+                      className="data-[state=checked]:border-indigo-600 data-[state=checked]:bg-indigo-600"
                     />
-                  )}
-                  <div style={{ flex: 1, fontSize: "13px", fontWeight: 600 }}>
-                    {option.label}
-                  </div>
-                  <div style={{ display: "flex", gap: "6px" }}>
-                    <button
-                      type="button"
-                      disabled={index === 0}
-                      onClick={() =>
-                        updateCurrentItems(
-                          moveItem(currentItemIds, index, index - 1),
-                        )
-                      }
-                      style={{
-                        ...buttonBaseStyles,
-                        padding: "4px 6px",
-                        cursor: index === 0 ? "not-allowed" : "pointer",
-                      }}
-                    >
-                      ^
-                    </button>
-                    <button
-                      type="button"
-                      disabled={index === selectedOptions.length - 1}
-                      onClick={() =>
-                        updateCurrentItems(
-                          moveItem(currentItemIds, index, index + 1),
-                        )
-                      }
-                      style={{
-                        ...buttonBaseStyles,
-                        padding: "4px 6px",
-                        cursor:
-                          index === selectedOptions.length - 1
-                            ? "not-allowed"
-                            : "pointer",
-                      }}
-                    >
-                      v
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        updateCurrentItems(
-                          currentItemIds.filter((id) => id !== option.id),
-                        )
-                      }
-                      style={{
-                        ...buttonBaseStyles,
-                        padding: "4px 6px",
-                      }}
-                    >
-                      x
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+                    <span className="text-sm text-gray-700">
+                      All available ({filteredLocations.length})
+                    </span>
+                  </label>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          <div
-            style={{
-              fontSize: "12px",
-              fontWeight: 600,
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              color: "var(--puck-color-grey-05)",
-            }}
-          >
-            {loading ? "Loading..." : "Available options"}
-          </div>
-          {error && (
-            <div
-              style={{ fontSize: "13px", color: "var(--puck-color-red-05)" }}
-            >
-              {error}
-            </div>
-          )}
-          <div
-            style={{
-              border: "1px solid var(--puck-color-grey-10)",
-              borderRadius: "6px",
-              maxHeight: "320px",
-              overflowY: "auto",
-            }}
-          >
-            <div>
-              {filteredOptions.map((option) => {
-                const isSelected = currentItemIds.includes(option.id);
-                return (
-                  <div
-                    key={option.id}
-                    onClick={() => {
-                      if (field.selectionMode === "multiple") {
-                        toggleMultiSelection(option.id);
-                      } else {
-                        updateCurrentItems([option.id]);
-                      }
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.key !== "Enter" && event.key !== " ") return;
-                      event.preventDefault();
-                      if (field.selectionMode === "multiple") {
-                        toggleMultiSelection(option.id);
-                      } else {
-                        updateCurrentItems([option.id]);
-                      }
-                    }}
-                    role="button"
-                    tabIndex={0}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                      padding: "12px 14px",
-                      borderBottom: "1px solid var(--puck-color-grey-11)",
-                      background: isSelected
-                        ? "var(--puck-color-grey-12)"
-                        : "transparent",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {field.selectionMode === "multiple" ? (
-                      <div
-                        onClick={(event) => event.stopPropagation()}
-                        onKeyDown={(event) => event.stopPropagation()}
+                  {filteredLocations.map((location) => {
+                    const claimed = claimedLocationIds.includes(location.id);
+                    const checked = activeOverride.locationIds.includes(location.id);
+                    return (
+                      <label
+                        key={location.id}
+                        className={cn(
+                          "flex items-center gap-3 border-b border-gray-100 py-2.5",
+                          claimed
+                            ? "cursor-default opacity-50"
+                            : "cursor-pointer",
+                        )}
                       >
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => toggleMultiSelection(option.id)}
-                          style={{ width: "16px", height: "16px" }}
+                        <Checkbox
+                          checked={checked}
+                          disabled={claimed}
+                          onCheckedChange={() =>
+                            !claimed && toggleLocationInOverride(location.id)
+                          }
+                          className="data-[state=checked]:border-indigo-600 data-[state=checked]:bg-indigo-600"
                         />
-                      </div>
-                    ) : (
-                      <input
-                        type="radio"
-                        checked={isSelected}
-                        onChange={() => updateCurrentItems([option.id])}
-                        style={{ width: "16px", height: "16px" }}
-                      />
-                    )}
-                    {option.imageUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={option.imageUrl}
-                        alt={option.label}
-                        style={{
-                          width: "40px",
-                          height: "40px",
-                          borderRadius: "4px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    )}
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: "14px", fontWeight: 600 }}>
-                        {option.label}
-                      </div>
-                    </div>
-                    {isSelected && (
-                      <span
-                        style={{
-                          padding: "4px 8px",
-                          borderRadius: "999px",
-                          background: "var(--puck-color-grey-11)",
-                          fontSize: "12px",
-                          color: "var(--puck-color-grey-02)",
-                        }}
-                      >
-                        Selected
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-              {!loading && filteredOptions.length === 0 && (
-                <div
-                  style={{
-                    padding: "24px",
-                    fontSize: "13px",
-                    color: "var(--puck-color-grey-05)",
-                  }}
-                >
-                  No matching {field.entityLabel.toLowerCase()}.
+                        <span className="flex-1 text-sm text-gray-800">
+                          {location.name ?? "Unnamed location"}
+                        </span>
+                        {claimed && (
+                          <span className="text-xs text-amber-600">
+                            in another override
+                          </span>
+                        )}
+                        <span className="text-xs text-gray-400">
+                          {location.address?.city
+                            ? `${location.address.city}, ${location.address.region ?? ""}`
+                            : ""}
+                        </span>
+                      </label>
+                    );
+                  })}
                 </div>
               )}
             </div>
+          )}
+
+        {/* ================================================================ */}
+        {/*  Main two-column area                                            */}
+        {/* ================================================================ */}
+        <div className="flex min-h-0 flex-1 overflow-hidden">
+          {/* -------- Left: Selected column -------- */}
+          {field.selectionMode === "multiple" && (
+            <div className="flex w-[240px] shrink-0 flex-col border-r border-gray-200">
+              {/* Selected header */}
+              <div className="flex items-center gap-2 px-4 py-3">
+                <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Selected
+                </span>
+                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-500 px-1.5 text-xs font-semibold text-white">
+                  {currentItemIds.length}
+                </span>
+              </div>
+
+              {/* Sortable list */}
+              <ScrollArea className="flex-1 px-3 pb-3">
+                {selectedOptions.length === 0 ? (
+                  <div className="px-2 py-8 text-center text-xs text-gray-400">
+                    No items selected
+                  </div>
+                ) : (
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    modifiers={[restrictToVerticalAxis]}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={currentItemIds}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div className="flex flex-col gap-1.5">
+                        {selectedOptions.map((option) => (
+                          <SortableSelectedItem
+                            key={option.id}
+                            option={option}
+                            onRemove={() =>
+                              updateCurrentItems(
+                                currentItemIds.filter((id) => id !== option.id),
+                              )
+                            }
+                          />
+                        ))}
+                      </div>
+                    </SortableContext>
+                  </DndContext>
+                )}
+              </ScrollArea>
+            </div>
+          )}
+
+          {/* -------- Right: Product browser -------- */}
+          <div className="flex min-w-0 flex-1 flex-col">
+            {/* Search & filter bar */}
+            <div className="flex items-center gap-2 border-b border-gray-200 px-4 py-3">
+              <div className="relative flex-1">
+                <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input
+                  placeholder={`Search ${field.entityLabel.toLowerCase()}...`}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="h-9 pl-8 text-sm"
+                />
+              </div>
+              {categories.length > 0 && (
+                <select
+                  value={categoryFilter ?? ""}
+                  onChange={(e) =>
+                    setCategoryFilter(e.target.value || null)
+                  }
+                  className="h-9 rounded-md border border-input bg-white px-3 text-sm text-gray-700 shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="">All</option>
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <Button variant="outline" size="sm" className="shrink-0 gap-1">
+                <Plus className="h-3.5 w-3.5" />
+                New
+              </Button>
+            </div>
+
+            {/* Error */}
+            {error && (
+              <div className="bg-red-50 px-4 py-2 text-sm text-red-600">
+                {error}
+              </div>
+            )}
+
+            {/* Product list */}
+            <ScrollArea className="flex-1">
+              <div className="divide-y divide-gray-100">
+                {loading && (
+                  <div className="px-4 py-12 text-center text-sm text-gray-400">
+                    Loading...
+                  </div>
+                )}
+
+                {!loading &&
+                  filteredOptions.map((option) => {
+                    const isSelected = currentItemIds.includes(option.id);
+                    return (
+                      <div
+                        key={option.id}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => {
+                          if (field.selectionMode === "multiple") {
+                            toggleMultiSelection(option.id);
+                          } else {
+                            updateCurrentItems([option.id]);
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key !== "Enter" && e.key !== " ") return;
+                          e.preventDefault();
+                          if (field.selectionMode === "multiple") {
+                            toggleMultiSelection(option.id);
+                          } else {
+                            updateCurrentItems([option.id]);
+                          }
+                        }}
+                        className={cn(
+                          "flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-50",
+                          isSelected && "bg-indigo-50/60",
+                        )}
+                      >
+                        {/* Checkbox / Radio */}
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          onKeyDown={(e) => e.stopPropagation()}
+                        >
+                          {field.selectionMode === "multiple" ? (
+                            <Checkbox
+                              checked={isSelected}
+                              onCheckedChange={() =>
+                                toggleMultiSelection(option.id)
+                              }
+                              className="data-[state=checked]:border-indigo-600 data-[state=checked]:bg-indigo-600"
+                            />
+                          ) : (
+                            <input
+                              type="radio"
+                              checked={isSelected}
+                              onChange={() => updateCurrentItems([option.id])}
+                              className="h-4 w-4 accent-indigo-600"
+                            />
+                          )}
+                        </div>
+
+                        {/* Image */}
+                        {option.imageUrl && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={option.imageUrl}
+                            alt={option.label}
+                            className="h-10 w-10 shrink-0 rounded object-cover"
+                          />
+                        )}
+
+                        {/* Name & description */}
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm font-semibold text-gray-900">
+                            {option.label}
+                          </div>
+                          {option.description && (
+                            <div className="truncate text-xs text-gray-500">
+                              {option.description}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Category badge */}
+                        {option.category && (
+                          <Badge
+                            variant="secondary"
+                            className="shrink-0 bg-gray-100 text-xs font-medium text-gray-600"
+                          >
+                            {option.category}
+                          </Badge>
+                        )}
+
+                        {/* Price */}
+                        {option.price != null && (
+                          <span className="shrink-0 text-sm font-medium text-gray-700">
+                            ${option.price.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                {!loading && filteredOptions.length === 0 && (
+                  <div className="px-4 py-12 text-center text-sm text-gray-400">
+                    No matching {field.entityLabel.toLowerCase()}.
+                  </div>
+                )}
+              </div>
+
+              {/* Item count */}
+              {!loading && (
+                <div className="border-t border-gray-100 px-4 py-2 text-xs text-gray-400">
+                  {options.length} {field.entityLabel.toLowerCase()}
+                </div>
+              )}
+            </ScrollArea>
           </div>
         </div>
 
-        <DialogFooter>
-          <div
-            style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}
-          >
-            <button
-              type="button"
+        {/* -------- Footer -------- */}
+        <div className="flex items-center justify-between border-t border-gray-200 px-6 py-3">
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            {mode === "synced" ? (
+              <RefreshCw className="h-4 w-4" />
+            ) : (
+              <SlidersHorizontal className="h-4 w-4" />
+            )}
+            {mode === "perLocation" && activeOverride && !activeOverride.isDefault ? (
+              <span>
+                Editing:{" "}
+                <span className="font-semibold text-gray-800">
+                  {activeOverride.label}
+                </span>{" "}
+                &middot; {footerStatus}
+              </span>
+            ) : (
+              <span>{footerStatus}</span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
               onClick={() => onOpenChange(false)}
-              style={buttonBaseStyles}
             >
               Cancel
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
               onClick={handleSave}
               disabled={saving || loading}
-              style={{
-                ...buttonBaseStyles,
-                background: "var(--puck-color-blue-06)",
-                color: "white",
-                cursor: saving || loading ? "not-allowed" : "pointer",
-                opacity: saving || loading ? 0.7 : 1,
-              }}
+              className="bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
             >
               {saving ? "Saving..." : "Save"}
-            </button>
+            </Button>
           </div>
-        </DialogFooter>
+        </div>
       </DialogContent>
 
+      {/* -------- Confirm dialog -------- */}
       {confirmState && (
         <ConfirmDialog
           open

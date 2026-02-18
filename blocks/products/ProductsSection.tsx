@@ -168,6 +168,9 @@ export const ProductsSectionConfig: ComponentConfig<ProductsSectionProps> = {
         id: String(item.id ?? item._id),
         label: String(item.name ?? "Untitled product"),
         imageUrl: item.image ? String(item.image) : undefined,
+        description: item.description ? String(item.description) : undefined,
+        category: item.category ? String(item.category) : undefined,
+        price: typeof item.price === "number" ? item.price : undefined,
         raw: item,
       }),
       render: (params) => (

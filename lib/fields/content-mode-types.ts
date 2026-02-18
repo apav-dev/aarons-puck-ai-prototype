@@ -6,6 +6,9 @@ export type ContentOption = {
   id: string;
   label: string;
   imageUrl?: string;
+  description?: string;
+  category?: string;
+  price?: number;
   raw?: Record<string, unknown>;
 };
 
